@@ -21,7 +21,7 @@ function AppWithTheme() {
                 algorithm: currentTheme === 'dark' ? darkAlgorithm : defaultAlgorithm,
                 token: {
                     // Seed Token，影响范围大
-                    colorPrimary: '#10b981',
+                    colorPrimary: '#058e62',
                     borderRadius: 8,
                 },
             }}

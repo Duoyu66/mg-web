@@ -6,7 +6,7 @@ const LayoutPage = () => {
     const location = useLocation();
     const {toggleTheme, theme: currentTheme} = useTheme();
     return (
-        <div className=" w-[100vw] min-h-[100vh] dark:bg-gray-900 transition-colors duration-300 ">
+        <div className=" w-[100vw] min-h-[100vh] dark:bg-gray-900 transition-colors duration-300 flex flex-col justify-start items-center ">
             <div className="w-[100%] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1)] sticky top-0 left-0 h-[60px]  flex justify-center items-center bg-white dark:bg-gray-800 transition-colors duration-300 z-50">
                 <ul className="flex [&_li]:mr-4">
                     <li>
@@ -58,7 +58,7 @@ const LayoutPage = () => {
                     {currentTheme === 'dark' ? '切到亮' : '切到暗'}
                 </Button>
             </div>
-            <div className="w-full max-w-full">
+            <div className="max-w-full border w-[80%] max-[1200px] pt-2">
                 <Outlet />
             </div>
         </div>
