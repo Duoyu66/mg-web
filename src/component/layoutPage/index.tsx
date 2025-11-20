@@ -58,7 +58,7 @@ const LayoutPage = () => {
                     {currentTheme === 'dark' ? '切到亮' : '切到暗'}
                 </Button>
             </div>
-            <div className="max-w-full border w-[80%] max-[1200px] pt-2">
+            <div className=" border w-[100%] max-[1200px] pt-2">
                 <Outlet />
             </div>
         </div>
