@@ -12,7 +12,9 @@
     --color-primary-800: #1e40af;
     --color-primary-900: #1e3a8a;
 }
-
+#root {
+    width: 100%;
+}
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -78,4 +80,25 @@ th, td {
   button {
     background-color: #f9f9f9;
   }
+}
+
+/* 路由过渡动画 */
+@keyframes routeEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-route-enter {
+  animation: routeEnter 0.3s ease-in-out;
+  will-change: opacity, transform;
+  /* 使用 GPU 加速，避免布局重排 */
+  transform-origin: top center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
