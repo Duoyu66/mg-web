@@ -1,7 +1,7 @@
 import {Outlet, useLocation, useNavigate} from 'react-router-dom';
 import {Button} from "antd";
 import {useTheme} from "@/component/context/useTheme";
-import {useLayoutEffect, useRef, useState} from 'react';
+import {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import type {MenuItemType} from "@/component/layoutPage/type";
 
 const LayoutPage = () => {
@@ -10,6 +10,15 @@ const LayoutPage = () => {
     const [isAnimating, setIsAnimating] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate()
+
+    // 确保 dark 类与主题状态同步
+    useEffect(() => {
+        if (currentTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }, [currentTheme]);
     useLayoutEffect(() => {
         // 确保布局计算完成后再开始动画
         setIsAnimating(false);
@@ -62,60 +71,10 @@ const LayoutPage = () => {
                                 }`} key={item.id} onClick={() => navigate(item.path)}>{item.title}
 
                                 {location.pathname.includes(item.path) && <span
-                                    className="absolute bottom-[1px] left-[50%] translate-x-[-50%] rounded-2xl opacity-80 bg-primary-500 inline-block w-[90%] h-[8px]"></span>}
+                                    className="absolute bottom-[1px] left-[50%] translate-x-[-50%] rounded-2xl opacity-80 bg-primary-500 dark:bg-red-500 inline-block w-[90%] h-[8px]"></span>}
                             </li>
                         })
                     }
-                    {/*<li>*/}
-                    {/*    <Link*/}
-                    {/*        to="/front/home"*/}
-                    {/*        className={`px-4 py-2 rounded font-bold hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${*/}
-                    {/*            location.pathname.includes('/front/home') ? 'text-primary-500 ' : ''*/}
-                    {/*        }`}*/}
-                    {/*    >*/}
-                    {/*        主页*/}
-                    {/*    </Link>*/}
-                    {/*</li>*/}
-                    {/*<li>*/}
-                    {/*    <Link*/}
-                    {/*        to="/front/algorithm"*/}
-                    {/*        className={`px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${*/}
-                    {/*            location.pathname.includes('/front/algorithm') ? 'text-primary-500 ' : ''*/}
-                    {/*        }`}*/}
-                    {/*    >*/}
-                    {/*        算法*/}
-                    {/*    </Link>*/}
-                    {/*</li>*/}
-                    {/*<li>*/}
-                    {/*    <Link*/}
-                    {/*        to="/front/questionBank"*/}
-                    {/*        className={`px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${*/}
-                    {/*            location.pathname.includes('/front/questionBank') ? 'text-primary-500 ' : ''*/}
-                    {/*        }`}*/}
-                    {/*    >*/}
-                    {/*        题库*/}
-                    {/*    </Link>*/}
-                    {/*</li>*/}
-                    {/*<li>*/}
-                    {/*    <Link*/}
-                    {/*        to="/front/message"*/}
-                    {/*        className={`px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${*/}
-                    {/*            location.pathname.includes('/front/message') ? 'text-primary-500 ' : ''*/}
-                    {/*        }`}*/}
-                    {/*    >*/}
-                    {/*        消息*/}
-                    {/*    </Link>*/}
-                    {/*</li>*/}
-                    {/*<li>*/}
-                    {/*    <Link*/}
-                    {/*        to="/front/nav"*/}
-                    {/*        className={`px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${*/}
-                    {/*            location.pathname.includes('/front/nav') ? 'text-primary-500 ' : ''*/}
-                    {/*        }`}*/}
-                    {/*    >*/}
-                    {/*        快捷导航*/}
-                    {/*    </Link>*/}
-                    {/*</li>*/}
                 </ul>
                 <Button onClick={toggleTheme} className="">
                     {currentTheme === 'dark' ? '切到亮' : '切到暗'}

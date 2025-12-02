@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useLayoutEffect, useState } from 'react';
 
 export interface ThemeContextType {
     theme: 'light' | 'dark';
@@ -8,9 +8,23 @@ export interface ThemeContextType {
 export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-    const [theme, setTheme] = useState<'light' | 'dark'>('light');
+    const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+        // 初始化时从 localStorage 读取，避免闪烁
+        if (typeof window !== 'undefined') {
+            const savedTheme = (localStorage.getItem('theme') || 'light') as 'light' | 'dark';
+            // 立即设置 dark 类，在渲染前
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            return savedTheme;
+        }
+        return 'light';
+    });
 
-    useEffect(() => {
+    useLayoutEffect(() => {
+        // 确保在渲染前设置 dark 类
         const savedTheme = (localStorage.getItem('theme') || 'light') as 'light' | 'dark';
         setTheme(savedTheme);
         // 为 Tailwind CSS 添加/移除 dark 类
@@ -24,16 +38,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const toggleTheme = () => {
-        const newTheme = theme === 'light' ? 'dark' : 'light';
-        setTheme(newTheme);
-        localStorage.setItem('theme', newTheme);
-        // 切换 Tailwind CSS 的 dark 类
-        if (newTheme === 'dark') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-        document.documentElement.setAttribute('data-theme', newTheme);
+        setTheme((prevTheme) => {
+            const newTheme = prevTheme === 'light' ? 'dark' : 'light';
+            localStorage.setItem('theme', newTheme);
+            // 切换 Tailwind CSS 的 dark 类
+            if (newTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            document.documentElement.setAttribute('data-theme', newTheme);
+            return newTheme;
+        });
     };
 
     return (
