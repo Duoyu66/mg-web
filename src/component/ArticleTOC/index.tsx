@@ -1,5 +1,6 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Affix} from "antd";
+import {ArrowLeftFromLine, ArrowRightFromLine, BookmarkMinus} from "lucide-react";
 
 export interface TOCItem {
     id: string;
@@ -34,12 +35,13 @@ export interface ArticleTOCProps {
 const ArticleTOC: React.FC<ArticleTOCProps> = ({
                                                    content,
                                                    showTOC = true,
-                                                   tocTitle = '目录',
+                                                   tocTitle = '文章目录',
                                                    className = '',
                                                }) => {
     const contentRef = useRef<HTMLDivElement>(null);
     const [tocItems, setTocItems] = useState<TOCItem[]>([]);
     const [activeId, setActiveId] = useState<string>('');
+    const [tocCollapsed, setTocCollapsed] = useState(false);
 
     // 清理 Quill 样式类，转换为正常样式
     const cleanedContent = useMemo(() => {
@@ -116,7 +118,7 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
         setTocItems(items);
     }, [cleanedContent]);
 
-    // 监听滚动，高亮当前标题
+    // 监听滚动，高亮当前标题（与点击滚动保持一致的偏移）
     useEffect(() => {
         if (!contentRef.current || tocItems.length === 0) return;
 
@@ -124,14 +126,18 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
             const headings = contentRef.current?.querySelectorAll('h1, h2, h3, h4, h5, h6');
             if (!headings || headings.length === 0) return;
 
+            const scrollPosition = window.scrollY + 90; // 当前滚动位置 + 轻微偏移
             let currentId = '';
 
-            // 从下往上查找当前可见的标题
-            for (let i = headings.length - 1; i >= 0; i--) {
+            // 从上往下查找离当前视口最近的标题
+            for (let i = 0; i < headings.length; i++) {
                 const heading = headings[i] as HTMLElement;
                 const rect = heading.getBoundingClientRect();
-                if (rect.top <= 100) {
+                const headingTop = rect.top + window.scrollY;
+
+                if (headingTop <= scrollPosition) {
                     currentId = heading.id;
+                } else {
                     break;
                 }
             }
@@ -153,11 +159,15 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
     const handleTOCClick = (id: string) => {
         const element = document.getElementById(id);
         if (element) {
-            const offsetTop = element.offsetTop - 80; // 考虑固定头部的高度
+            const rect = element.getBoundingClientRect();
+            const absoluteTop = rect.top + window.scrollY;
+            const offsetTop = absoluteTop - 80; // 考虑固定头部的高度
+
             window.scrollTo({
                 top: offsetTop,
                 behavior: 'smooth',
             });
+
             setActiveId(id);
         }
     };
@@ -173,7 +183,7 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
                     onClick={() => handleTOCClick(item.id)}
                     className={`cursor-pointer py-1 px-2 rounded transition-colors duration-200 ${
                         isActive
-                            ? 'bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 font-medium'
+                            ? 'bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 font-bold'
                             : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                     }`}
                     style={{paddingLeft}}
@@ -181,7 +191,7 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
                     <span className="text-sm">{item.title}</span>
                 </div>
                 {item.children && item.children.length > 0 && (
-                    <div className="ml-2">
+                    <div className="ml-2 hover:text-primary-100 dark:text-primary-600">
                         {item.children.map((child, childIndex) => renderTOCItem(child, childIndex))}
                     </div>
                 )}
@@ -191,31 +201,6 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
 
     return (
         <div className={`flex gap-6 ${className}`}>
-            {/* 目录 */}
-            {showTOC && tocItems.length > 0 && (
-                <div className="w-64 flex-shrink-0">
-                    <Affix offsetTop={80}>
-                        <div
-                            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border border-gray-200 dark:border-gray-700"
-                            style={{
-                                maxHeight: 'calc(100vh - 100px)',
-                            }}
-                        >
-                            <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">
-                                {tocTitle}
-                            </h3>
-                            <div 
-                                className="space-y-1 overflow-y-auto overscroll-contain"
-                                style={{maxHeight: 'calc(100vh - 200px)'}}
-                            >
-                                {tocItems.map((item, index) => renderTOCItem(item, index))}
-                            </div>
-                        </div>
-                    </Affix>
-                </div>
-            )}
-
-
             {/* 文章内容 */}
             <div className="flex-1 min-w-0">
                 <div
@@ -240,6 +225,54 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
                     dangerouslySetInnerHTML={{__html: cleanedContent}}
                 />
             </div>
+            {/* 目录：展开时占据左侧宽度，隐藏时释放宽度 */}
+            {showTOC && tocItems.length > 0 && !tocCollapsed && (
+                <div className="w-64 flex-shrink-0">
+                    <Affix offsetTop={80}>
+                        <div
+                            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border border-gray-200 dark:border-gray-700"
+                            style={{
+                                maxHeight: 'calc(100vh - 100px)',
+                            }}
+                        >
+                            <h3 className="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100 flex justify-between items-center">
+                                <div className="flex items-center">
+                                    <BookmarkMinus size={20} className="mr-1"/>
+                                    {tocTitle}
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setTocCollapsed(true)}
+                                    className="ml-2 inline-flex items-center justify-center w-7 h-7 rounded-full border border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
+                                >
+                                    <ArrowLeftFromLine size={16}/>
+                                </button>
+                            </h3>
+                            <div
+                                className="space-y-1 overflow-y-auto overscroll-contain"
+                                style={{maxHeight: 'calc(100vh - 200px)'}}
+                            >
+                                {tocItems.map((item, index) => renderTOCItem(item, index))}
+                            </div>
+                        </div>
+                    </Affix>
+                </div>
+            )}
+
+            {/* 折叠状态下的浮动按钮：不占据左侧宽度，只用于重新展开目录 */}
+            {showTOC && tocItems.length > 0 && tocCollapsed && (
+                <Affix offsetTop={80}>
+                    <button
+                        type="button"
+                        onClick={() => setTocCollapsed(false)}
+                        className="bg-white dark:bg-gray-800 rounded-full shadow-sm border border-gray-200 dark:border-gray-700 w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700"
+                        title="展开目录"
+                    >
+                        <ArrowRightFromLine size={16}/>
+                    </button>
+                </Affix>
+            )}
+
         </div>
     );
 };

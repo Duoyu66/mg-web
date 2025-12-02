@@ -2,7 +2,7 @@ import ArticleTOC from '@/component/ArticleTOC/index'
 
 function TestBox() {
     const articleContent = `<h3 class="ql-align-justify">玩法介绍</h3>
-<p class="ql-align-justify"><span class="text_CgLK7" data-text="true">游戏需要2名玩家一同进行冒险，玩家在游戏中将扮演相互看不顺眼、被魔咒变成了玩偶的科迪和小梅夫妇。他们一起被困在一个奇幻世界里，每个角落都隐藏着意想不到的东西，他们不得不一起克服挑战，同时挽救他们破裂的关系。</span></p>
+<p class="ql-align-justify"><span class="text_CgLK7" data-text="true">游戏需要2名玩家一同进行。</span></p>
 <h3 class="ql-align-justify">章节攻略</h3>
 <p>这款游戏需要两名玩家共同参与冒险。玩家将扮演一对由于矛盾而彼此疏远、被魔咒变成玩偶的夫妻&mdash;&mdash;科迪和小梅。他们被困在一个充满奇幻色彩的世界中，每个角落都隐藏着意想不到的挑战。他们不仅要携手度过重重难关，还要在冒险过程中修复破裂的婚姻关系。</p>
 <h4>1. 棚屋</h4>
@@ -88,11 +88,6 @@ function TestBox() {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            {/*<ArticleTOC*/}
-            {/*    content={articleContent}*/}
-            {/*    showTOC={true}*/}
-            {/*    tocTitle="目录"*/}
-            {/*/>*/}
             <ArticleTOC content={articleContent}/>
         </div>
     );
