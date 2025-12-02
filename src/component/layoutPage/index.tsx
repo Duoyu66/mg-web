@@ -57,11 +57,17 @@ const LayoutPage = () => {
         },
 
     ]
+    const goIndex = () => {
+        navigate('/')
+    }
     return (
         <div
             className="w-full min-h-[100vh] dark:bg-gray-900 transition-colors duration-300 flex flex-col justify-start items-center overflow-x-hidden ">
+            <span className="cursor-pointer border border-gray-300 dark:border-gray-600 px-2 py-1 rounded"
+                  onClick={goIndex}>木瓜一块八</span>
             <div
                 className="w-[100%] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1)]  fixed top-0 left-0 h-[60px]  flex justify-center items-center bg-white dark:bg-gray-800 transition-colors duration-300 z-50">
+                <span className="border" onClick={goIndex}>木瓜一块八</span>
                 <ul className="flex [&_li]:mr-4">
                     {
                         menuData.map((item: MenuItemType) => {
