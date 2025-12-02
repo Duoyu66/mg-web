@@ -4,13 +4,13 @@ import Algorithm from "@/pages/front-end/algorithm";
 import QuestionBank from "@/pages/front-end/questionBank";
 import Message from "@/pages/front-end/message";
 import Nav from "@/pages/front-end/nav";
+import Index from "@/pages/front-end/index";
 
 const routes = [
     {
         path: "/",
-        redirect: "/front/home",
-        title: "Home",
-        component: Home
+        title: "官网",
+        component: Index
     },
     {
         path: "/front",

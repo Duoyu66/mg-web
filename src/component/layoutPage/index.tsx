@@ -66,12 +66,12 @@ const LayoutPage = () => {
                     {
                         menuData.map((item: MenuItemType) => {
                             return <li
-                                className={`relative  mx-2  cursor-pointer  rounded-3xl  hover:ease-linear  dark:hover:bg-gray-700  ${
+                                className={`relative  mx-2  cursor-pointer  rounded-3xl  hover:ease-linear   ${
                                     location.pathname.includes(item.path) ? ' font-bold' : ''
                                 }`} key={item.id} onClick={() => navigate(item.path)}>{item.title}
 
                                 {location.pathname.includes(item.path) && <span
-                                    className="absolute bottom-[1px] left-[50%] translate-x-[-50%] rounded-2xl opacity-80 bg-primary-500 dark:bg-red-500 inline-block w-[90%] h-[8px]"></span>}
+                                    className="absolute bottom-[1px] left-[50%] translate-x-[-50%] rounded-2xl opacity-80 bg-primary-500 dark:bg-green-500 inline-block w-[90%] h-[8px]"></span>}
                             </li>
                         })
                     }

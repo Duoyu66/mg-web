@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* 在 Tailwind CSS v4 中明确配置暗色模式 */
+@variant dark (&:is(.dark *));
+
 @theme {
     --color-primary-50: #eff6ff;
     --color-primary-100: #dbeafe;
@@ -100,34 +103,4 @@
     transform-origin: top center;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-}
-
-/* 手动添加暗色模式样式，确保关键样式正常工作 */
-/* 如果 Tailwind 没有生成这些样式，这些规则将作为备用 */
-html.dark [class*="dark:bg-gray-800"] {
-    background-color: rgb(31 41 55) !important;
-}
-
-html.dark [class*="dark:bg-gray-900"] {
-    background-color: rgb(17 24 39) !important;
-}
-
-html.dark [class*="dark:bg-red-500"] {
-    background-color: rgb(239 68 68) !important;
-}
-
-html.dark [class*="dark:hover:bg-gray-700"]:hover {
-    background-color: rgb(55 65 81) !important;
-}
-
-html.dark [class*="dark:text-white"] {
-    color: rgb(255 255 255) !important;
-}
-
-html.dark [class*="dark:border-gray-600"] {
-    border-color: rgb(75 85 99) !important;
-}
-
-html.dark [class*="dark:bg-primary-700"] {
-    background-color: rgb(29 78 216) !important;
 }
