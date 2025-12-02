@@ -9,6 +9,7 @@ import Index from "@/pages/front-end/index";
 const routes = [
     {
         path: "/",
+        redirect: "/front/index",
         title: "官网",
         component: Index
     },
@@ -18,29 +19,58 @@ const routes = [
         title: '前端',
         children: [
             {
+                title: '首页',
+                path: 'index',
+                component: Index,
+                meta: {
+                    age: 1,
+                    name: "张三"
+                }
+            },
+            {
                 title: '主页',
                 path: "home",
-                component: Home
+                component: Home,
+                meta: {
+                    age: 1,
+                    name: "张三"
+                }
             },
             {
                 title: '算法',
                 path: "algorithm",
-                component: Algorithm
+                component: Algorithm,
+                meta: {
+                    age: 1,
+                    name: "张三"
+                }
             },
             {
                 title: '题库',
                 path: "questionBank",
-                component: QuestionBank
+                component: QuestionBank,
+                meta: {
+                    age: 1,
+                    name: "张三"
+                }
             },
             {
                 title: '消息',
                 path: "message",
-                component: Message
+                component: Message,
+                meta: {
+                    age: 1,
+                    name: "张三"
+                }
             },
             {
                 title: '快捷导航',
                 path: "nav",
-                component: Nav
+                component: Nav,
+                meta: {
+                    age: 1,
+                    name: "张三"
+                }
             },
         ]
     }
