@@ -30,6 +30,18 @@ const LayoutPage = () => {
         return () => cancelAnimationFrame(timer);
     }, [location.pathname]);
 
+    // 在需要 Affix 的页面（如 /front/nav）禁用路由过渡动画的 transform，避免影响 Affix 的定位
+    const isNavPage = location.pathname.startsWith('/front/nav');
+    const contentClassName = isNavPage
+        ? ''
+        : (isAnimating ? 'animate-route-enter' : 'opacity-0 scale-[0.98]');
+    const contentStyle = isNavPage
+        ? undefined
+        : {
+            willChange: 'opacity, transform',
+            transformOrigin: 'top center',
+        } as const;
+
     return (
         <div
             className="w-full min-h-[100vh] dark:bg-gray-900 transition-colors duration-300 flex flex-col justify-start items-center overflow-x-hidden">
@@ -38,11 +50,8 @@ const LayoutPage = () => {
                  ref={containerRef}>
                 <div
                     key={location.pathname}
-                    className={isAnimating ? 'animate-route-enter' : 'opacity-0 scale-[0.98]'}
-                    style={{
-                        willChange: 'opacity, transform',
-                        transformOrigin: 'top center',
-                    }}
+                    className={contentClassName}
+                    style={contentStyle}
                 >
                     <Outlet/>
                 </div>

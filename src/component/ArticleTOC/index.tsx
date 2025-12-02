@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {Affix} from "antd";
+import {createPortal} from 'react-dom';
 import {ArrowLeftFromLine, ArrowRightFromLine, BookmarkMinus} from "lucide-react";
 
 export interface TOCItem {
@@ -228,49 +228,53 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
             {/* 目录：展开时占据左侧宽度，隐藏时释放宽度 */}
             {showTOC && tocItems.length > 0 && !tocCollapsed && (
                 <div className="w-64 flex-shrink-0">
-                    <Affix offsetTop={80}>
-                        <div
-                            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border border-gray-200 dark:border-gray-700"
-                            style={{
-                                maxHeight: 'calc(100vh - 100px)',
-                            }}
-                        >
-                            <h3 className="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100 flex justify-between items-center">
-                                <div className="flex items-center">
-                                    <BookmarkMinus size={20} className="mr-1"/>
-                                    {tocTitle}
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={() => setTocCollapsed(true)}
-                                    className="ml-2 inline-flex items-center justify-center w-7 h-7 rounded-full border border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
-                                >
-                                    <ArrowLeftFromLine size={16}/>
-                                </button>
-                            </h3>
-                            <div
-                                className="space-y-1 overflow-y-auto overscroll-contain"
-                                style={{maxHeight: 'calc(100vh - 200px)'}}
-                            >
-                                {tocItems.map((item, index) => renderTOCItem(item, index))}
-                            </div>
-                        </div>
-                    </Affix>
+                    {/* 占位，保持布局 */}
                 </div>
             )}
 
-            {/* 折叠状态下的浮动按钮：不占据左侧宽度，只用于重新展开目录 */}
-            {showTOC && tocItems.length > 0 && tocCollapsed && (
-                <Affix offsetTop={80}>
-                    <button
-                        type="button"
-                        onClick={() => setTocCollapsed(false)}
-                        className="bg-white dark:bg-gray-800 rounded-full shadow-sm border border-gray-200 dark:border-gray-700 w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700"
-                        title="展开目录"
+            {/* 使用 Portal 将目录渲染到 body，完全脱离父元素的 transform 影响 */}
+            {showTOC && tocItems.length > 0 && createPortal(
+                !tocCollapsed ? (
+                    <div
+                        className="fixed top-20 left-10 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border border-gray-200 dark:border-gray-700 z-50"
+                        style={{
+                            maxHeight: 'calc(100vh - 100px)',
+                            width: '256px',
+                        }}
                     >
-                        <ArrowRightFromLine size={16}/>
-                    </button>
-                </Affix>
+                        <h3 className="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100 flex justify-between items-center">
+                            <div className="flex items-center">
+                                <BookmarkMinus size={20} className="mr-1"/>
+                                {tocTitle}
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setTocCollapsed(true)}
+                                className="ml-2 inline-flex items-center justify-center w-7 h-7 rounded-full border border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
+                            >
+                                <ArrowLeftFromLine size={16}/>
+                            </button>
+                        </h3>
+                        <div
+                            className="space-y-1 overflow-y-auto overscroll-contain"
+                            style={{maxHeight: 'calc(100vh - 200px)'}}
+                        >
+                            {tocItems.map((item, index) => renderTOCItem(item, index))}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="fixed top-20 left-10 z-50">
+                        <button
+                            type="button"
+                            onClick={() => setTocCollapsed(false)}
+                            className="bg-white dark:bg-gray-800 rounded-full shadow-sm border border-gray-200 dark:border-gray-700 w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700"
+                            title="展开目录"
+                        >
+                            <ArrowRightFromLine size={16}/>
+                        </button>
+                    </div>
+                ),
+                document.body
             )}
 
         </div>
