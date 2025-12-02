@@ -42,6 +42,8 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
     const [tocItems, setTocItems] = useState<TOCItem[]>([]);
     const [activeId, setActiveId] = useState<string>('');
     const [tocCollapsed, setTocCollapsed] = useState(false);
+    const isScrollingRef = useRef<boolean>(false);
+    const targetIdRef = useRef<string>('');
 
     // 清理 Quill 样式类，转换为正常样式
     const cleanedContent = useMemo(() => {
@@ -123,6 +125,26 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
         if (!contentRef.current || tocItems.length === 0) return;
 
         const handleScroll = () => {
+            // 如果正在手动滚动（点击目录项触发），检查是否到达目标位置
+            if (isScrollingRef.current && targetIdRef.current) {
+                const targetElement = document.getElementById(targetIdRef.current);
+                if (targetElement) {
+                    const rect = targetElement.getBoundingClientRect();
+                    const targetTop = rect.top + window.scrollY;
+                    const currentScroll = window.scrollY + 80; // 考虑固定头部
+                    const distance = Math.abs(targetTop - currentScroll);
+                    
+                    // 如果已经接近目标位置（误差小于 50px），认为滚动完成
+                    if (distance < 50) {
+                        isScrollingRef.current = false;
+                        targetIdRef.current = '';
+                    } else {
+                        // 还在滚动中，保持目标 ID 不变，不更新高亮
+                        return;
+                    }
+                }
+            }
+
             const headings = contentRef.current?.querySelectorAll('h1, h2, h3, h4, h5, h6');
             if (!headings || headings.length === 0) return;
 
@@ -178,6 +200,11 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
     const handleTOCClick = (id: string) => {
         const element = document.getElementById(id);
         if (element) {
+            // 立即设置目标 ID 和高亮，避免经过中间标题
+            setActiveId(id);
+            isScrollingRef.current = true;
+            targetIdRef.current = id;
+
             const rect = element.getBoundingClientRect();
             const absoluteTop = rect.top + window.scrollY;
             const offsetTop = absoluteTop - 80; // 考虑固定头部的高度
@@ -187,7 +214,11 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
                 behavior: 'smooth',
             });
 
-            setActiveId(id);
+            // 设置一个超时，确保即使检测失败也能恢复滚动监听
+            setTimeout(() => {
+                isScrollingRef.current = false;
+                targetIdRef.current = '';
+            }, 2000); // 2秒后自动恢复，防止卡住
         }
     };
 
