@@ -3,18 +3,86 @@
 /* 在 Tailwind CSS v4 中明确配置暗色模式 */
 @variant dark (&:is(.dark *));
 
+/*紫色系*/
 @theme {
-    --color-primary-50: #eff6ff;
-    --color-primary-100: #dbeafe;
-    --color-primary-200: #bfdbfe;
-    --color-primary-300: #93c5fd;
-    --color-primary-400: #60a5fa;
-    --color-primary-500: #3b82f6;
-    --color-primary-600: #2563eb;
-    --color-primary-700: #1d4ed8;
-    --color-primary-800: #1e40af;
-    --color-primary-900: #1e3a8a;
+    /* 主色调 - 紫色系 */
+    --color-primary-50: #f5f3ff;
+    --color-primary-100: #ede9fe;
+    --color-primary-200: #ddd6fe;
+    --color-primary-300: #c4b5fd;
+    --color-primary-400: #a78bfa;
+    --color-primary-500: #8b5cf6;
+    --color-primary-600: #7c3aed;
+    --color-primary-700: #6d28d9;
+    --color-primary-800: #5b21b6;
+    --color-primary-900: #4c1d95;
+    --color-primary-950: #2e1065;
+
+    /* 精准匹配 #722ed1 */
+    --color-primary-base: #722ed1;
+
+    /* 辅助色系 - 基于主色调生成的协调色 */
+    --color-secondary-50: #fdf4ff;
+    --color-secondary-100: #fae8ff;
+    --color-secondary-200: #f5d0fe;
+    --color-secondary-300: #f0abfc;
+    --color-secondary-400: #e879f9;
+    --color-secondary-500: #d946ef;
+    --color-secondary-600: #c026d3;
+    --color-secondary-700: #a21caf;
+    --color-secondary-800: #86198f;
+    --color-secondary-900: #701a75;
+
+    /* 中性色系 - 与紫色搭配和谐 */
+    --color-gray-50: #f9fafb;
+    --color-gray-100: #f3f4f6;
+    --color-gray-200: #e5e7eb;
+    --color-gray-300: #d1d5db;
+    --color-gray-400: #9ca3af;
+    --color-gray-500: #6b7280;
+    --color-gray-600: #4b5563;
+    --color-gray-700: #374151;
+    --color-gray-800: #1f2937;
+    --color-gray-900: #111827;
+
+    /* 功能色系 */
+    --color-success-500: #10b981;
+    --color-warning-500: #f59e0b;
+    --color-error-500: #ef4444;
+    --color-info-500: #3b82f6;
+
+    /* 扩展色系 - 如果需要更多色彩层次 */
+    --color-primary-light: #a78bfa;
+    --color-primary-dark: #5b21b6;
+    --color-primary-accent: #9333ea;
+
+    /* 透明度变体 */
+    --color-primary-500-10: rgba(123, 97, 255, 0.1);
+    --color-primary-500-20: rgba(123, 97, 255, 0.2);
+    --color-primary-500-50: rgba(123, 97, 255, 0.5);
+
+    /* 阴影效果 */
+    --shadow-primary: 0 4px 14px 0 rgba(123, 97, 255, 0.39);
+    --shadow-primary-lg: 0 10px 30px rgba(123, 97, 255, 0.25);
+
+    /* 渐变 */
+    --gradient-primary: linear-gradient(135deg, #7b61ff 0%, #8b5cf6 100%);
+    --gradient-primary-hover: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
 }
+
+/*蓝色系*/
+/*@theme {*/
+/*    --color-primary-50: #eff6ff;*/
+/*    --color-primary-100: #dbeafe;*/
+/*    --color-primary-200: #bfdbfe;*/
+/*    --color-primary-300: #93c5fd;*/
+/*    --color-primary-400: #60a5fa;*/
+/*    --color-primary-500: #3b82f6;*/
+/*    --color-primary-600: #2563eb;*/
+/*    --color-primary-700: #1d4ed8;*/
+/*    --color-primary-800: #1e40af;*/
+/*    --color-primary-900: #1e3a8a;*/
+/*}*/
 
 #root {
     width: 100%;
@@ -84,6 +152,18 @@
     }
 }
 
+/* 全局图标默认样式 */
+@layer base {
+    /* 为所有 lucide-react 图标设置默认颜色
+     * 使用 currentColor 继承父元素的文本颜色
+     * 这样图标会自动适配亮色/暗色模式
+     */
+    svg[data-lucide] {
+        color: currentColor;
+        stroke: currentColor;
+    }
+}
+
 /* 路由过渡动画 */
 @keyframes routeEnter {
     from {
@@ -103,4 +183,18 @@
     transform-origin: top center;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+}
+
+/* Ant Design Switch 图标垂直居中样式 */
+/* 只影响图标居中，不影响 Switch 尺寸 */
+.ant-switch-inner .ant-switch-inner-checked {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.ant-switch-inner .ant-switch-inner-unchecked {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
 }

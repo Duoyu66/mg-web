@@ -9,7 +9,6 @@ import Index from "@/pages/front-end/index";
 const routes = [
     {
         path: "/",
-        redirect: "/front/index",
         title: "官网",
         component: Index
     },

@@ -8,7 +8,7 @@ const Index = () => {
     }
     return (<div>
         我是门户
-        <Button onClick={goFrontHome}>前台首页</Button>
+        <Button onClick={goFrontHome}>立即学习</Button>
     </div>)
 }
 export default Index
