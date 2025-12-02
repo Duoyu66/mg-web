@@ -33,6 +33,10 @@ const Header = () => {
             id: '5',
             title: '快捷导航',
             path: '/front/nav',
+        }, {
+            id: '6',
+            title: '测试',
+            path: '/front/test',
         },
     ];
 
@@ -58,7 +62,7 @@ const Header = () => {
                                 {item.title}
                                 {location.pathname.includes(item.path) && (
                                     <span
-                                        className="absolute bottom-[1px] left-[50%] translate-x-[-50%] rounded-2xl opacity-80 bg-primary-500 dark:bg-green-500 inline-block w-[90%] h-[8px]"
+                                        className="absolute bottom-[1px] left-[50%] translate-x-[-50%] rounded-2xl opacity-85 bg-primary-500 dark:bg-green-500 inline-block w-[85%] h-[8px]"
                                     />
                                 )}
                             </li>
@@ -67,14 +71,6 @@ const Header = () => {
                 }
             </ul>
             <div className="flex gap-2 justify-end items-center ml-auto">
-                {/*<span onClick={toggleTheme}*/}
-                {/*      className="cursor-pointer flex justify-center items-center w-[24px] h-[24px] hover:text-primary-500 transition-colors duration-300 z-50">*/}
-                {/*    {currentTheme === 'dark' ? (*/}
-                {/*        <ICONS.SUN className={ICON_DEFAULT_COLOR}/>*/}
-                {/*    ) : (*/}
-                {/*        <ICONS.MOON className={ICON_DEFAULT_COLOR}/>*/}
-                {/*    )}*/}
-                {/*</span>*/}
                 <Switch
                     onClick={toggleTheme}
                     checkedChildren={

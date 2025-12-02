@@ -5,6 +5,7 @@ import QuestionBank from "@/pages/front-end/questionBank";
 import Message from "@/pages/front-end/message";
 import Nav from "@/pages/front-end/nav";
 import Index from "@/pages/front-end/index";
+import TestBox from "@/pages/front-end/test";
 
 const routes = [
     {
@@ -66,6 +67,15 @@ const routes = [
                 title: '快捷导航',
                 path: "nav",
                 component: Nav,
+                meta: {
+                    age: 1,
+                    name: "张三"
+                }
+            },
+            {
+                title: '测试',
+                path: "test",
+                component: TestBox,
                 meta: {
                     age: 1,
                     name: "张三"

@@ -1,4 +1,5 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {Affix} from "antd";
 
 export interface TOCItem {
     id: string;
@@ -192,24 +193,28 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
         <div className={`flex gap-6 ${className}`}>
             {/* 目录 */}
             {showTOC && tocItems.length > 0 && (
-                <aside className="fixed top-0 w-64 flex-shrink-0">
-                    <div
-                        className="fixed top-20 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border border-gray-200 dark:border-gray-700 z-10"
-                        style={{
-                            position: 'sticky',
-                            top: '80px',
-                            alignSelf: 'flex-start',
-                        }}
-                    >
-                        <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">
-                            {tocTitle}
-                        </h3>
-                        <div className="space-y-1 max-h-[calc(100vh-200px)] overflow-y-auto overscroll-contain">
-                            {tocItems.map((item, index) => renderTOCItem(item, index))}
+                <div className="w-64 flex-shrink-0">
+                    <Affix offsetTop={80}>
+                        <div
+                            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border border-gray-200 dark:border-gray-700"
+                            style={{
+                                maxHeight: 'calc(100vh - 100px)',
+                            }}
+                        >
+                            <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">
+                                {tocTitle}
+                            </h3>
+                            <div 
+                                className="space-y-1 overflow-y-auto overscroll-contain"
+                                style={{maxHeight: 'calc(100vh - 200px)'}}
+                            >
+                                {tocItems.map((item, index) => renderTOCItem(item, index))}
+                            </div>
                         </div>
-                    </div>
-                </aside>
+                    </Affix>
+                </div>
             )}
+
 
             {/* 文章内容 */}
             <div className="flex-1 min-w-0">
