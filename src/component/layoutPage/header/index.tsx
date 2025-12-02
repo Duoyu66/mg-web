@@ -1,5 +1,5 @@
 import {useLocation, useNavigate} from 'react-router-dom';
-import {Button, Divider, Switch} from "antd";
+import {Divider, Switch} from "antd";
 import {useTheme} from "@/component/context/useTheme";
 import type {MenuItemType} from "@/component/layoutPage/type";
 import {ICONS} from "@/constants/icons";
@@ -86,8 +86,8 @@ const Header = () => {
                     checked={currentTheme !== 'dark'}
                 />
                 <Divider orientation="vertical"/>
-                <Button>发布</Button>
-                <Button>登录/注册</Button>
+                <span>发布</span>
+                <span>登录/注册</span>
             </div>
         </div>
     );
