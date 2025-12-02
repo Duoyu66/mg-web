@@ -143,7 +143,7 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
                     const targetTop = rect.top + window.scrollY;
                     const currentScroll = window.scrollY + 80; // 考虑固定头部
                     const distance = Math.abs(targetTop - currentScroll);
-                    
+
                     // 如果已经接近目标位置（误差小于 50px），认为滚动完成
                     if (distance < 50) {
                         isScrollingRef.current = false;
@@ -235,7 +235,7 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
     // 渲染目录项
     const renderTOCItem = (item: TOCItem, index: number): React.ReactNode => {
         const isActive = activeId === item.id;
-        const paddingLeft = `${(item.level - 1) * 16}px`;
+        const paddingLeft = `${(item.level - 1) * 8}px`;
 
         return (
             <div key={`${item.id}-${index}`}>
