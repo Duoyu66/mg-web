@@ -120,6 +120,16 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
         setTocItems(items);
     }, [cleanedContent]);
 
+    // 初始化：如果还没有高亮的标题，且存在目录项，则高亮第一个标题
+    useEffect(() => {
+        if (tocItems.length > 0 && !activeId) {
+            const firstTopLevelItem = tocItems[0];
+            if (firstTopLevelItem && firstTopLevelItem.id) {
+                setActiveId(firstTopLevelItem.id);
+            }
+        }
+    }, [tocItems, activeId]);
+
     // 监听滚动，高亮当前标题（与点击滚动保持一致的偏移）
     useEffect(() => {
         if (!contentRef.current || tocItems.length === 0) return;
