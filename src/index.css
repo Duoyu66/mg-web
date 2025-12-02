@@ -12,93 +12,92 @@
     --color-primary-800: #1e40af;
     --color-primary-900: #1e3a8a;
 }
+
 #root {
     width: 100%;
 }
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-*{
-    box-sizing: border-box!important;
-}
-/* 亮色主题默认样式 */
-body {
-    box-sizing: border-box!important;
-  min-width: 320px;
-  min-height: 100vh;
-  background-color: #ffffff;
-  color: #213547;
-  transition: background-color 0.3s ease, color 0.3s ease;
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-/* 暗色主题样式 */
-.dark body {
-  background-color: #111827;
-  color: #f9fafb;
-}
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+/* 使用 @layer base 将全局重置放在基础层，这样 Tailwind 的实用类会覆盖它 */
+@layer base {
+    * {
+        box-sizing: border-box !important;
+        margin: 0;
+        padding: 0;
+    }
 
-body {
-  padding: 0;
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-body, h1, h2, h3, h4, h5, h6, hr, p, blockquote,
-dl, dt, dd, ul, ol, li,
-pre,
-fieldset, lengend, button, input, textarea,
-th, td {
-    margin: 0;
-    padding: 0;
-}
+    /* 亮色主题默认样式 */
+    body {
+        box-sizing: border-box !important;
+        min-width: 320px;
+        min-height: 100vh;
+        background-color: #ffffff;
+        color: #213547;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        place-items: center;
+    }
 
+    /* 暗色主题样式 */
+    .dark body {
+        background-color: #111827;
+        color: #f9fafb;
+    }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+    a {
+        font-weight: 500;
+        color: #646cff;
+        text-decoration: inherit;
+    }
+
+    a:hover {
+        color: #535bf2;
+    }
+
+    @media (prefers-color-scheme: light) {
+        :root {
+            color: #213547;
+            background-color: #ffffff;
+        }
+
+        a:hover {
+            color: #747bff;
+        }
+
+        button {
+            background-color: #f9f9f9;
+        }
+    }
 }
 
 /* 路由过渡动画 */
 @keyframes routeEnter {
-  from {
-    opacity: 0;
-    transform: scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+    from {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .animate-route-enter {
-  animation: routeEnter 0.3s ease-in-out;
-  will-change: opacity, transform;
-  /* 使用 GPU 加速，避免布局重排 */
-  transform-origin: top center;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+    animation: routeEnter 0.3s ease-in-out;
+    will-change: opacity, transform;
+    /* 使用 GPU 加速，避免布局重排 */
+    transform-origin: top center;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
