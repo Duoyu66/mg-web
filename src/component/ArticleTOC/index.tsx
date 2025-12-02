@@ -126,19 +126,38 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
             const headings = contentRef.current?.querySelectorAll('h1, h2, h3, h4, h5, h6');
             if (!headings || headings.length === 0) return;
 
-            const scrollPosition = window.scrollY + 90; // 当前滚动位置 + 轻微偏移
+            // 检查是否滚动到底部
+            const windowHeight = window.innerHeight;
+            const scrollTop = window.scrollY;
+            const documentHeight = document.documentElement.scrollHeight;
+            const distanceToBottom = documentHeight - (scrollTop + windowHeight);
+            // 距离底部小于 150px 时认为到底部，或者最后一个标题已经在视口上方
+            const isNearBottom = distanceToBottom <= 150;
+
             let currentId = '';
 
-            // 从上往下查找离当前视口最近的标题
-            for (let i = 0; i < headings.length; i++) {
-                const heading = headings[i] as HTMLElement;
-                const rect = heading.getBoundingClientRect();
-                const headingTop = rect.top + window.scrollY;
+            if (isNearBottom && headings.length > 0) {
+                // 如果接近底部，直接高亮最后一个标题
+                const lastHeading = headings[headings.length - 1] as HTMLElement;
+                if (lastHeading && lastHeading.id) {
+                    currentId = lastHeading.id;
+                }
+            }
 
-                if (headingTop <= scrollPosition) {
-                    currentId = heading.id;
-                } else {
-                    break;
+            // 如果还没找到，或者不在底部，使用正常逻辑查找
+            if (!currentId) {
+                const scrollPosition = window.scrollY + 90; // 当前滚动位置 + 轻微偏移
+
+                for (let i = 0; i < headings.length; i++) {
+                    const heading = headings[i] as HTMLElement;
+                    const rect = heading.getBoundingClientRect();
+                    const headingTop = rect.top + window.scrollY;
+
+                    if (headingTop <= scrollPosition) {
+                        currentId = heading.id;
+                    } else {
+                        break;
+                    }
                 }
             }
 
@@ -181,7 +200,7 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
             <div key={`${item.id}-${index}`}>
                 <div
                     onClick={() => handleTOCClick(item.id)}
-                    className={`cursor-pointer py-1 px-2 rounded transition-colors duration-200 ${
+                    className={`cursor-pointer py-1 px-2 rounded transition-all duration-200 ${
                         isActive
                             ? 'bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 font-bold'
                             : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -236,7 +255,7 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
             {showTOC && tocItems.length > 0 && createPortal(
                 !tocCollapsed ? (
                     <div
-                        className="fixed top-20 left-10 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border border-gray-200 dark:border-gray-700 z-50"
+                        className="fixed top-20 right-10 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border border-gray-200 dark:border-gray-700 z-50"
                         style={{
                             maxHeight: 'calc(100vh - 100px)',
                             width: '256px',
@@ -282,4 +301,3 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
 };
 
 export default ArticleTOC;
-
