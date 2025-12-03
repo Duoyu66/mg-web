@@ -44,6 +44,7 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
     const [tocCollapsed, setTocCollapsed] = useState(false);
     const isScrollingRef = useRef<boolean>(false);
     const targetIdRef = useRef<string>('');
+    const scrollEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // 清理 Quill 样式类，转换为正常样式
     const cleanedContent = useMemo(() => {
@@ -135,24 +136,10 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
         if (!contentRef.current || tocItems.length === 0) return;
 
         const handleScroll = () => {
-            // 如果正在手动滚动（点击目录项触发），检查是否到达目标位置
-            if (isScrollingRef.current && targetIdRef.current) {
-                const targetElement = document.getElementById(targetIdRef.current);
-                if (targetElement) {
-                    const rect = targetElement.getBoundingClientRect();
-                    const targetTop = rect.top + window.scrollY;
-                    const currentScroll = window.scrollY + 80; // 考虑固定头部
-                    const distance = Math.abs(targetTop - currentScroll);
-
-                    // 如果已经接近目标位置（误差小于 50px），认为滚动完成
-                    if (distance < 50) {
-                        isScrollingRef.current = false;
-                        targetIdRef.current = '';
-                    } else {
-                        // 还在滚动中，保持目标 ID 不变，不更新高亮
-                        return;
-                    }
-                }
+            // 如果正在手动滚动（点击目录项触发），完全阻止所有高亮更新
+            // 这是关键：在手动滚动期间，滚动监听器绝对不能更新高亮，无论距离远近
+            if (isScrollingRef.current) {
+                return; // 直接返回，不执行任何高亮更新逻辑
             }
 
             const headings = contentRef.current?.querySelectorAll('h1, h2, h3, h4, h5, h6');
@@ -163,7 +150,7 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
             const scrollTop = window.scrollY;
             const documentHeight = document.documentElement.scrollHeight;
             const distanceToBottom = documentHeight - (scrollTop + windowHeight);
-            // 距离底部小于 150px 时认为到底部，或者最后一个标题已经在视口上方
+            // 距离底部小于 150px 时认为到底部
             const isNearBottom = distanceToBottom <= 150;
 
             let currentId = '';
@@ -193,42 +180,132 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
                 }
             }
 
+            // 更新高亮（此时 isScrollingRef.current 一定是 false）
             if (currentId) {
                 setActiveId(currentId);
             }
         };
 
-        window.addEventListener('scroll', handleScroll);
+        // 使用防抖优化滚动监听，减少频繁更新
+        let rafId: number | null = null;
+        const throttledHandleScroll = () => {
+            if (rafId !== null) {
+                cancelAnimationFrame(rafId);
+            }
+            rafId = requestAnimationFrame(() => {
+                handleScroll();
+                rafId = null;
+            });
+        };
+
+        window.addEventListener('scroll', throttledHandleScroll, {passive: true});
         handleScroll(); // 初始检查
 
         return () => {
-            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('scroll', throttledHandleScroll);
+            if (rafId !== null) {
+                cancelAnimationFrame(rafId);
+            }
         };
     }, [tocItems]);
+
+    // 清理滚动结束定时器
+    const clearScrollEndTimer = () => {
+        if (scrollEndTimerRef.current) {
+            clearTimeout(scrollEndTimerRef.current);
+            scrollEndTimerRef.current = null;
+        }
+    };
+
+    // 解锁滚动状态
+    const unlockScrolling = () => {
+        if (targetIdRef.current) {
+            setActiveId(targetIdRef.current);
+        }
+        isScrollingRef.current = false;
+        targetIdRef.current = '';
+        clearScrollEndTimer();
+    };
 
     // 点击目录项，滚动到对应位置
     const handleTOCClick = (id: string) => {
         const element = document.getElementById(id);
-        if (element) {
-            // 立即设置目标 ID 和高亮，避免经过中间标题
-            setActiveId(id);
-            isScrollingRef.current = true;
-            targetIdRef.current = id;
+        if (!element) return;
 
-            const rect = element.getBoundingClientRect();
-            const absoluteTop = rect.top + window.scrollY;
-            const offsetTop = absoluteTop - 80; // 考虑固定头部的高度
+        // 清理之前的定时器
+        clearScrollEndTimer();
 
-            window.scrollTo({
-                top: offsetTop,
-                behavior: 'smooth',
+        // 立即锁定滚动状态并设置目标高亮，完全阻止滚动过程中的高亮更新
+        isScrollingRef.current = true;
+        targetIdRef.current = id;
+        setActiveId(id); // 立即设置高亮为目标项，避免闪烁
+
+        const rect = element.getBoundingClientRect();
+        const absoluteTop = rect.top + window.scrollY;
+        const offsetTop = absoluteTop - 80; // 考虑固定头部的高度
+        
+        // 计算滚动距离
+        const currentScrollTop = window.scrollY;
+        const scrollDistance = Math.abs(offsetTop - currentScrollTop);
+        const useInstant = scrollDistance < 100;
+
+        window.scrollTo({
+            top: offsetTop,
+            behavior: useInstant ? 'instant' : 'smooth',
+        });
+
+        if (useInstant) {
+            // 距离很近时，立即滚动完成，延迟一帧确保滚动完成
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    unlockScrolling();
+                });
             });
+        } else {
+            // 距离较远时，使用双重检测：位置检测 + 滚动停止检测
+            let lastScrollTop = window.scrollY;
+            let checkCount = 0;
+            const maxChecks = 200; // 最多检查 4 秒 (200 * 20ms)
+            
+            const checkScrollEnd = () => {
+                checkCount++;
+                
+                // 超时保护
+                if (checkCount >= maxChecks || !targetIdRef.current) {
+                    unlockScrolling();
+                    return;
+                }
 
-            // 设置一个超时，确保即使检测失败也能恢复滚动监听
-            setTimeout(() => {
-                isScrollingRef.current = false;
-                targetIdRef.current = '';
-            }, 2000); // 2秒后自动恢复，防止卡住
+                const targetElement = document.getElementById(targetIdRef.current);
+                if (!targetElement) {
+                    unlockScrolling();
+                    return;
+                }
+
+                const currentScrollTop = window.scrollY;
+                const targetRect = targetElement.getBoundingClientRect();
+                const targetTop = targetRect.top + window.scrollY;
+                const targetScrollPosition = targetTop - 80;
+                const distance = Math.abs(targetScrollPosition - currentScrollTop);
+                
+                // 双重检测：位置接近 + 滚动停止
+                const isAtTarget = distance < 30;
+                const isScrollStopped = Math.abs(currentScrollTop - lastScrollTop) < 1;
+                
+                if (isAtTarget && isScrollStopped) {
+                    // 到达目标且滚动停止，解锁状态
+                    unlockScrolling();
+                    return;
+                }
+                
+                lastScrollTop = currentScrollTop;
+                
+                // 继续检测
+                scrollEndTimerRef.current = setTimeout(checkScrollEnd, 20);
+            };
+            
+            // 开始检测滚动结束（延迟一点，让滚动开始）
+            scrollEndTimerRef.current = setTimeout(checkScrollEnd, 50);
         }
     };
 
@@ -243,7 +320,7 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
                     onClick={() => handleTOCClick(item.id)}
                     className={`cursor-pointer py-1 px-2 rounded transition-all duration-200 ${
                         isActive
-                            ? 'bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 font-bold'
+                            ? 'bg-primary-500 dark:bg-primary-900 text-white dark:text-primary-300 font-bold'
                             : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                     }`}
                     style={{paddingLeft}}
