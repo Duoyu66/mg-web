@@ -84,12 +84,28 @@
 /*    --color-primary-900: #1e3a8a;*/
 /*}*/
 
+
+@font-face {
+    font-family: 'newFont';
+    src: url('./assets/font/font0829.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* 将字体设置移到 @layer base 中，这样 Tailwind 的实用类可以覆盖它 */
+@layer base {
+    * {
+        font-family: 'newFont', sans-serif;
+    }
+}
+
+
 #root {
     width: 100%;
 }
 
 :root {
-    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
     font-weight: 400;
     font-synthesis: none;
