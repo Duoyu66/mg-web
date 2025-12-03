@@ -1,6 +1,7 @@
-import {Routes, Route, Navigate} from 'react-router-dom';
+import {Routes, Route, Navigate, useLocation} from 'react-router-dom';
 import routes from '@/router/index';
 import type {ReactElement} from 'react';
+import {useEffect} from 'react';
 import './index.css'
 interface RouteConfig {
     path: string;
@@ -8,6 +9,21 @@ interface RouteConfig {
     redirect?: string;
     title?: string;
     children?: RouteConfig[];
+}
+
+// 全局滚动到顶部组件
+function ScrollToTop() {
+    const {pathname} = useLocation();
+
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: 'instant' as ScrollBehavior,
+        });
+    }, [pathname]);
+
+    return null;
 }
 
 function App() {
@@ -55,9 +71,12 @@ function App() {
     };
 
     return (
-        <Routes>
-            {generateRoutes(routes)}
-        </Routes>
+        <>
+            <ScrollToTop />
+            <Routes>
+                {generateRoutes(routes)}
+            </Routes>
+        </>
     );
 }
 
