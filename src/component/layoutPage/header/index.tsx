@@ -43,7 +43,9 @@ const Header = () => {
     const goIndex = () => {
         navigate('/');
     };
-
+    const goLogin = () => {
+        navigate('/login');
+    }
     return (
         <div
             className="w-[100%] pl-[15%] pr-[25px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1)] fixed top-0 left-0 h-[60px] flex justify-start items-center bg-white dark:bg-gray-800 transition-colors duration-300 z-50">
@@ -88,7 +90,7 @@ const Header = () => {
                 />
                 <Divider orientation="vertical"/>
                 <span>发布</span>
-                <span>登录/注册</span>
+                <span onClick={goLogin}>登录/注册</span>
             </div>
         </div>
     );

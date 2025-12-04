@@ -6,6 +6,7 @@ import Message from "@/pages/front-end/message";
 import Nav from "@/pages/front-end/nav";
 import Index from "@/pages/front-end/index";
 import TestBox from "@/pages/front-end/test";
+import Login from "@/pages/front-end/login";
 
 const routes = [
     {
@@ -14,19 +15,28 @@ const routes = [
         component: Index
     },
     {
+        title: '登录',
+        path: "/login",
+        component: Login,
+        meta: {
+            age: 1,
+            name: "张三"
+        }
+    },
+    {
         path: "/front",
         component: LayoutPage,
         title: '前端',
         children: [
-            {
-                title: '首页',
-                path: 'index',
-                component: Index,
-                meta: {
-                    age: 1,
-                    name: "张三"
-                }
-            },
+            // {
+            //     title: '首页',
+            //     path: 'index',
+            //     component: Index,
+            //     meta: {
+            //         age: 1,
+            //         name: "张三"
+            //     }
+            // },
             {
                 title: '主页',
                 path: "home",
@@ -81,6 +91,7 @@ const routes = [
                     name: "张三"
                 }
             },
+
         ]
     }
 ]
