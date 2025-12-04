@@ -46,8 +46,13 @@ const Header = () => {
 
     return (
         <div
-            className="w-[100%] pl-[150px] pr-[25px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1)] fixed top-0 left-0 h-[60px] flex justify-start items-center bg-white dark:bg-gray-800 transition-colors duration-300 z-50">
-            <span className="border cursor-pointer mr-[80px]" onClick={goIndex}>木瓜编程</span>
+            className="w-[100%] pl-[15%] pr-[25px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1)] fixed top-0 left-0 h-[60px] flex justify-start items-center bg-white dark:bg-gray-800 transition-colors duration-300 z-50">
+            <span className=" cursor-pointer mr-[80px] flex justify-center items-center" onClick={goIndex}>
+                <div
+                    className="w-[32px] h-[32px] border border-amber-200 rounded-md bg-amber-200 flex justify-center items-center text-white font-bold mr-1">
+                    mg
+                </div>
+                木瓜编程</span>
             <ul className="flex [&_li]:mr-4">
                 {
                     menuData.map((item: MenuItemType) => {
