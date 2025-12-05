@@ -91,7 +91,7 @@ export default function Index() {
         navigate('/front/home')
     }
     return (
-        <div className="w-[100vw] h-[100vh] flex flex-col items-center justify-start mt-60">
+        <div className="w-full h-[100vh] flex flex-col items-center justify-start mt-60">
 
             <Button onClick={goHome}>去学习</Button>
             <div className="w-[500px] h-[350px] border bg-amber-200 rounded-md">

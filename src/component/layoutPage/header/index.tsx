@@ -90,7 +90,7 @@ const Header = () => {
                 />
                 <Divider orientation="vertical"/>
                 <span>发布</span>
-                <span onClick={goLogin}>登录/注册</span>
+                <span className="cursor-pointer" onClick={goLogin}>登录/注册</span>
             </div>
         </div>
     );

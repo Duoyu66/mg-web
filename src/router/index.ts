@@ -28,15 +28,6 @@ const routes = [
         component: LayoutPage,
         title: '前端',
         children: [
-            // {
-            //     title: '首页',
-            //     path: 'index',
-            //     component: Index,
-            //     meta: {
-            //         age: 1,
-            //         name: "张三"
-            //     }
-            // },
             {
                 title: '主页',
                 path: "home",

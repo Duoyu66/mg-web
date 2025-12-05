@@ -16,16 +16,14 @@ const Login = () => {
     return (
         <div
             className="w-[100vw] h-[100vh] flex items-center justify-center bg-cover bg-center"
-            style={{
-                backgroundImage:
-                    "url('https://images.pexels.com/photos/1028726/pexels-photo-1028726.jpeg?auto=compress&cs=tinysrgb&w=1600')",
-            }}
+
         >
             {/* 半透明遮罩，略微压暗背景 */}
             <div className="absolute inset-0 bg-black/25 pointer-events-none"/>
 
             {/* 中间容器 */}
-            <div className="relative z-10 flex rounded-[24px] overflow-hidden shadow-[0_18px_40px_rgba(0,0,0,0.18)] bg-white min-h-[420px]">
+            <div
+                className="relative z-10 flex rounded-[24px] overflow-hidden shadow-[0_18px_40px_rgba(0,0,0,0.18)] bg-white min-h-[420px]">
                 {/* 左侧插画区域（整块图片，不要纯蓝色） */}
                 <div className="w-[460px] min-h-[420px] overflow-hidden">
                     <img
