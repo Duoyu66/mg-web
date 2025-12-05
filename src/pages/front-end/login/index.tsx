@@ -40,9 +40,9 @@ const Login = () => {
                     <div className="mb-8">
                         <div className="flex items-center gap-2 mb-2">
                             <span className="text-xl font-semibold tracking-wide text-[#1890ff]">
-                                POETIZE
+                                木瓜编程
                             </span>
-                            <span className="text-sm text-gray-400">灵感 博客</span>
+                            <span className="text-sm text-gray-400">灵感 学习</span>
                         </div>
                         <div className="text-2xl font-semibold text-gray-800">登录</div>
                         <div className="mt-1 text-[13px] text-gray-400">
