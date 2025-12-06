@@ -14,16 +14,10 @@ const queryClient = new QueryClient()
 function AppWithTheme() {
     const {theme: currentTheme} = useTheme();
     const {defaultAlgorithm, darkAlgorithm} = theme;
-
     return (
         <ConfigProvider
             theme={{
                 algorithm: currentTheme === 'dark' ? darkAlgorithm : defaultAlgorithm,
-                // token: {
-                //     // Seed Token，影响范围大
-                //     colorPrimary: '#058e62',
-                //     borderRadius: 8,
-                // },
                 "token": {
                     "colorPrimary": "#722ed1",
                     "colorInfo": "#722ed1",
