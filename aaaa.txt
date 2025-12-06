@@ -1,0 +1,20 @@
+curl 'http://localhost:8000/api/question/getUserQuestionInfo' \
+  -H 'Accept: application/json, text/plain, */*' \
+  -H 'Accept-Language: zh-CN,zh;q=0.9' \
+  -H 'Authorization: Bearer undefined' \
+  -H 'Cache-Control: no-cache' \
+  -H 'Connection: keep-alive' \
+  -H 'Content-Type: application/json' \
+  -b 'third-account=oYwOm69rTU-8ZLTF51ZYpS0niHNg; third-appid=wxfde4e8f0ae407c3c; third-version=2.10.0.1213; third-token=57FMTEz6oxx5zOG7cdiVDJc0bssBPKj6ihOn%2BNRMi%2BCD5dvUfO2whaqijUXuf6FLya6LY9R5a71aU%2FTwfP44bw%3D%3D' \
+  -H 'Origin: http://localhost:8000' \
+  -H 'Pragma: no-cache' \
+  -H 'Referer: http://localhost:8000/question/questionHome' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Site: same-origin' \
+  -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36' \
+  -H 'sec-ch-ua: "Chromium";v="142", "Google Chrome";v="142", "Not_A Brand";v="99"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Windows"' \
+  -H 'third-admin-token: KZxl0vLTyJq9o5ywvW24UOb0a7azGL59PA3eNoK2yiubwDdwYGyeM9OGdo0fop91vbbNbwyOCq1gQFnIutVXId2YZFQL0TK+VA4HiF8UhxjaqvSWrzNvOV7rDCdQ4HR03GWGUcu3Y1JYF7KccMMgeN7ySM5TzpNJ8eqkDlOMRQ/5/1tH6ZjOxVHmi+OUUngrrxiW2CR1yTx5cqrlOKSPyWhzGfrm6iOYjm6A7fADOO0l14pMhbYzU3tcbyObelA7' \
+  --data-raw '{}'

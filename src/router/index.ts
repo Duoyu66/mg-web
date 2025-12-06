@@ -7,12 +7,44 @@ import Nav from "@/pages/front-end/nav";
 import Index from "@/pages/front-end/index";
 import TestBox from "@/pages/front-end/test";
 import Login from "@/pages/front-end/login";
+import LayoutPage from '@/component/layoutPage'
+import QuestionNav from "@/pages/front-end/question/questionNav";
+import QuestionHome from "@/pages/front-end/question/questionHome";
+import ExamPage from "@/pages/front-end/question/questionHome/examPage";
+import FinishPage from "@/pages/front-end/question/questionHome/finishPage";
 
 const routes = [
     {
         path: "/",
         title: "官网",
         component: Index
+    },
+    {
+        path: "/question",
+        component: LayoutPage,
+        title: '刷题',
+        children: [
+            {
+                title: '入口',
+                path: "nav",
+                component: QuestionNav,
+            },
+            {
+                title: '主页',
+                path: "questionHome",
+                component: QuestionHome,
+            },
+            {
+                title: '考试',
+                path: "examPage",
+                component: ExamPage,
+            },
+            {
+                title: '结束页',
+                path: "finishPage",
+                component: FinishPage,
+            },
+        ]
     },
     {
         title: '登录',

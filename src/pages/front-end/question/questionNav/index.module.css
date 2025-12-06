@@ -1,0 +1,97 @@
+.main-box {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  color: #4c4948;
+}
+.content-box {
+  width: 100%;
+  max-width: 900px;
+}
+.headerBox {
+  padding-top: 15px;
+  height: 45px;
+  color: #2e51b3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 26px;
+  font-weight: bold;
+}
+.headerBox svg {
+  font-size: 16px!important;
+  width: 36px!important;
+  height: 36px!important;
+}
+.title {
+  font-size: 64px;
+  font-weight: bold;
+}
+.handStyle {
+  margin-top: 50px;
+  width: 80px;
+  transform-origin: center bottom;
+  /* 保留原点设置（虽对平移影响不大，但可兼容其他变换） */
+  animation: 10s ease-in-out 0s infinite normal none running shake;
+  /* 重命名动画 */
+}
+@keyframes shake {
+  2% {
+    transform: rotate(15deg);
+  }
+  4% {
+    transform: rotate(-10deg);
+  }
+  6% {
+    transform: rotate(5deg);
+  }
+  8% {
+    transform: rotate(-5deg);
+  }
+  10% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+.btnBox {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.btnBoxItem {
+  margin-top: 15px;
+  padding: 20px 10px 40px 20px;
+  width: 300px;
+  border: 1px solid #b8afaf;
+  height: 145px;
+  background-color: white;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease-in-out;
+  border-radius: 16px;
+}
+.btnBoxItem:hover {
+  transition: all 0.3s ease-in-out;
+  transform: translateY(-5px);
+  cursor: pointer;
+}
+.itemTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2e51b3;
+}
+.tip {
+  color: #7c7070;
+}
+.go {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+/*# sourceMappingURL=index.module.css.map */

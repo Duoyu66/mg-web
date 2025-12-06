@@ -38,6 +38,11 @@ const Header = () => {
             title: '测试',
             path: '/front/test',
         },
+        {
+            id: '7',
+            title: '刷题',
+            path: '/question/nav',
+        },
     ];
 
     const goIndex = () => {

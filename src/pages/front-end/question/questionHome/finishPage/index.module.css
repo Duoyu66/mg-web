@@ -1,0 +1,98 @@
+.main-box {
+  padding-top: 80px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.main-box .content {
+  width: 100%;
+  max-width: 1200px;
+}
+.main-box .content .contentUl {
+  width: 100%;
+  padding: 15px 0;
+  display: flex;
+  justify-content: space-around;
+}
+.main-box .content .contentUl .contentLi {
+  width: 33%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.main-box .content .contentUl .contentLi .liLeft {
+  margin-right: 10px;
+  width: 100px;
+  height: 100px;
+}
+.main-box .content .contentUl .contentLi .liLeft img {
+  width: 100%;
+  height: 100%;
+}
+.main-box .content .contentUl .contentLi .liRight {
+  width: 180px;
+  height: 100%;
+}
+.topStyle {
+  display: flex;
+  align-items: flex-end;
+}
+.rateStyle {
+  font-size: 40px;
+  font-weight: bold;
+  display: flex;
+  margin-right: 5px;
+  align-items: flex-end;
+}
+.rateStyleLittle {
+  font-size: 18px;
+  height: 100%;
+  display: flex;
+  padding-bottom: 5px;
+  margin: 0 3px;
+}
+.bottomStyle {
+  margin-top: 15px;
+  font-size: 20px;
+  height: 50px;
+}
+.topScoreStyle {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 15px 0 50px 0;
+}
+.myScore {
+  font-family: 'make', sans-serif !important;
+  font-size: 60px;
+  display: flex;
+  justify-content: flex-end;
+}
+.back {
+  border-radius: 12px;
+  display: flex;
+  padding: 5px 8px;
+  justify-content: center;
+  align-items: center;
+  margin: 15px 0;
+  transition: all 0.3s ease-in-out;
+}
+.back:hover {
+  transition: all 0.3s ease-in-out;
+  background-color: #2e51b3;
+  cursor: pointer;
+  color: white;
+}
+.tipStyle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+/*# sourceMappingURL=index.module.css.map */

@@ -10,7 +10,14 @@ export default defineConfig({
         },
     },
     server: {
-        host: '0.0.0.0', // 允许通过局域网 IP 访问
-        port: 8000,      // 可选，指定端口
+        host: '0.0.0.0',
+        port: 8000,
+        proxy: {
+            '/api': {
+                target: 'http://localhost:8082',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api/, ''),
+            },
+        },
     },
 })

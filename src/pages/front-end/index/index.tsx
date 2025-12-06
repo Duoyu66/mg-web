@@ -5,10 +5,11 @@ import 'swiper/css';
 import 'swiper/css/effect-cards';
 import {Swiper, SwiperSlide} from 'swiper/react';
 import type {Swiper as SwiperType} from 'swiper';
-import {EffectCards,} from 'swiper/modules';
+import {EffectCards} from 'swiper/modules';
 import './index.css'
-import {Card} from "antd";
-import {useRef, useState} from "react";
+import {Button, Card} from "antd";
+import {useEffect, useRef, useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 const {Meta} = Card;
 
@@ -58,8 +59,9 @@ const webSites = [
 
 export default function Index() {
     const swiperRef = useRef<SwiperType | null>(null);
+    const swiperContainerRef = useRef<HTMLDivElement | null>(null);
     const [activeIndex, setActiveIndex] = useState(0);
-
+    const navigate = useNavigate();
     const handleCardClick = (index: number) => {
         if (swiperRef.current) {
             swiperRef.current.slideTo(index);
@@ -70,16 +72,45 @@ export default function Index() {
         setActiveIndex(swiper.activeIndex);
     };
 
+    // 处理鼠标滚轮事件
+    useEffect(() => {
+        const container = swiperContainerRef.current;
+        if (!container) return;
+
+        const handleWheel = (e: WheelEvent) => {
+            if (!swiperRef.current) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (e.deltaY > 0) {
+                // 向下滚动，切换到下一张
+                swiperRef.current.slideNext();
+            } else if (e.deltaY < 0) {
+                // 向上滚动，切换到上一张
+                swiperRef.current.slidePrev();
+            }
+        };
+
+        container.addEventListener('wheel', handleWheel, {passive: false});
+
+        return () => {
+            container.removeEventListener('wheel', handleWheel);
+        };
+    }, []);
+    const goHome = () => {
+        navigate('/front/home')
+    }
     return (
         <div style={{background: 'linear-gradient(75deg, #1e81c0, #2b20a0 39%, #131951)'}}
              className="w-full min-h-[100vh] flex  items-center justify-start py-8 px-4">
             <div className="w-[1000px] border pl-[25px]">
-                <div className="font-bold text-white text-3xl mb-2">木瓜生态</div>
+                <div className="font-bold text-white text-[56px] mb-2">木瓜生态</div>
                 <div
-                    className=" text-white text-xl">木瓜生态 现代化 学习管理系统
+                    className="my-2 text-white text-xl mb-16">木瓜生态 现代化 学习管理系统
                 </div>
-
-                <div className="grid grid-cols-3 gap-6 mb-12">
+                <Button onClick={() => goHome()}> 去首页</Button>
+                <div className="grid grid-cols-3 gap-6">
                     {
                         webSites.map((item, index) => {
                             return <div key={index}>
@@ -87,8 +118,9 @@ export default function Index() {
                                     style={{
                                         width: 300,
                                         cursor: 'pointer',
-                                        border: activeIndex === index ? '2px solid #1890ff' : '2px solid #d9d9d9',
-                                        transition: 'all 0.3s ease'
+                                        border: activeIndex === index ? '2px solid #1890ff ' : '2px solid #d9d9d9',
+                                        transition: 'all 0.3s ease',
+                                        color: activeIndex === index ? ' text-primary-500' : 'text-gray-500',
                                     }}
                                     onClick={() => handleCardClick(index)}
                                     hoverable
@@ -106,7 +138,10 @@ export default function Index() {
 
             </div>
 
-            <div className="flex-1 border overflow-hidden">
+            <div
+                ref={swiperContainerRef}
+                className="flex-1 border overflow-hidden"
+            >
                 <Swiper
                     effect={'cards'}
                     grabCursor={true}
@@ -129,7 +164,7 @@ export default function Index() {
                             >
                                 <div
                                     className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"/>
-                                <div className="absolute bottom-[50px] left-0 right-0 p-6 ">
+                                <div className="absolute bottom-[25px] left-0 right-0 p-6 ">
                                     <h3 className="text-white text-2xl font-bold">{item.title}</h3>
                                     <span className="text-base text-white">{item.description}</span>
                                 </div>
