@@ -261,7 +261,7 @@ const QuestionHome = () => {
                     </div>
                 </li>
                 <li className={styles['contentLi']}>
-                    <ExamIcon/>
+                    <img src={ExamIcon} alt="考试"/>
                     <div className={styles['liRight']}>
                         <span className={styles['tilte']}>我的考试</span>
                         <span className={styles['subTilte']}>仿真冲刺</span>
@@ -428,7 +428,7 @@ const QuestionHome = () => {
                     <img src={INavIcon} alt="i"/> 工作台
                 </>
             ),
-            key: "p",
+            key: "work",
             children: userInfoPart(),
         },
         {
@@ -446,7 +446,7 @@ const QuestionHome = () => {
                     <img src={INavIcon} alt="i"/> 个人分析
                 </>
             ),
-            key: "p",
+            key: "analysis",
             children: userInfoPart(),
         },
         {
@@ -578,7 +578,7 @@ const QuestionHome = () => {
 
                 className={`${styles['myTabs']} ${isSign ? styles['newTabs'] : ''}`}
                 animated={true}
-                tabPosition={"left"}
+                tabPlacement={"left"}
                 items={tabsItem}
             />
             <div style={{display: 'none'}} className={styles['contentRight']}>
