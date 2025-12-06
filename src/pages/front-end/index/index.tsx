@@ -4,9 +4,11 @@ import {BookMarked, BookOpen, Code, MessageCircleQuestionMark, Music, Rss} from 
 import 'swiper/css';
 import 'swiper/css/effect-cards';
 import {Swiper, SwiperSlide} from 'swiper/react';
+import type {Swiper as SwiperType} from 'swiper';
 import {EffectCards,} from 'swiper/modules';
 import './index.css'
 import {Card} from "antd";
+import {useRef, useState} from "react";
 
 const {Meta} = Card;
 
@@ -55,7 +57,18 @@ const webSites = [
 
 
 export default function Index() {
-    // const navigate = useNavigate();
+    const swiperRef = useRef<SwiperType | null>(null);
+    const [activeIndex, setActiveIndex] = useState(0);
+
+    const handleCardClick = (index: number) => {
+        if (swiperRef.current) {
+            swiperRef.current.slideTo(index);
+        }
+    };
+
+    const handleSwiperSlideChange = (swiper: SwiperType) => {
+        setActiveIndex(swiper.activeIndex);
+    };
 
     return (
         <div style={{background: 'linear-gradient(75deg, #1e81c0, #2b20a0 39%, #131951)'}}
@@ -71,7 +84,14 @@ export default function Index() {
                         webSites.map((item, index) => {
                             return <div key={index}>
                                 <Card
-                                    style={{width: 300}}
+                                    style={{
+                                        width: 300,
+                                        cursor: 'pointer',
+                                        border: activeIndex === index ? '2px solid #1890ff' : '2px solid #d9d9d9',
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                    onClick={() => handleCardClick(index)}
+                                    hoverable
                                 >
                                     <Meta
                                         avatar={item.icon}
@@ -85,7 +105,6 @@ export default function Index() {
                 </div>
 
             </div>
-            {/*<Button onClick={goHome} className="mb-8">去学习</Button>*/}
 
             <div className="flex-1 border overflow-hidden">
                 <Swiper
@@ -93,9 +112,13 @@ export default function Index() {
                     grabCursor={true}
                     modules={[EffectCards]}
                     className="mySwiper w-[500px] h-[350px]"
+                    onSwiper={(swiper) => {
+                        swiperRef.current = swiper;
+                    }}
+                    onSlideChange={handleSwiperSlideChange}
                 >
-                    {webSites.map((item) => (
-                        <SwiperSlide onClick={() => window.open(item.url)} key={item.id}>
+                    {webSites.map((item, index) => (
+                        <SwiperSlide onClick={() => window.open(item.url)} key={index}>
                             <div
                                 className="w-full h-full rounded-lg overflow-hidden relative"
                                 style={{
@@ -108,7 +131,7 @@ export default function Index() {
                                     className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"/>
                                 <div className="absolute bottom-[50px] left-0 right-0 p-6 ">
                                     <h3 className="text-white text-2xl font-bold">{item.title}</h3>
-                                    <span className="text-base">{item.description}</span>
+                                    <span className="text-base text-white">{item.description}</span>
                                 </div>
                             </div>
                         </SwiperSlide>
