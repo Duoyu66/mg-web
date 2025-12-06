@@ -165,7 +165,7 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
 
             // 如果还没找到，或者不在底部，使用正常逻辑查找
             if (!currentId) {
-                const scrollPosition = window.scrollY + 90; // 当前滚动位置 + 轻微偏移
+                const scrollPosition = window.scrollY; 
 
                 for (let i = 0; i < headings.length; i++) {
                     const heading = headings[i] as HTMLElement;
@@ -242,7 +242,8 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
 
         const rect = element.getBoundingClientRect();
         const absoluteTop = rect.top + window.scrollY;
-        const offsetTop = absoluteTop - 80; // 考虑固定头部的高度
+        const marginTop = parseFloat(getComputedStyle(element).marginTop || '0');
+        const offsetTop = Math.max(absoluteTop - marginTop, 0);
         
         // 计算滚动距离
         const currentScrollTop = window.scrollY;
@@ -251,7 +252,7 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
 
         window.scrollTo({
             top: offsetTop,
-            behavior: useInstant ? 'instant' : 'smooth',
+            behavior: useInstant ? 'auto' : 'smooth',
         });
 
         if (useInstant) {
@@ -285,7 +286,8 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
                 const currentScrollTop = window.scrollY;
                 const targetRect = targetElement.getBoundingClientRect();
                 const targetTop = targetRect.top + window.scrollY;
-                const targetScrollPosition = targetTop - 80;
+                const targetMarginTop = parseFloat(getComputedStyle(targetElement).marginTop || '0');
+                const targetScrollPosition = Math.max(targetTop - targetMarginTop, 0);
                 const distance = Math.abs(targetScrollPosition - currentScrollTop);
                 
                 // 双重检测：位置接近 + 滚动停止
