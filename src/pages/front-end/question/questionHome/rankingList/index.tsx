@@ -1,4 +1,4 @@
-import styles from './index.module.css'
+ 
 import {Dropdown, MenuProps, Table, Tooltip} from "antd";
 import {useEffect, useState} from "react";
 import SwitchIcon from "./img/switch.svg";
@@ -26,18 +26,18 @@ const RankingList = () => {
             },
             width: 180,
             render: (text: string, record: any, index: number) => (
-                <div className={styles['tableStyle']}>
-                    <img src={record.avatarUrl} alt=""/>
-                    <div className={styles['nickNameStyle']}>
-                        <div className={styles['nameWrapper']}> {/* 新增一个包裹层 */}
+                <div className="flex items-center justify-start">
+                    <img className="mr-1 w-[50px] h-[50px] rounded-full" src={record.avatarUrl} alt=""/>
+                    <div className="flex flex-col justify-center items-start w-[calc(100%-50px)]">
+                        <div className="flex justify-start w-full mb-1">
                             <Tooltip placement="topRight" title={record.nickName}>
-                                <div className={styles['nameText']}
+                                <div className="whitespace-nowrap overflow-hidden text-ellipsis max-w-full"
                                      style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
                                     {record.nickName}
                                 </div>
                             </Tooltip>
                         </div>
-                        <span className={styles['bottomStyle']}> 已参加竞赛 {record.examNum} 次</span>
+                        <span className="text-[12px] text-[#4c4948]"> 已参加竞赛 {record.examNum} 次</span>
                     </div>
                 </div>
             )
@@ -299,40 +299,40 @@ const RankingList = () => {
         }
     }
     const rankBox = (rankList:any) => (
-        <div className={styles['rankOutBox']}>
-            <div className={styles['mapStyle']}>
+        <div className="relative w-[48%] border border-red-500">
+            <div className="flex w-full absolute left-[-25px] top-0 text-[20px] font-semibold text-[#bdc3c7]">
                 <img src="https://static.leetcode.cn/cn-assets/webpack_bundles/images/china_map.e6e137c72.svg"
-                     alt=""/>{textMap[showRankType]}
+                     alt="" className="w-[62px] h-[30px]"/>{textMap[showRankType]}
 
             </div>
             {rankList.length > 0 ?
                 <div>
-                    <div className={styles['topRank']}>
-                        <div className={styles['oneRank']}>
-                            <img src={rankList[0]?.avatarUrl} alt=""/>
-                            <span className={styles['nameStyle']}>{rankList[0].nickName}</span>
+                    <div className="w-full h-[200px] flex flex-col justify-start items-center mt-[10px]">
+                        <div className="relative w-[90px] h-[90px] rounded-full flex justify-center items-center bg-gradient-to-b from-[#feea88] to-[#d7a807] shadow-[0_0_50px_rgba(0,0,0,0.15)]">
+                            <img className="w-[calc(100%-10px)] h-[calc(100%-10px)] rounded-full bg-white/40 text-[#373737] text-[40px] opacity-75" src={rankList[0]?.avatarUrl} alt=""/>
+                            <span className="absolute bottom-[-15px] bg-white rounded-lg px-2 py-0.5 text-[#ffa116] max-w-[120px] whitespace-nowrap overflow-hidden text-ellipsis">{rankList[0].nickName}</span>
                         </div>
-                        <div className={styles['bottomItem']}>
-                            <div className={styles['twoRank']}>
-                                <img src={rankList[1]?.avatarUrl} alt=""/>
-                                <span className={styles['nameStyle']}>{rankList[1].nickName}</span>
+                        <div className="flex w-full justify-around">
+                            <div className="relative w-[90px] h-[90px] rounded-full flex justify-center items-center mt-[15px] bg-gradient-to-b from-white to-[#ababab] shadow-[0_0_50px_rgba(0,0,0,0.15)]">
+                                <img className="w-[calc(100%-10px)] h-[calc(100%-10px)] rounded-full bg-white/40 text-[#373737] text-[40px] opacity-75" src={rankList[1]?.avatarUrl} alt=""/>
+                                <span className="absolute bottom-[-15px] bg-white rounded-lg px-2 py-0.5 text-[#ffa116] max-w-[120px] whitespace-nowrap overflow-hidden text-ellipsis">{rankList[1].nickName}</span>
                             </div>
-                            <div className={styles['threeRank']}>
-                                <img src={rankList[2]?.avatarUrl} alt=""/>
-                                <span className={styles['nameStyle']}>{rankList[2]?.nickName}</span>
+                            <div className="relative w-[90px] h-[90px] rounded-full flex justify-center items-center mt-[15px] bg-gradient-to-b from-[#facfa3] to-[#d77c44] shadow-[0_0_50px_rgba(0,0,0,0.15)]">
+                                <img className="w-[calc(100%-10px)] h-[calc(100%-10px)] rounded-full bg-white/40 text-[#373737] text-[40px] opacity-75" src={rankList[2]?.avatarUrl} alt=""/>
+                                <span className="absolute bottom-[-15px] bg-white rounded-lg px-2 py-0.5 text-[#ffa116] max-w-[120px] whitespace-nowrap overflow-hidden text-ellipsis">{rankList[2]?.nickName}</span>
                             </div>
                         </div>
                     </div>
-                    <div className={styles['outBox']}>
-                        <Table className={styles['tableOutStyle']} size="small"
+                    <div className="my-[30px] mb-[20px] overflow-hidden rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.15)]">
+                        <Table size="small"
                                dataSource={rankList.slice(3)} columns={filteredColumns}
                                pagination={false}/>
-                        <div className={styles['showMoreBtn']}>
-                    <span className={styles['showBtnTextStyle']}>
+                        <div className="flex justify-center items-center py-[15px] bg-white transition-all duration-300 hover:bg-[#fafafa]">
+                    <span className="text-blue-600 transition-all duration-300 hover:text-[#2e51b3]">
                     显示更多
                 </span></div>
                     </div>
-                    <div className={`${styles['tipStyle']} ${styles['tip']}`}>
+                    <div className="mt-[5px] text-[12px] text-[#4c4948] mb-[30px]">
                         ①巅峰赛积分=在考试系统中，简单题目正确可获得1积分，中等题目正确可获得2积分，困难题目正确可获得3积分
                     </div>
                     {/*<div className={`${styles['tipStyle']} ${styles['tip']}`}>*/}
@@ -345,14 +345,14 @@ const RankingList = () => {
             }
         </div>
     )
-    return <div className={styles['main-box']}>
-        <div style={{display: "none"}} className={styles['switchStyle']}>
+    return <div className="w-[98%] h-full flex justify-around items-center">
+        <div style={{display: "none"}} className="w-[120px] absolute right-[10px] top-[10px]">
             <Dropdown menu={{
                 items,
                 onClick: handleMenuClick
             }} trigger={['click']}>
                 <a onClick={(e) => e.preventDefault()}>
-                 <span className={styles['switchBtnStyle']}>
+                 <span className="flex justify-center items-center text-blue-600 hover:text-[#2e51b3]">
                      <img src={SwitchIcon} alt="switch"/>
                      切换排行榜
 

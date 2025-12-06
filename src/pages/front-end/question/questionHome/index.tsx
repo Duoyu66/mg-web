@@ -1,4 +1,4 @@
-import styles from './index.module.css'
+ 
 import ExamIcon from "./img/exam.svg";
 import {useEffect, useState} from "react";
 import {reqGetExamList, useGetQuestionType, reqLvInfo, reqAddLvExp} from "@/pages/front-end/question/hooks/question";
@@ -77,49 +77,49 @@ const QuestionHome = () => {
     const text = 'Are you sure to delete this task?';
     const CustomDescription = () => (
         <div>
-            <ul className={styles['tipUl']}>
-                <li className={styles['tipLiBig']}>简单题目积分</li>
-                <li className={styles['tipLiSmall']}>+</li>
-                <li className={styles['tipLiBig']}>中等题目积分</li>
-                <li className={styles['tipLiSmall']}>+</li>
-                <li className={styles['tipLiBig']}>困难题目积分</li>
-                <li className={styles['tipLiSmall']}>=</li>
-                <li className={styles['tipLiBig']}>竞赛积分</li>
+            <ul className="w-[445px] flex flex-wrap">
+                <li className="flex justify-center items-center w-[100px]">简单题目积分</li>
+                <li className="flex justify-center items-center w-[15px]">+</li>
+                <li className="flex justify-center items-center w-[100px]">中等题目积分</li>
+                <li className="flex justify-center items-center w-[15px]">+</li>
+                <li className="flex justify-center items-center w-[100px]">困难题目积分</li>
+                <li className="flex justify-center items-center w-[15px]">=</li>
+                <li className="flex justify-center items-center w-[100px]">竞赛积分</li>
 
-                <li className={styles['tipLiBig']}>{userQuestionInfoObj.qdScoreData.easyAcNum == null ? 0 : userQuestionInfoObj.qdScoreData.easyAcNum}*1</li>
-                <li className={styles['tipLiSmall']}>+</li>
-                <li className={styles['tipLiBig']}>{userQuestionInfoObj.qdScoreData.medAcNum == null ? 0 : userQuestionInfoObj.qdScoreData.medAcNum}*2</li>
-                <li className={styles['tipLiSmall']}>+</li>
-                <li className={styles['tipLiBig']}>{userQuestionInfoObj.qdScoreData.hardAcNum == null ? 0 : userQuestionInfoObj.qdScoreData.hardAcNum}*3</li>
-                <li className={styles['tipLiSmall']}>=</li>
-                <li className={styles['tipLiBig']}>{userQuestionInfoObj.qdScoreData.easyAcNum + userQuestionInfoObj.qdScoreData.medAcNum * 2 + userQuestionInfoObj.qdScoreData.hardAcNum * 3}</li>
-                <li className={styles['chao']}>超越了本站 {userQuestionInfoObj.qdScoreData.surpass}% 的小伙伴~</li>
+                <li className="flex justify-center items-center w-[100px]">{userQuestionInfoObj.qdScoreData.easyAcNum == null ? 0 : userQuestionInfoObj.qdScoreData.easyAcNum}*1</li>
+                <li className="flex justify-center items-center w-[15px]">+</li>
+                <li className="flex justify-center items-center w-[100px]">{userQuestionInfoObj.qdScoreData.medAcNum == null ? 0 : userQuestionInfoObj.qdScoreData.medAcNum}*2</li>
+                <li className="flex justify-center items-center w-[15px]">+</li>
+                <li className="flex justify-center items-center w-[100px]">{userQuestionInfoObj.qdScoreData.hardAcNum == null ? 0 : userQuestionInfoObj.qdScoreData.hardAcNum}*3</li>
+                <li className="flex justify-center items-center w-[15px]">=</li>
+                <li className="flex justify-center items-center w-[100px]">{userQuestionInfoObj.qdScoreData.easyAcNum + userQuestionInfoObj.qdScoreData.medAcNum * 2 + userQuestionInfoObj.qdScoreData.hardAcNum * 3}</li>
+                <li className="w-full">超越了本站 {userQuestionInfoObj.qdScoreData.surpass}% 的小伙伴~</li>
             </ul>
 
         </div>
     );
     const RateDescription = () => (
         <div>
-            <ul className={styles['tipRateUl']}>
-                <li className={styles['rateBig']}>简单难度正确率:</li>
-                <li className={styles['rateSmall']}>{userQuestionInfoObj?.qdAcRateData?.easyAcRate}%</li>
-                <li className={styles['rateBig']}>中等难度正确率:</li>
-                <li className={styles['rateSmall']}>{userQuestionInfoObj?.qdAcRateData?.mediumAcRate}%</li>
-                <li className={styles['rateBig']}>困难难度正确率:</li>
-                <li className={styles['rateSmall']}>{userQuestionInfoObj?.qdAcRateData?.hardAcRate}%</li>
+            <ul className="w-[160px] flex flex-wrap">
+                <li className="w-[75%] flex justify-center items-center">简单难度正确率:</li>
+                <li className="w-[25%] flex justify-center items-center text-[#2e51b3] font-bold">{userQuestionInfoObj?.qdAcRateData?.easyAcRate}%</li>
+                <li className="w-[75%] flex justify-center items-center">中等难度正确率:</li>
+                <li className="w-[25%] flex justify-center items-center text-[#2e51b3] font-bold">{userQuestionInfoObj?.qdAcRateData?.mediumAcRate}%</li>
+                <li className="w-[75%] flex justify-center items-center">困难难度正确率:</li>
+                <li className="w-[25%] flex justify-center items-center text-[#2e51b3] font-bold">{userQuestionInfoObj?.qdAcRateData?.hardAcRate}%</li>
             </ul>
 
         </div>
     );
     const ScoreDescription = () => (
         <div>
-            <ul className={styles['tipScoreUl']}>
-                <li className={styles['scoreBig']}>简单难度平均分:</li>
-                <li className={styles['scoreSmall']}>{userQuestionInfoObj.qdAveScoreData.aveEasyScore.toFixed(2)}</li>
-                <li className={styles['scoreBig']}>中等难度平均分:</li>
-                <li className={styles['scoreSmall']}>{userQuestionInfoObj.qdAveScoreData.aveMediumScore.toFixed(2)}</li>
-                <li className={styles['scoreBig']}>困难难度平均分:</li>
-                <li className={styles['scoreSmall']}>{userQuestionInfoObj.qdAveScoreData.aveHardScore.toFixed(2)}</li>
+            <ul className="w-[160px] flex flex-wrap">
+                <li className="w-[75%] flex justify-center items-center">简单难度平均分:</li>
+                <li className="w-[25%] flex justify-center items-center text-[#2e51b3] font-bold">{userQuestionInfoObj.qdAveScoreData.aveEasyScore.toFixed(2)}</li>
+                <li className="w-[75%] flex justify-center items-center">中等难度平均分:</li>
+                <li className="w-[25%] flex justify-center items-center text-[#2e51b3] font-bold">{userQuestionInfoObj.qdAveScoreData.aveMediumScore.toFixed(2)}</li>
+                <li className="w-[75%] flex justify-center items-center">困难难度平均分:</li>
+                <li className="w-[25%] flex justify-center items-center text-[#2e51b3] font-bold">{userQuestionInfoObj.qdAveScoreData.aveHardScore.toFixed(2)}</li>
             </ul>
 
         </div>
@@ -224,59 +224,59 @@ const QuestionHome = () => {
     }
     const questionPart = () => (
         <div>
-            <div className={styles['title']}>
+            <div className="text-[22px] font-bold text-[#4c4948] flex justify-start items-center my-[15px]">
                 <img src={RuKouIcon} alt="入口"/>
                 快捷入口
             </div>
-            <ul className={styles['contentUl']}>
-                <li className={styles['contentLi']} onClick={showModal}>
+            <ul className="flex flex-wrap items-center">
+                <li className="m-[12px_5px] bg-white transition-all duration-300 rounded-xl w-[150px] flex justify-around items-center hover:-translate-y-1 hover:scale-105 hover:shadow-[0_4px_10px_#00adff4d] hover:bg-[#2e51b3]" onClick={showModal}>
                     <img src={ExamIcon} alt="考试"/>
-                    <div className={styles['liRight']} >
-                        <span className={styles['tilte']}>模拟考试</span>
-                        <span className={styles['subTilte']}>仿真冲刺</span>
+                    <div className="px-[3px] w-[calc(100%-50px)] h-full" >
+                        <span className="text-[16px] font-bold text-[#4c4948]">模拟考试</span>
+                        <span className="text-[12px] my-[5px] text-[#786f6f]">仿真冲刺</span>
                     </div>
                 </li>
 
-                <li className={styles['contentLi']}>
+                <li className="m-[12px_5px] mt-3 p-3 w-[150px] bg-white rounded-xl transition-all duration-300 ease-in-out flex justify-around items-center hover:-translate-y-1 hover:scale-105 hover:shadow-[0_4px_10px_#00adff4d] hover:bg-[#2e51b3]" >
                     <img src={ExamIcon} alt="考试"/>
-                    <div className={styles['liRight']}>
-                        <span className={styles['tilte']}>顺序练习</span>
-                        <span className={styles['subTilte']}>仿真冲刺</span>
+                    <div className="px-[3px] w-[calc(100%-50px)] h-full">
+                        <span className="text-[16px] font-bold text-[#4c4948]">顺序练习</span>
+                        <span className="text-[12px] my-[5px] text-[#786f6f]">仿真冲刺</span>
                     </div>
                 </li>
 
 
-                <li className={styles['contentLi']}>
+                <li className="m-[12px_5px] mt-3 p-3 w-[150px] bg-white rounded-xl transition-all duration-300 ease-in-out flex justify-around items-center hover:-translate-y-1 hover:scale-105 hover:shadow-[0_4px_10px_#00adff4d] hover:bg-[#2e51b3]" >
                     <img src={ExamIcon} alt="考试"/>
-                    <div className={styles['liRight']}>
-                        <span className={styles['tilte']}>我的错题</span>
-                        <span className={styles['subTilte']}>仿真冲刺</span>
+                    <div className="px-[3px] w-[calc(100%-50px)] h-full">
+                        <span className="text-[16px] font-bold text-[#4c4948]">我的错题</span>
+                        <span className="text-[12px] my-[5px] text-[#786f6f]">仿真冲刺</span>
                     </div>
                 </li>
-                <li className={styles['contentLi']}>
+                <li className="m-[12px_5px] bg-white transition-all duration-300 rounded-xl w-[150px] flex justify-around items-center hover:-translate-y-1 hover:scale-105 hover:shadow-[0_4px_10px_#00adff4d] hover:bg-[#2e51b3]">
                     <img src={ExamIcon} alt="考试"/>
-                    <div className={styles['liRight']}>
-                        <span className={styles['tilte']}>我的收藏</span>
-                        <span className={styles['subTilte']}>仿真冲刺</span>
+                    <div className="px-[3px] w-[calc(100%-50px)] h-full">
+                        <span className="text-[16px] font-bold text-[#4c4948]">我的收藏</span>
+                        <span className="text-[12px] my-[5px] text-[#786f6f]">仿真冲刺</span>
                     </div>
                 </li>
-                <li className={styles['contentLi']}>
+                <li className="m-[12px_5px] mt-3 p-3 w-[150px] bg-white rounded-xl transition-all duration-300 ease-in-out flex justify-around items-center hover:-translate-y-1 hover:scale-105 hover:shadow-[0_4px_10px_#00adff4d] hover:bg-[#2e51b3]" >
                     <img src={ExamIcon} alt="考试"/>
-                    <div className={styles['liRight']}>
-                        <span className={styles['tilte']}>我的考试</span>
-                        <span className={styles['subTilte']}>仿真冲刺</span>
+                    <div className="px-[3px] w-[calc(100%-50px)] h-full">
+                        <span className="text-[16px] font-bold text-[#4c4948]">我的考试</span>
+                        <span className="text-[12px] my-[5px] text-[#786f6f]">仿真冲刺</span>
                     </div>
                 </li>
 
             </ul>
-            <div className={styles['title']}>
+            <div className="text-[22px] font-bold text-[#4c4948] flex justify-start items-center my-[15px]">
                 <img src={TypeIcon} alt="类型"/>
                 专项练习
             </div>
-            <ul className={styles['singleUl']}>
+            <ul className="flex flex-wrap items-start min-h-0">
                 {
                     laodingType && [1, 2, 3, 4, 5, 6, 7, 8].map((item: any) => {
-                        return <li key={item} className={styles['singleLiLoading']}>
+                        return <li key={item} className="m-[10px_12px] rounded-xl">
                             <Skeleton.Node style={{width: 180, height: 90}} active={true}>
                                 <DotChartOutlined style={{fontSize: 40, color: '#bfbfbf'}}/>
                             </Skeleton.Node>
@@ -286,16 +286,15 @@ const QuestionHome = () => {
 
                 {
                     !laodingType && typeList.map((item: any, index: number) => {
-                        return <li className={styles['singleLi']}>
-                            <div className={styles['singleLiLeft']}>
+                        return <li className="bg-white flex flex-wrap min-w-[180px] h-[100px] m-[10px_12px] p-2 rounded-xl transition-all duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:shadow-[0_4px_10px_#00adff4d] hover:bg-[#2e51b3]">
+                            <div className="w-[50px] mr-2 flex justify-center items-center">
                                 <img src={item.img} alt=""/>
                             </div>
                             <div>
-                                <div className={styles['tilte']}>
+                                <div className="text-[16px] font-bold text-[#4c4948]">
                                     {item.name}
                                 </div>
-                                <div
-                                    className={styles['subTilte']}> 已完成{item.computedNum}/总共{item.allNum}</div>
+                                <div className="text-[12px] my-[5px] text-[#786f6f]"> 已完成{item.computedNum}/总共{item.allNum}</div>
                                 <Progress
                                     percent={parseFloat(((item.computedNum / item.allNum) * 100).toFixed(2))}
                                     percentPosition={{align: 'end', type: 'outer'}}
@@ -312,10 +311,10 @@ const QuestionHome = () => {
 
     )
     const userInfoPart = () => (
-        <div className={styles['tip']}>
+        <div>
 
 
-            <div className={styles['title']}>
+            <div className="text-[22px] font-bold text-[#4c4948] flex justify-start items-center my-[15px]">
                 <img src={FenXiIcon} alt="分析"/>
                 题目分析
             </div>
@@ -327,12 +326,12 @@ const QuestionHome = () => {
                    3-10：您当前在本站的排名是第x名，距离超越巅峰榜第3名还差xxx分，继续加油吧！
                    >10：您当前在本站的排名是第x名，距离超越巅峰榜第10名(上榜)还差xxx分，继续加油吧！
                     */}
-            <div className={styles['questionInfo']}>
-                <ul className={styles['questionInfoUl']}>
-                    <li className={styles['questionInfoLi']}>
+            <div className="overflow-hidden rounded-xl flex justify-around w-full">
+                <ul className="rounded-xl bg-white w-[48%] flex flex-wrap">
+                    <li className="pb-[15px] flex flex-col justify-center items-center w-1/2">
                                 <span
-                                    className={styles['valueLi']}>{laodingType ? "--" : userQuestionInfoObj?.qdScoreData?.easyAcNum + userQuestionInfoObj?.qdScoreData?.medAcNum * 2 + userQuestionInfoObj?.qdScoreData?.hardAcNum * 3}</span>
-                        <span className={styles['titleLi']}>竞赛积分
+                                    className="text-[36px] py-[15px] text-[#2e51b3]">{laodingType ? "--" : userQuestionInfoObj?.qdScoreData?.easyAcNum + userQuestionInfoObj?.qdScoreData?.medAcNum * 2 + userQuestionInfoObj?.qdScoreData?.hardAcNum * 3}</span>
+                        <span className="text-[18px] text-[#656a6a] flex justify-center items-center">竞赛积分
 
                                        <Popconfirm
                                            icon={null}
@@ -347,9 +346,9 @@ const QuestionHome = () => {
         </Popconfirm>
                                 </span>
                     </li>
-                    <li className={styles['questionInfoLi']}><span
-                        className={styles['valueLi']}>{laodingType ? "--" : userQuestionInfoObj?.qdAcRateData?.allAcRate}%</span>
-                        <span className={styles['titleLi']}>正确率
+                    <li className="pb-[15px] flex flex-col justify-center items-center w-1/2"><span
+                        className="text-[36px] py-[15px] text-[#2e51b3]">{laodingType ? "--" : userQuestionInfoObj?.qdAcRateData?.allAcRate}%</span>
+                        <span className="text-[18px] text-[#656a6a] flex justify-center items-center">正确率
 
                                                        <Popconfirm
                                                            icon={null}
@@ -363,12 +362,12 @@ const QuestionHome = () => {
        <img src={InfoIcon} alt="info"/>
         </Popconfirm>
                                 </span></li>
-                    <li className={styles['questionInfoLi']}><span
-                        className={styles['valueLi']}>{laodingType ? "--" : userQuestionInfoObj?.qdProgressData?.completedNum}/{laodingType ? "--" : userQuestionInfoObj?.qdProgressData?.totalNum}</span>
-                        <span className={styles['titleLi']}>练习进度 </span></li>
-                    <li className={styles['questionInfoLi']}><span
-                        className={styles['valueLi']}>{laodingType ? "--" : userQuestionInfoObj?.qdAveScoreData?.aveAllScore}</span>
-                        <span className={styles['titleLi']}>平均分
+                    <li className="pb-[15px] flex flex-col justify-center items-center w-1/2"><span
+                        className="text-[36px] py-[15px] text-[#2e51b3]">{laodingType ? "--" : userQuestionInfoObj?.qdProgressData?.completedNum}/{laodingType ? "--" : userQuestionInfoObj?.qdProgressData?.totalNum}</span>
+                        <span className="text-[18px] text-[#656a6a] flex justify-center items-center">练习进度 </span></li>
+                    <li className="pb-[15px] flex flex-col justify-center items-center w-1/2"><span
+                        className="text-[36px] py-[15px] text-[#2e51b3]">{laodingType ? "--" : userQuestionInfoObj?.qdAveScoreData?.aveAllScore}</span>
+                        <span className="text-[18px] text-[#656a6a] flex justify-center items-center">平均分
 
                                                                  <Popconfirm
                                                                      icon={null}
@@ -384,7 +383,7 @@ const QuestionHome = () => {
                     {/*<li className={styles['questionInfoLi']}>  <span className={styles['valueLi']}>3.25%</span>*/}
                     {/*    <span className={styles['titleLi']}>困难题目正确率 </span></li>*/}
                 </ul>
-                <div className={styles['rBox']}>
+                <div className="w-[48%] border-none rounded-xl bg-white">
                     {
                         !laodingType && <LineChart
                             data={Array.from({length: 10}, (v, i) => userQuestionInfoObj?.qdChartData?.dataList[i] || null)}></LineChart>
@@ -397,7 +396,7 @@ const QuestionHome = () => {
         </div>
     )
     const rangPart = () => (
-        <div className={styles['rangListBox']}>
+        <div className="flex justify-start items-center">
             <RankingList></RankingList>
         </div>
     )
@@ -500,38 +499,38 @@ const QuestionHome = () => {
 //
 
     return (
-        <div className={styles['mainBox']}>
+        <div className="pt-5 flex flex-col items-center min-h-screen overflow-auto">
 
             {/*<div className={loading ? '' : `${commonStyles['loaded']}`}>*/}
             {/*    <FullScreenLoading></FullScreenLoading>*/}
             {/*</div>*/}
-            <div className={styles['content']}>
+            <div className="w-full max-w-[1200px] flex justify-between relative">
                 {/*<div className={styles['contentLeft']}>*/}
 
 
                 {/*</div>*/}
-                <div className={styles['info']}>
-                    <div className={styles['topTitle']}>
+                <div className="absolute left-0 right-0 w-[300px] z-10">
+                    <div className="w-full flex justify-start pl-[15px] items-center">
                         <img src={avatarUrl} alt=""/>
-                        <div className={styles['infoR']}>
-                            <span className={styles['nickName']}>{nickName}</span>
-                            <span className={styles['lvBox']}>     <span className={styles['lv']}>Lv.{lvInfo.lv}</span>
+                        <div className="pl-[10px] w-[calc(100%-90px)] h-full">
+                            <span className="text-[22px] font-bold text-[#4c4948]">{nickName}</span>
+                            <span className="flex justify-start items-center">     <span className="w-[50px] h-[18px] text-white text-[14px] mr-[10px] rounded-[3px_12px_12px_12px] bg-[#59e476] flex items-center justify-center">Lv.{lvInfo.lv}</span>
                                        <span
-                                           className={styles['lvIcon']}>{coinChange([1, 4, 16, 64], lvInfo.lv)}</span>
+                                           className="flex justify-start items-center">{coinChange([1, 4, 16, 64], lvInfo.lv)}</span>
                             </span>
 
-                            <span className={styles['proBox']}>
-                            <span className={styles['prBox']}>
-                                    <Progress className={styles['progressBox']}
+                            <span className="w-[90%] flex">
+                            <span className="flex justify-start items-center">
+                                    <Progress
                                               percent={(lvInfo.exp - lvInfo.lastLvExp) / (lvInfo.nextLvExp - lvInfo.lastLvExp) * 100}
                                               showInfo={false}/>
                                 <img src={TipIcon} alt="tip"/>
                             </span>
 
                                 {lvInfo.lv !== 100 ? <span
-                                        className={styles['tipBox']}>距离Lv.{lvInfo.lv + 1} 还需{lvInfo.nextLvExp - lvInfo.exp}经验值</span> :
+                                        className="text-[12px] text-[#73767c]">距离Lv.{lvInfo.lv + 1} 还需{lvInfo.nextLvExp - lvInfo.exp}经验值</span> :
                                     <span
-                                        className={styles['tipBox']}>距离Lv.max 还需{9999999 - lvInfo.exp}经验值</span>
+                                        className="text-[12px] text-[#73767c]">距离Lv.max 还需{9999999 - lvInfo.exp}经验值</span>
 
                                 }
 
@@ -539,32 +538,32 @@ const QuestionHome = () => {
                         </div>
 
                     </div>
-                    <div className={styles['signIn']}>
-                        <div className={styles['signL']}>
-                            <span className={styles['signTilte']}>今日签到</span><br/>
-                            <span className={styles['signContent']}>随机获取10-20经验值</span>
+                    <div className="my-[15px] flex justify-around items-center h-[80px] rounded-[8px]" style={{backgroundImage: 'url("https://www.mianshiya.com/_next/image?url=%2Fassets%2Fimages%2Fvip%2FnormalCard.png&w=750&q=75")', backgroundSize: 'cover', backgroundPosition: 'center'}}>
+                        <div className="p-[15px] w-[65%]">
+                            <span className="text-[22px] text-[#4c4948]">今日签到</span><br/>
+                            <span className="text-[12px] text-[#857c7c]">随机获取10-20经验值</span>
                         </div>
-                        <div className={styles['signR']}>
+                        <div className="w-[35%]">
                             {contextHolder}
-                            <div className={styles['signStyle']} onClick={signBtn}>{
+                            <div className="mx-2 px-[3px] py-[5px] font-bold rounded-full bg-[#43403a] border-2 border-[#ede9e6] text-[#ffecba] cursor-pointer transition-opacity duration-300 flex justify-center items-center hover:opacity-80" onClick={signBtn}>{
                                 lvInfo.dailySign==="0" ? "立即签到" : "今日已签到"
                             }</div>
                         </div>
 
                     </div>
-                    <div style={{display: 'none'}} className={styles['tipContent']}>
+                    <div style={{display: 'none'}} className="w-full flex justify-start items-center">
                         {userQuestionInfoObj?.qdRankData === null ? "您还未参加考试，快来挑战自己吧~" : <div
                             style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center'}}
                         >
                             您当前在本站的排名是第 <span
-                            className={styles['hightValue']}>{userQuestionInfoObj?.qdRankData?.rankNum}</span>名，
+                            className="mx-[2px] text-[20px] font-bold text-[#2e51b3] flex justify-center items-center">{userQuestionInfoObj?.qdRankData?.rankNum}</span>名，
                             {tipStr(userQuestionInfoObj?.qdRankData?.rankNum)}
                             <span
-                                className={styles['hightValue']}> {userQuestionInfoObj?.qdRankData?.opponentName}</span>
+                                className="mx-[2px] text-[20px] font-bold text-[#2e51b3] flex justify-center items-center"> {userQuestionInfoObj?.qdRankData?.opponentName}</span>
 
                             {userQuestionInfoObj?.qdRankData?.rankNum != 1 ? "还差" : ""}
                             <span
-                                className={styles['hightValue']}> {userQuestionInfoObj?.qdRankData?.differenceNum}</span>
+                                className="mx-[2px] text-[20px] font-bold text-[#2e51b3] flex justify-center items-center"> {userQuestionInfoObj?.qdRankData?.differenceNum}</span>
                             分，加油鸭！
                         </div>}
 
@@ -576,12 +575,13 @@ const QuestionHome = () => {
             </div>
             <Tabs
 
-                className={`${styles['myTabs']} ${isSign ? styles['newTabs'] : ''}`}
+                className={`max-w-[1200px] w-full h-[calc(100vh-100px)]`}
                 animated={true}
-                tabPlacement={"left"}
+                tabPosition={"left"}
+                tabBarStyle={{ width: 300, marginTop: 215 }}
                 items={tabsItem}
             />
-            <div style={{display: 'none'}} className={styles['contentRight']}>
+            <div style={{display: 'none'}} className="w-[calc(100%-300px)] px-[15px] pl-[50px] flex flex-col">
 
             </div>
 
@@ -589,16 +589,16 @@ const QuestionHome = () => {
             {/*    模拟考试弹窗*/}
 
             <Modal footer={null} title="模拟考试" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-                <div className={styles['modalDiv']}>
-                    <div className={styles['itemStyle']}>
-                        <span className={styles['typeStyle']}> 题目类型：</span> <Checkbox.Group
+                <div className="w-full h-[400px] flex flex-col">
+                    <div className="my-[15px] flex items-center">
+                        <span className="min-w-[120px] text-[18px] font-bold flex justify-start items-center"> 题目类型：</span> <Checkbox.Group
                         options={examPloay.typesList}
                         defaultValue={examPloay.typesList.map((item: any) => item.value)}
                         onChange={typeChange}/>
                     </div>
-                    <div className={styles['itemStyle']}>
+                    <div className="my-[15px] flex items-center">
 
-                        <span className={styles['typeStyle']}> 题目难度：</span>
+                        <span className="min-w-[120px] text-[18px] font-bold flex justify-start items-center"> 题目难度：</span>
                         <Radio.Group
                             name="radiogroup"
                             defaultValue={'easy'}
@@ -610,8 +610,8 @@ const QuestionHome = () => {
                             ]}
                         />
                     </div>
-                    <div className={styles['itemStyle']}>
-                        <span className={styles['typeStyle']}>   题目数量：</span>
+                    <div className="my-[15px] flex items-center">
+                        <span className="min-w-[120px] text-[18px] font-bold flex justify-start items-center">   题目数量：</span>
 
                         <Radio.Group
                             name="radiogroup"
@@ -625,7 +625,7 @@ const QuestionHome = () => {
                         />
                     </div>
                 </div>
-                <Button loading={loading} type='primary' className={styles['startBtn']}
+                <Button loading={loading} type='primary' className="block mx-auto"
                         onClick={getExamListFn}>开始测试</Button>
             </Modal>
         </div>
