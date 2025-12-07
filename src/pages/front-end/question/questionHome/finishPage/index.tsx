@@ -102,7 +102,7 @@ const FinishPage = () => {
 
 
            {/*<span  className={styles['back']}>回顾试卷</span>*/}
-           <span onClick={()=>nav("/front/question/questionHome")} className={styles['back']}>返回刷题页</span>
+           <span onClick={()=>nav("/question/questionHome")} className={styles['back']}>返回刷题页</span>
        </div>
         </div>
     </div>

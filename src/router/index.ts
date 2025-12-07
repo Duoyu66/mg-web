@@ -7,7 +7,7 @@ import Nav from "@/pages/front-end/nav";
 import Index from "@/pages/front-end/index";
 import TestBox from "@/pages/front-end/test";
 import Login from "@/pages/front-end/login";
-import LayoutPage from '@/component/layoutPage'
+import Question from "@/pages/front-end/question";
 import QuestionNav from "@/pages/front-end/question/questionNav";
 import QuestionHome from "@/pages/front-end/question/questionHome";
 import ExamPage from "@/pages/front-end/question/questionHome/examPage";
@@ -22,6 +22,7 @@ const routes = [
     {
         path: "/question",
         title: '刷题',
+        component: Question,
         children: [
             {
                 title: '入口',

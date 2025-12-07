@@ -5,7 +5,7 @@ import  ArrowIcon from "./img/rightArrow.svg";
 const QuestionNav = () => {
     const nav = useNavigate()
     const goQuestionHome = () => {
-        nav('/front/question/questionHome')
+        nav('/question/questionHome')
     }
     return <div className="w-full min-h-screen flex flex-col items-center text-[#4c4948]">
 

@@ -197,7 +197,7 @@ const QuestionHome = () => {
         reqGetExamList(examPloay).then(res => {
             setLoading(false)
             if (res.status) {
-                nav('/front/question/examPage', {
+                nav('/question/examPage', {
                     state: {
                         questionList: res.data,
                         firstQuestion: res.data[0],

@@ -47,7 +47,7 @@ const LayoutPage = () => {
             className="w-full min-h-[100vh] dark:bg-gray-900 transition-colors duration-300 flex flex-col justify-start items-center overflow-x-hidden">
             <Header/>
             <div 
-                className={`border w-[100%] max-w-[1200px] min-h-[calc(100vh - 150px)] relative mt-[350px]`}
+                className={`border w-[100%] max-w-[1200px] min-h-[calc(100vh - 150px)] relative mt-[70px]`}
                 ref={containerRef}>
                 <div
                     key={location.pathname}

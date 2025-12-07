@@ -3,7 +3,9 @@ import React from "react";
 
 const Question = () => {
   return (
-    <div className="flex flex-col border border-red-500">      <Outlet /></div>
+    <div className="flex flex-col w-full">
+      <Outlet />
+    </div>
   )
 }
 export default Question
