@@ -21,7 +21,6 @@ const routes = [
     },
     {
         path: "/question",
-        component: LayoutPage,
         title: '刷题',
         children: [
             {

@@ -1,8 +1,8 @@
 import {Outlet, useLocation} from 'react-router-dom';
 import {useTheme} from "@/component/context/useTheme";
 import {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import Header from "./header";
 import Footer from "./footer";
+import Header from "./header";
 
 const LayoutPage = () => {
     const location = useLocation();
@@ -46,12 +46,14 @@ const LayoutPage = () => {
         <div
             className="w-full min-h-[100vh] dark:bg-gray-900 transition-colors duration-300 flex flex-col justify-start items-center overflow-x-hidden">
             <Header/>
-            <div className="border w-[100%] max-w-[1200px] min-h-[calc(100vh - 150px)] pt-[70px] relative"
-                 ref={containerRef}>
+            <div 
+                className={`border w-[100%] max-w-[1200px] min-h-[calc(100vh - 150px)] relative mt-[350px]`}
+                ref={containerRef}>
                 <div
                     key={location.pathname}
                     className={contentClassName}
                     style={contentStyle}
+                    
                 >
                     <Outlet/>
                 </div>

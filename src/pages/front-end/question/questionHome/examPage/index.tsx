@@ -382,6 +382,7 @@ const ExamPage = () => {
                             }
                         </div>
                         <Button disabled={questionIndex == 0} onClick={prevQuestion} type="primary" className={styles['btnItem']}>
+<Button onClick={goQuestionHome} type="default" style={{marginLeft:8}}>返回刷题主页</Button>
                             <LeftOutlined/>
                             <span className={styles['contentSpan']}>上一题</span>
                         </Button>

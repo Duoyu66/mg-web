@@ -344,7 +344,7 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
             <div className="flex-1 min-w-0">
                 <div
                     ref={contentRef}
-                    className="article-content
+                    className="flex flex-col justify-start items-start article-content
                         [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:mt-8 [&_h1]:mb-4 [&_h1]:text-gray-900 dark:[&_h1]:text-gray-100
                         [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-8 [&_h2]:mb-4 [&_h2]:text-gray-900 dark:[&_h2]:text-gray-100
                         [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mt-8 [&_h3]:mb-4 [&_h3]:text-gray-900 dark:[&_h3]:text-gray-100
@@ -395,7 +395,7 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
                             </button>
                         </h3>
                         <div
-                            className="space-y-1 overflow-y-auto overscroll-contain"
+                            className="space-y-1 overflow-y-auto overscroll-auto"
                             style={{maxHeight: 'calc(100vh - 200px)'}}
                         >
                             {tocItems.map((item, index) => renderTOCItem(item, index))}

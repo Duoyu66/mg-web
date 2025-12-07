@@ -3,7 +3,7 @@ import {Divider, Switch} from "antd";
 import {useTheme} from "@/component/context/useTheme";
 import type {MenuItemType} from "@/component/layoutPage/type";
 import {ICONS} from "@/constants/icons";
-
+import { Button } from 'antd';
 const Header = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -38,11 +38,7 @@ const Header = () => {
             title: '测试',
             path: '/front/test',
         },
-        {
-            id: '7',
-            title: '刷题',
-            path: '/question/nav',
-        },
+ 
     ];
 
     const goIndex = () => {
@@ -95,6 +91,7 @@ const Header = () => {
                 />
                 <Divider orientation="vertical"/>
                 <span>发布</span>
+                <Button onClick={()=>navigate('/question/nav')}>刷题</Button>
                 <span className="cursor-pointer" onClick={goLogin}>登录/注册</span>
             </div>
         </div>
