@@ -12,7 +12,7 @@ function TestBox() {
             <div className='h-[500px] w-[200px] bg-red-500'></div>
             <div className='h-[500px] w-[200px] bg-red-500'></div>
 
-            <ArticleTOC content={articleContent}/>
+            <ArticleTOC content={articleContent} offsetTop={70}/>
         </div>
     );
 }

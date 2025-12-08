@@ -77,7 +77,6 @@ const QuestionHome = () => {
             }));
         });
     };
-    const text = 'Are you sure to delete this task?';
     const CustomDescription = () => (
         <div>
             <ul className="w-[445px] flex flex-wrap">

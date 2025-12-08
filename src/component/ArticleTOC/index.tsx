@@ -26,6 +26,7 @@ export interface ArticleTOCProps {
      * 自定义类名
      */
     className?: string;
+    offsetTop?: number;
 }
 
 /**
@@ -37,6 +38,7 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
                                                    showTOC = true,
                                                    tocTitle = '文章目录',
                                                    className = '',
+                                                   offsetTop = 0,
                                                }) => {
     const contentRef = useRef<HTMLDivElement>(null);
     const [tocItems, setTocItems] = useState<TOCItem[]>([]);
@@ -170,9 +172,9 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
                 for (let i = 0; i < headings.length; i++) {
                     const heading = headings[i] as HTMLElement;
                     const rect = heading.getBoundingClientRect();
-                    const headingTop = rect.top + window.scrollY;
+                    const adjustedTop = rect.top - offsetTop; // 视口内距离扣除固定头部
 
-                    if (headingTop <= scrollPosition) {
+                    if (adjustedTop <= 0) {
                         currentId = heading.id;
                     } else {
                         break;
@@ -243,15 +245,15 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
         const rect = element.getBoundingClientRect();
         const absoluteTop = rect.top + window.scrollY;
         const marginTop = parseFloat(getComputedStyle(element).marginTop || '0');
-        const offsetTop = Math.max(absoluteTop - marginTop, 0);
+        const targetTop = Math.max(absoluteTop - marginTop - offsetTop, 0);
         
         // 计算滚动距离
         const currentScrollTop = window.scrollY;
-        const scrollDistance = Math.abs(offsetTop - currentScrollTop);
+        const scrollDistance = Math.abs(targetTop - currentScrollTop);
         const useInstant = scrollDistance < 100;
 
         window.scrollTo({
-            top: offsetTop,
+            top: targetTop,
             behavior: useInstant ? 'auto' : 'smooth',
         });
 
@@ -285,9 +287,9 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
 
                 const currentScrollTop = window.scrollY;
                 const targetRect = targetElement.getBoundingClientRect();
-                const targetTop = targetRect.top + window.scrollY;
+                const targetTopAbs = targetRect.top + window.scrollY;
                 const targetMarginTop = parseFloat(getComputedStyle(targetElement).marginTop || '0');
-                const targetScrollPosition = Math.max(targetTop - targetMarginTop, 0);
+                const targetScrollPosition = Math.max(targetTopAbs - targetMarginTop - offsetTop, 0);
                 const distance = Math.abs(targetScrollPosition - currentScrollTop);
                 
                 // 双重检测：位置接近 + 滚动停止
