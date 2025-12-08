@@ -4,7 +4,10 @@ import React, {useEffect, useState} from "react";
 import type {DrawerProps} from 'antd';
 import {Button, Checkbox, Drawer, Modal, Radio, Statistic, Tag, Flex, Progress, message} from "antd";
 import { LeftOutlined, RightOutlined, PaperClipOutlined } from '@ant-design/icons';
-import {getFinalScore, addRecordOrError, deleteRecord, getQuestionErrorOrRecord} from "@/pages/front-end/question/hooks/question";
+import {getFinalScore} from "@/pages/front-end/question/hooks/getFinalScore";
+import {addRecordOrError} from "@/pages/front-end/question/hooks/addRecordOrError";
+import {deleteRecord} from "@/pages/front-end/question/hooks/deleteRecord";
+import {getQuestionErrorOrRecord} from "@/pages/front-end/question/hooks/getQuestionErrorOrRecord";
 import Prism from "prismjs";
 import 'prismjs/themes/prism-okaidia.css'
 import 'prismjs/components/'
@@ -277,6 +280,9 @@ const ExamPage = () => {
     const onClose = () => {
         setOpen(false);
     };
+    const goQuestionHome=()=>{
+        nav('/question/questionHome')
+    }
     return (
         <div className={styles['main_box']}>
             <div className={styles['question_box']}>
@@ -381,8 +387,8 @@ const ExamPage = () => {
                                 <img src={SnoICon} onClick={addCollection} className={styles['collectStyle']} alt="no"/>
                             }
                         </div>
+                        <Button onClick={goQuestionHome} type="default" className={styles['btnItem']}>返回刷题主页</Button>
                         <Button disabled={questionIndex == 0} onClick={prevQuestion} type="primary" className={styles['btnItem']}>
-<Button onClick={goQuestionHome} type="default" style={{marginLeft:8}}>返回刷题主页</Button>
                             <LeftOutlined/>
                             <span className={styles['contentSpan']}>上一题</span>
                         </Button>

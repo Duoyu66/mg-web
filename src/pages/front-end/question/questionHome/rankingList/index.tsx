@@ -2,7 +2,7 @@
 import {Dropdown, MenuProps, Table, Tooltip} from "antd";
 import {useEffect, useState} from "react";
 import SwitchIcon from "./img/switch.svg";
-import {getRankingList} from "@/pages/front-end/question/hooks/question";
+import {getRankingList} from "@/pages/front-end/question/hooks/getRankingList";
 
 const RankingList = () => {
     const text = 'Are you sure to delete this task?';

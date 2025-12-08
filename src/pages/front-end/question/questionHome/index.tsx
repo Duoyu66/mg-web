@@ -1,7 +1,10 @@
  
 import ExamIcon from "./img/exam.svg";
 import {useEffect, useState} from "react";
-import {reqGetExamList, useGetQuestionType, reqLvInfo, reqAddLvExp} from "@/pages/front-end/question/hooks/question";
+import {reqGetExamList} from "@/pages/front-end/question/hooks/reqGetExamList";
+import {useGetQuestionType} from "@/pages/front-end/question/hooks/useGetQuestionType";
+import {reqLvInfo} from "@/pages/front-end/question/hooks/reqLvInfo";
+import {reqAddLvExp} from "@/pages/front-end/question/hooks/reqAddLvExp";
 import {Button, Checkbox, Descriptions,notification , GetProp, Modal, Popconfirm, Progress, Radio, Skeleton, Tabs} from "antd";
 import {useNavigate} from "react-router-dom";
 import {themeColor} from "../../settings/theme";
@@ -424,7 +427,9 @@ const QuestionHome = () => {
         {
             label: (
                 <>
-                    <img src={INavIcon} alt="i"/> 工作台
+                  <div className="flex items-center">
+                      <img src={INavIcon} alt="i" className="mr-2"/> 工作台
+                  </div>
                 </>
             ),
             key: "work",
@@ -433,7 +438,9 @@ const QuestionHome = () => {
         {
             label: (
                 <>
-                    <img src={TNavIcon} alt="t"/> 题库
+                  <div className="flex items-center">
+                      <img src={TNavIcon} alt="t" className="mr-2"/> 题库
+                  </div>
                 </>
             ),
             key: "l",
@@ -442,7 +449,9 @@ const QuestionHome = () => {
         {
             label: (
                 <>
-                    <img src={INavIcon} alt="i"/> 个人分析
+                  <div className="flex items-center">
+                      <img src={INavIcon} alt="i" className="mr-2"/> 个人分析
+                  </div>    
                 </>
             ),
             key: "analysis",
@@ -451,7 +460,9 @@ const QuestionHome = () => {
         {
             label: (
                 <>
-                    <img src={PNavIcon} alt="p"/> 排行榜
+                  <div className="flex items-center">
+                      <img src={PNavIcon} alt="p" className="mr-2"/> 排行榜
+                  </div>    
                 </>
             ),
             key: "s",
@@ -459,7 +470,9 @@ const QuestionHome = () => {
         }, {
             label: (
                 <>
-                    <img src={PNavIcon} alt="p"/> 等级系统
+                  <div className="flex items-center">
+                      <img src={PNavIcon} alt="p" className="mr-2"/> 等级系统
+                  </div>        
                 </>
             ),
             key: "ss",
@@ -511,7 +524,7 @@ const QuestionHome = () => {
                 {/*</div>*/}
                 <div className="absolute left-0 right-0 w-[300px] z-10">
                     <div className="w-full flex justify-start pl-[15px] items-center">
-                        <img src={avatarUrl} alt=""/>
+                        <img className="w-[60px] h-[60px] rounded-[12px] border border-[#e5e5e5]" src='https://img.pawpaw18.cn/user-img/987b1688d3754e4d88371c7f93bb5654.jpg' alt=""/>
                         <div className="pl-[10px] w-[calc(100%-90px)] h-full">
                             <span className="text-[22px] font-bold text-[#4c4948]">{nickName}</span>
                             <span className="flex justify-start items-center">     <span className="w-[50px] h-[18px] text-white text-[14px] mr-[10px] rounded-[3px_12px_12px_12px] bg-[#59e476] flex items-center justify-center">Lv.{lvInfo.lv}</span>
