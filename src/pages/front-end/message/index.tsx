@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Send, Settings, X, MessageCircle, Reply, AtSign, Heart, BellRing, MoreVertical } from 'lucide-react';
 import { Button } from 'antd';
 import EmojiPicker from '@/components/EmojiPicker';
@@ -13,6 +13,17 @@ interface MessageItem {
     type?: string;
 }
 
+interface ChatMessage {
+    id: string;
+    content: string;
+    timestamp: number;
+    type: 'sent' | 'received';
+}
+
+interface ChatHistory {
+    [userId: string]: ChatMessage[];
+}
+
 interface NavItem {
     id: string;
     label: string;
@@ -25,7 +36,105 @@ const Message = () => {
     const [activeNav, setActiveNav] = useState('my-messages');
     const [selectedMessage, setSelectedMessage] = useState<string | null>(null);
     const [inputContent, setInputContent] = useState('');
+    const [messages, setMessages] = useState<MessageItem[]>([
+        {
+            id: '1',
+            avatar: 'https://img.pawpaw18.cn/user-img/987b1688d3754e4d88371c7f93bb5654.jpg',
+            name: '哔哩哔哩智能机',
+            content: '[有新通知]登录操作通知',
+            time: '刚刚',
+            unread: true,
+            type: 'system'
+        },
+        {
+            id: '2',
+            avatar: 'https://img.pawpaw18.cn/user-img/987b1688d3754e4d88371c7f93bb5654.jpg',
+            name: '哔哩哔哩公益',
+            content: '请大好人回家看看!还送表...',
+            time: '10分钟前',
+            unread: false
+        },
+        {
+            id: '3',
+            avatar: 'https://img.pawpaw18.cn/user-img/987b1688d3754e4d88371c7f93bb5654.jpg',
+            name: '洛天依',
+            content: '[自动回复]你好呀,我是虚...',
+            time: '30分钟前',
+            unread: false
+        },
+        {
+            id: '4',
+            avatar: 'https://img.pawpaw18.cn/user-img/987b1688d3754e4d88371c7f93bb5654.jpg',
+            name: '阿白的金手指厨房',
+            content: '[自动回复]视频中出现的厨...',
+            time: '1小时前',
+            unread: false
+        },
+        {
+            id: '5',
+            avatar: 'https://img.pawpaw18.cn/user-img/987b1688d3754e4d88371c7f93bb5654.jpg',
+            name: '潜艇伟伟迷',
+            content: 'up主我是你的粉丝,新植...',
+            time: '2小时前',
+            unread: false
+        },
+        {
+            id: '6',
+            avatar: 'https://img.pawpaw18.cn/user-img/987b1688d3754e4d88371c7f93bb5654.jpg',
+            name: '左程云',
+            content: '[自动回复]感谢关注!我正...',
+            time: '3小时前',
+            unread: false
+        },
+        {
+            id: '7',
+            avatar: 'https://img.pawpaw18.cn/user-img/987b1688d3754e4d88371c7f93bb5654.jpg',
+            name: '尚硅谷',
+            content: '视频上线提醒',
+            time: '5小时前',
+            unread: false
+        },
+        {
+            id: '8',
+            avatar: 'https://img.pawpaw18.cn/user-img/987b1688d3754e4d88371c7f93bb5654.jpg',
+            name: '薛同学不想学',
+            content: '嗯转行了[tv笑哭]',
+            time: '1天前',
+            unread: false
+        },
+        {
+            id: '9',
+            avatar: 'https://img.pawpaw18.cn/user-img/987b1688d3754e4d88371c7f93bb5654.jpg',
+            name: 'test测试的',
+            content: '嗯转行了[tv笑哭]',
+            time: '1天前',
+            unread: false
+        },
+        {
+            id: '10',
+            avatar: 'https://img.pawpaw18.cn/user-img/987b1688d3754e4d88371c7f93bb5654.jpg',
+            name: 'test测试的2',
+            content: '嗯转行了[tv笑哭]',
+            time: '1天前',
+            unread: false
+        },
+    ]);
+    
+    // 聊天历史记录，按用户ID存储
+    const [chatHistory, setChatHistory] = useState<ChatHistory>({
+        '5': [
+            {
+                id: 'chat-1',
+                content: 'up主我是你的粉丝,新植物什么时候上卡槽啊?',
+                timestamp: Date.now() - 2 * 60 * 60 * 1000,
+                type: 'received'
+            }
+        ]
+    });
+    
     const maxLength = 500;
+    const chatContentRef = useRef<HTMLDivElement>(null);
+    const myAvatar = 'https://img.pawpaw18.cn/user-img/987b1688d3754e4d88371c7f93bb5654.jpg';
 
     const navItems: NavItem[] = [
         { id: 'my-messages', label: '我的消息', icon: <MessageCircle className="w-4 h-4" />, badge: 1, active: true },
@@ -35,73 +144,108 @@ const Message = () => {
         { id: 'system', label: '系统通知', icon: <BellRing className="w-4 h-4" /> },
     ];
 
-    const messages: MessageItem[] = [
-        {
-            id: '1',
-            avatar: 'https://via.placeholder.com/40',
-            name: '哔哩哔哩智能机',
-            content: '[有新通知]登录操作通知',
-            time: '刚刚',
-            unread: true,
-            type: 'system'
-        },
-        {
-            id: '2',
-            avatar: 'https://via.placeholder.com/40',
-            name: '哔哩哔哩公益',
-            content: '请大好人回家看看!还送表...',
-            time: '10分钟前',
-            unread: false
-        },
-        {
-            id: '3',
-            avatar: 'https://via.placeholder.com/40',
-            name: '洛天依',
-            content: '[自动回复]你好呀,我是虚...',
-            time: '30分钟前',
-            unread: false
-        },
-        {
-            id: '4',
-            avatar: 'https://via.placeholder.com/40',
-            name: '阿白的金手指厨房',
-            content: '[自动回复]视频中出现的厨...',
-            time: '1小时前',
-            unread: false
-        },
-        {
-            id: '5',
-            avatar: 'https://via.placeholder.com/40',
-            name: '潜艇伟伟迷',
-            content: 'up主我是你的粉丝,新植...',
-            time: '2小时前',
-            unread: false
-        },
-        {
-            id: '6',
-            avatar: 'https://via.placeholder.com/40',
-            name: '左程云',
-            content: '[自动回复]感谢关注!我正...',
-            time: '3小时前',
-            unread: false
-        },
-        {
-            id: '7',
-            avatar: 'https://via.placeholder.com/40',
-            name: '尚硅谷',
-            content: '视频上线提醒',
-            time: '5小时前',
-            unread: false
-        },
-        {
-            id: '8',
-            avatar: 'https://via.placeholder.com/40',
-            name: '薛同学不想学',
-            content: '嗯转行了[tv笑哭]',
-            time: '1天前',
-            unread: false
-        },
-    ];
+    // 格式化时间
+    const formatTime = (timestamp: number) => {
+        const now = Date.now();
+        const diff = now - timestamp;
+        const minutes = Math.floor(diff / 60000);
+        const hours = Math.floor(diff / 3600000);
+        const days = Math.floor(diff / 86400000);
+
+        if (minutes < 1) return '刚刚';
+        if (minutes < 60) return `${minutes}分钟前`;
+        if (hours < 24) return `${hours}小时前`;
+        if (days < 7) return `${days}天前`;
+        
+        const date = new Date(timestamp);
+        return `${date.getMonth() + 1}-${date.getDate()}`;
+    };
+
+    // 格式化聊天时间
+    const formatChatTime = (timestamp: number) => {
+        const date = new Date(timestamp);
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const msgDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        
+        if (msgDate.getTime() === today.getTime()) {
+            // 今天：显示时间
+            return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        } else if (msgDate.getTime() === today.getTime() - 86400000) {
+            // 昨天
+            return `昨天 ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        } else {
+            // 更早：显示日期和时间
+            return `${date.getMonth() + 1}-${date.getDate()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        }
+    };
+
+    // 获取当前聊天的消息列表
+    const getCurrentChatMessages = (): ChatMessage[] => {
+        if (!selectedMessage) return [];
+        return chatHistory[selectedMessage] || [];
+    };
+
+    // 发送消息
+    const handleSendMessage = () => {
+        if (!inputContent.trim() || !selectedMessage) return;
+
+        const newMessage: ChatMessage = {
+            id: `msg-${Date.now()}-${Math.random()}`,
+            content: inputContent.trim(),
+            timestamp: Date.now(),
+            type: 'sent'
+        };
+
+        // 更新聊天历史
+        setChatHistory(prev => ({
+            ...prev,
+            [selectedMessage]: [...(prev[selectedMessage] || []), newMessage]
+        }));
+
+        // 更新消息列表中的最后一条消息和时间
+        setMessages(prev => prev.map(msg => {
+            if (msg.id === selectedMessage) {
+                const shortContent = newMessage.content.length > 15 
+                    ? newMessage.content.substring(0, 15) + '...' 
+                    : newMessage.content;
+                return {
+                    ...msg,
+                    content: shortContent,
+                    time: formatTime(newMessage.timestamp),
+                    unread: false
+                };
+            }
+            return msg;
+        }));
+
+        // 清空输入框
+        setInputContent('');
+
+        // 滚动到底部
+        setTimeout(() => {
+            if (chatContentRef.current) {
+                chatContentRef.current.scrollTop = chatContentRef.current.scrollHeight;
+            }
+        }, 100);
+    };
+
+    // 处理换行显示
+    const formatContent = (content: string) => {
+        return content.split('\n').map((line, index) => (
+            <span key={index}>
+                {line}
+                {index < content.split('\n').length - 1 && <br />}
+            </span>
+        ));
+    };
+
+    // 自动滚动到底部
+    useEffect(() => {
+        if (chatContentRef.current && selectedMessage) {
+            chatContentRef.current.scrollTop = chatContentRef.current.scrollHeight;
+        }
+    }, [selectedMessage, chatHistory]);
 
     const handleDeleteMessage = (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
@@ -116,6 +260,14 @@ const Message = () => {
             }
             return prev;
         });
+    };
+
+    // 处理回车键发送（Ctrl+Enter 换行）
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
+            e.preventDefault();
+            handleSendMessage();
+        }
     };
 
     return (
@@ -183,7 +335,16 @@ const Message = () => {
                             {messages.map((message) => (
                                 <div
                                     key={message.id}
-                                    onClick={() => setSelectedMessage(message.id)}
+                                    onClick={() => {
+                                        setSelectedMessage(message.id);
+                                        setInputContent(''); // 切换会话时清空输入框
+                                        
+                                        // 如果该用户没有聊天历史，初始化第一条消息（显示原始消息内容）
+                                        if (!chatHistory[message.id] || chatHistory[message.id].length === 0) {
+                                            // 保留原始消息作为第一条接收消息（如果需要）
+                                            // 这里可以根据需要决定是否自动添加
+                                        }
+                                    }}
                                     className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors relative group ${
                                         selectedMessage === message.id
                                             ? 'bg-primary-50 dark:bg-primary-900/20'
@@ -192,7 +353,7 @@ const Message = () => {
                                 >
                                     <div className="relative flex-shrink-0">
                                         <img
-                                            src='https://img.pawpaw18.cn/user-img/987b1688d3754e4d88371c7f93bb5654.jpg'
+                                            src={message.avatar || 'https://via.placeholder.com/48'}
                                             alt={message.name}
                                             className="w-12 h-12 rounded-full object-cover"
                                             onError={(e) => {
@@ -209,11 +370,30 @@ const Message = () => {
                                                 {message.name}
                                             </span>
                                             <span className="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0 ml-2">
-                                                {message.time}
+                                                {(() => {
+                                                    // 如果有聊天历史，显示最后一条消息的时间
+                                                    const chatMsgs = chatHistory[message.id];
+                                                    if (chatMsgs && chatMsgs.length > 0) {
+                                                        const lastMsg = chatMsgs[chatMsgs.length - 1];
+                                                        return formatTime(lastMsg.timestamp);
+                                                    }
+                                                    return message.time;
+                                                })()}
                                             </span>
                                         </div>
                                         <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
-                                            {message.content}
+                                            {(() => {
+                                                // 如果有聊天历史，显示最后一条消息的预览
+                                                const chatMsgs = chatHistory[message.id];
+                                                if (chatMsgs && chatMsgs.length > 0) {
+                                                    const lastMsg = chatMsgs[chatMsgs.length - 1];
+                                                    const preview = lastMsg.content.length > 15 
+                                                        ? lastMsg.content.substring(0, 15) + '...' 
+                                                        : lastMsg.content;
+                                                    return preview;
+                                                }
+                                                return message.content;
+                                            })()}
                                         </div>
                                     </div>
                                     <button
@@ -245,29 +425,65 @@ const Message = () => {
                             </div>
 
                             {/* 聊天内容区 */}
-                            <div className="flex-1 overflow-y-auto px-4 py-4">
+                            <div 
+                                ref={chatContentRef}
+                                className="flex-1 overflow-y-auto px-4 py-4"
+                            >
                                 {/* 提示信息 */}
-                                <div className="text-center mb-4">
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        对方主动回复或关注你前,最多发送1条消息
-                                    </p>
-                                </div>
-
-                                {/* 用户发送的消息 */}
-                                <div className="flex items-end justify-end gap-2 mb-4">
-                                    <div className="max-w-[70%]">
-                                        <div className="bg-primary-500 text-white rounded-lg px-4 py-2 text-sm">
-                                            {messages.find(m => m.id === selectedMessage)?.content || 'up主我是你的粉丝,新植物什么时候上卡槽啊?'}
-                                        </div>
+                                {getCurrentChatMessages().length === 0 && (
+                                    <div className="text-center mb-4">
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                                            对方主动回复或关注你前,最多发送1条消息
+                                        </p>
                                     </div>
-                                    <img
-                                        src="https://img.pawpaw18.cn/user-img/987b1688d3754e4d88371c7f93bb5654.jpg"
-                                        alt="我的头像"
-                                        className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                                        onError={(e) => {
-                                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/32';
-                                        }}
-                                    />
+                                )}
+
+                                {/* 聊天消息列表 */}
+                                <div className="space-y-4">
+                                    {getCurrentChatMessages().map((msg) => {
+                                        const selectedMsg = messages.find(m => m.id === selectedMessage);
+                                        const isSent = msg.type === 'sent';
+                                        
+                                        return (
+                                            <div
+                                                key={msg.id}
+                                                className={`flex  items-start gap-2  ${isSent ? 'justify-end' : 'justify-start'}`}
+                                            >
+                                                {!isSent && (
+                                                    <img
+                                                        src={selectedMsg?.avatar || 'https://via.placeholder.com/32'}
+                                                        alt={selectedMsg?.name || '用户'}
+                                                        className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                                                        onError={(e) => {
+                                                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/32';
+                                                        }}
+                                                    />
+                                                )}
+                                                <div className={`max-w-[70%] flex flex-col ${isSent ? 'items-end' : 'items-start'}`}>
+                                                    <div className={`rounded-lg px-4 py-2 text-sm whitespace-pre-wrap ${
+                                                        isSent
+                                                            ? 'bg-primary-500 text-white'
+                                                            : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
+                                                    }`}>
+                                                        {formatContent(msg.content)}
+                                                    </div>
+                                                    <span className="text-xs text-gray-400 dark:text-gray-500 mt-1 px-1">
+                                                        {formatChatTime(msg.timestamp)}
+                                                    </span>
+                                                </div>
+                                                {isSent && (
+                                                    <img
+                                                        src={myAvatar}
+                                                        alt="我的头像"
+                                                        className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                                                        onError={(e) => {
+                                                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/32';
+                                                        }}
+                                                    />
+                                                )}
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
 
@@ -291,6 +507,7 @@ const Message = () => {
                                                 setInputContent(value);
                                             }
                                         }}
+                                        onKeyDown={handleKeyDown}
                                         placeholder="请输入消息内容"
                                         className="w-full px-3 pt-9 pb-12 border-0 rounded-lg resize-none focus:outline-none focus:ring-0 dark:bg-gray-700 dark:text-gray-100 bg-white"
                                         rows={5}
@@ -311,12 +528,7 @@ const Message = () => {
                                             type="primary"
                                             disabled={!inputContent.trim()}
                                             className={`!rounded-md ${!inputContent.trim() ? '!bg-gray-300 !border-gray-300 dark:!bg-gray-600 dark:!border-gray-600' : ''}`}
-                                            onClick={() => {
-                                                if (inputContent.trim()) {
-                                                    console.log('发送消息:', inputContent);
-                                                    setInputContent('');
-                                                }
-                                            }}
+                                            onClick={handleSendMessage}
                                         >
                                             发送
                                         </Button>
@@ -378,7 +590,7 @@ const Message = () => {
                     )}
                 </div>
             </div>
-        </div>
+    </div>
     );
 };
 
