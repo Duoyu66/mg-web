@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MessageCircle, Star, Eye, ThumbsUp, Bookmark } from 'lucide-react';
+import { MessageCircle, MessageCircleMore, Eye, ThumbsUp, Bookmark } from 'lucide-react';
 import { Button } from 'antd';
 
 interface User {
@@ -381,16 +381,16 @@ const Home = () => {
                                     {/* 最佳评论 */}
                                     {item.bestComment && (
                                         <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mb-4 border-l-4 border-primary-500">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                                            <div className="flex flex-wrap items-center gap-1">
+                                                <MessageCircleMore  size={14} className="w-4 h-4 text-gray-500  inline-block" />
                                                 <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                                    木小瓜智能助手
+                                                    木小瓜智能助手：
                                                 </span>
-                                                <span className="text-xs text-gray-500 dark:text-gray-400">精选评论</span>
-                                            </div>
-                                            <div className="text-sm text-gray-700 dark:text-gray-300">
+                                                <div className="text-sm text-gray-700 dark:text-gray-300">
                                                 {item.bestComment.plainTextDescription}
                                             </div>
+                                            </div>
+                                      
                                         </div>
                                     )}
 

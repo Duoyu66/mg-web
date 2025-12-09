@@ -12,6 +12,7 @@ import QuestionNav from "@/pages/front-end/question/questionNav";
 import QuestionHome from "@/pages/front-end/question/questionHome";
 import ExamPage from "@/pages/front-end/question/questionHome/examPage";
 import FinishPage from "@/pages/front-end/question/questionHome/finishPage";
+import PublishArticle from "@/pages/front-end/publishArticle";
 
 const routes = [
     {
@@ -64,6 +65,15 @@ const routes = [
                 title: '主页',
                 path: "home",
                 component: Home,
+                meta: {
+                    age: 1,
+                    name: "张三"
+                }
+            },
+            {
+                title: '发布文章',
+                path: "publishArticle",
+                component: PublishArticle,
                 meta: {
                     age: 1,
                     name: "张三"
