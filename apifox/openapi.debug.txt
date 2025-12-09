@@ -3,8 +3,8 @@ headers: {
   "access-control-allow-credentials": "true",
   "connection": "keep-alive",
   "content-length": "0",
-  "date": "Tue, 09 Dec 2025 10:25:20 GMT",
-  "set-cookie": "acw_tc=0a005a8e17652759207353617e630ef830c982af492b159044fcfb821745d2;path=/;HttpOnly;Max-Age=1800",
+  "date": "Tue, 09 Dec 2025 10:52:36 GMT",
+  "set-cookie": "acw_tc=0a005a8a17652775560661327e76e5fb11b03e397255875393698ae3f70767;path=/;HttpOnly;Max-Age=1800",
   "vary": "Origin",
   "x-waf-access": "1",
   "x-waf-client-ip": "222.128.2.51"
