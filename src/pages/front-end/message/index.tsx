@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Send, Settings, X, MessageCircle, Reply, AtSign, Heart, BellRing, MoreVertical, Smile, Image as ImageIcon } from 'lucide-react';
+import { Send, Settings, X, MessageCircle, Reply, AtSign, Heart, BellRing, MoreVertical } from 'lucide-react';
 import { Button } from 'antd';
+import EmojiPicker from '@/components/EmojiPicker';
 
 interface MessageItem {
     id: string;
@@ -105,6 +106,16 @@ const Message = () => {
     const handleDeleteMessage = (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
         console.log('删除消息', id);
+    };
+
+    const handleEmojiSelect = (emoji: string) => {
+        setInputContent(prev => {
+            const newContent = prev + emoji;
+            if (newContent.length <= maxLength) {
+                return newContent;
+            }
+            return prev;
+        });
     };
 
     return (
@@ -264,13 +275,11 @@ const Message = () => {
                             <div className="border-t border-gray-200 dark:border-gray-700 ">
                                 <div className="relative dark:border-gray-600  bg-white dark:bg-gray-700">
                                     {/* 顶部图标 */}
-                                    <div className="absolute top-1 left-2 z-10 flex items-center gap-1">
-                                        <button className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors">
+                                    <div className="absolute top-1 left-2 z-10 flex items-center gap-1 cursor-pointer">
+                                        {/* <button className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors">
                                             <ImageIcon className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                        </button>
-                                        <button className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors">
-                                            <Smile className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                        </button>
+                                        </button> */}
+                                        <EmojiPicker onSelect={handleEmojiSelect}  />
                                     </div>
 
                                     {/* 输入框 */}
@@ -283,7 +292,7 @@ const Message = () => {
                                             }
                                         }}
                                         placeholder="请输入消息内容"
-                                        className="w-full px-3 pt-8 pb-12 border-0 rounded-lg resize-none focus:outline-none focus:ring-0 dark:bg-gray-700 dark:text-gray-100 bg-white"
+                                        className="w-full px-3 pt-9 pb-12 border-0 rounded-lg resize-none focus:outline-none focus:ring-0 dark:bg-gray-700 dark:text-gray-100 bg-white"
                                         rows={5}
                                         style={{ minHeight: '120px' }}
                                         onInput={(e) => {
