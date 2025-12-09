@@ -6,13 +6,7 @@ function TestBox() {
 
     return (
         <div className="">
-            12321
-            asdasd
-            asfd
-            <div className='h-[500px] w-[200px] bg-red-500'></div>
-            <div className='h-[500px] w-[200px] bg-red-500'></div>
-
-            <ArticleTOC content={articleContent} offsetTop={70}/>
+            <ArticleTOC content={articleContent}/>
         </div>
     );
 }

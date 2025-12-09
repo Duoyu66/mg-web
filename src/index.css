@@ -122,6 +122,14 @@
         padding: 0;
     }
 
+    /* 恢复标题元素的默认样式，避免全局重置影响标题 */
+    h1, h2, h3, h4, h5, h6 {
+        font-size: revert;
+        font-weight: revert;
+        margin: revert;
+        padding: revert;
+    }
+
     /* 亮色主题默认样式 */
     body {
         box-sizing: border-box !important;
@@ -213,4 +221,14 @@
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
+}
+
+/* 使用 @theme 中定义的渐变变量的工具类 */
+@layer utilities {
+    .color-gradient-primary {
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
 }

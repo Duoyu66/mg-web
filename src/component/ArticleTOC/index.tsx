@@ -26,7 +26,6 @@ export interface ArticleTOCProps {
      * 自定义类名
      */
     className?: string;
-    offsetTop?: number;
 }
 
 /**
@@ -38,7 +37,6 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
                                                    showTOC = true,
                                                    tocTitle = '文章目录',
                                                    className = '',
-                                                   offsetTop = 0,
                                                }) => {
     const contentRef = useRef<HTMLDivElement>(null);
     const [tocItems, setTocItems] = useState<TOCItem[]>([]);
@@ -167,14 +165,11 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
 
             // 如果还没找到，或者不在底部，使用正常逻辑查找
             if (!currentId) {
-                const scrollPosition = window.scrollY; 
-
                 for (let i = 0; i < headings.length; i++) {
                     const heading = headings[i] as HTMLElement;
-                    const rect = heading.getBoundingClientRect();
-                    const adjustedTop = rect.top - offsetTop; // 视口内距离扣除固定头部
+                const rect = heading.getBoundingClientRect();
 
-                    if (adjustedTop <= 0) {
+                if (rect.top <= 0) {
                         currentId = heading.id;
                     } else {
                         break;
@@ -245,7 +240,7 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
         const rect = element.getBoundingClientRect();
         const absoluteTop = rect.top + window.scrollY;
         const marginTop = parseFloat(getComputedStyle(element).marginTop || '0');
-        const targetTop = Math.max(absoluteTop - marginTop - offsetTop, 0);
+        const targetTop = Math.max(absoluteTop - marginTop, 0);
         
         // 计算滚动距离
         const currentScrollTop = window.scrollY;
@@ -289,7 +284,7 @@ const ArticleTOC: React.FC<ArticleTOCProps> = ({
                 const targetRect = targetElement.getBoundingClientRect();
                 const targetTopAbs = targetRect.top + window.scrollY;
                 const targetMarginTop = parseFloat(getComputedStyle(targetElement).marginTop || '0');
-                const targetScrollPosition = Math.max(targetTopAbs - targetMarginTop - offsetTop, 0);
+                const targetScrollPosition = Math.max(targetTopAbs - targetMarginTop, 0);
                 const distance = Math.abs(targetScrollPosition - currentScrollTop);
                 
                 // 双重检测：位置接近 + 滚动停止
