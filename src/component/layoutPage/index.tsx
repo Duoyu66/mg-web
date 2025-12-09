@@ -3,6 +3,7 @@ import {useTheme} from "@/component/context/useTheme";
 import {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import Footer from "./footer";
 import Header from "./header";
+import {getRouteMeta} from "@/utils/routeUtils";
 
 const LayoutPage = () => {
     const location = useLocation();
@@ -58,7 +59,11 @@ const LayoutPage = () => {
                     <Outlet/>
                 </div>
             </div>
-            <Footer/>
+            {(() => {
+                const routeMeta = getRouteMeta(location.pathname);
+                const showFooter = routeMeta?.showFooter !== false; // 默认显示，只有明确设置为 false 时才隐藏
+                return showFooter ? <Footer/> : null;
+            })()}
         </div>
     );
 };

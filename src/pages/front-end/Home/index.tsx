@@ -384,7 +384,7 @@ const Home = () => {
                                             <div className="flex items-center gap-2 mb-2">
                                                 <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                                                 <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                                    {item.bestComment.user.userName}
+                                                    木小瓜智能助手
                                                 </span>
                                                 <span className="text-xs text-gray-500 dark:text-gray-400">精选评论</span>
                                             </div>

@@ -93,7 +93,8 @@ const routes = [
                 component: Message,
                 meta: {
                     age: 1,
-                    name: "张三"
+                    name: "张三",
+                    showFooter: false
                 }
             },
             {

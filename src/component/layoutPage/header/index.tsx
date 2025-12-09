@@ -4,6 +4,7 @@ import {useTheme} from "@/component/context/useTheme";
 import type {MenuItemType} from "@/component/layoutPage/type";
 import {ICONS} from "@/constants/icons";
 import { Button } from 'antd';
+import { Bell } from 'lucide-react';
 const Header = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -24,11 +25,11 @@ const Header = () => {
             title: '题库',
             path: '/front/questionBank'
         },
-        {
-            id: '4',
-            title: '消息',
-            path: '/front/message'
-        },
+        // {
+        //     id: '4',
+        //     title: '消息',
+        //     path: '/front/message'
+        // },
         {
             id: '5',
             title: '快捷导航',
@@ -91,6 +92,7 @@ const Header = () => {
                 />
                 <Divider orientation="vertical"/>
                 <span>发布</span>
+                <Bell onClick={()=>navigate('/front/message')} className="w-4 h-4 text-primary-500 dark:text-white cursor-pointer" />
                 <Button onClick={()=>navigate('/question/nav')}>刷题</Button>
                 <span className="cursor-pointer" onClick={goLogin}>登录/注册</span>
             </div>
