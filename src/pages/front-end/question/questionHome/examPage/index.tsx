@@ -4,10 +4,9 @@ import React, {useEffect, useState} from "react";
 import type {DrawerProps} from 'antd';
 import {Button, Checkbox, Drawer, Modal, Radio, Statistic, Tag, Flex, Progress, message} from "antd";
 import { LeftOutlined, RightOutlined, PaperClipOutlined } from '@ant-design/icons';
-import {getFinalScore} from "@/pages/front-end/question/hooks/getFinalScore";
-import {addRecordOrError} from "@/pages/front-end/question/hooks/addRecordOrError";
-import {deleteRecord} from "@/pages/front-end/question/hooks/deleteRecord";
-import {getQuestionErrorOrRecord} from "@/pages/front-end/question/hooks/getQuestionErrorOrRecord";
+import {useSubmitFinalScore} from "@/pages/front-end/question/hooks/useSubmitFinalScore";
+import {useAddRecordOrError} from "@/pages/front-end/question/hooks/useAddRecordOrError";
+import {useDeleteRecord} from "@/pages/front-end/question/hooks/useDeleteRecord";
 import Prism from "prismjs";
 import 'prismjs/themes/prism-okaidia.css'
 import 'prismjs/components/'
@@ -33,6 +32,9 @@ const ExamPage = () => {
     const allQuestion = location.state;
     const userId = localStorage.getItem("userId");
     const {questionList, firstQuestion, questionTypeList, difficulty, num} = allQuestion
+    const submitFinalScoreMutation = useSubmitFinalScore();
+    const addRecordMutation = useAddRecordOrError();
+    const deleteRecordMutation = useDeleteRecord();
     const [passedMinutes, setPassedMinutes] = useState(0);
     const [modeTime, setModeTime]: any = useState(() => {
         switch (num) {
@@ -135,14 +137,15 @@ const ExamPage = () => {
             questionName: questionList[questionIndex].title,
         }
         //添加收藏
-        addRecordOrError(data).then((res:any)=>{
-            console.log(res)
-            if (res.status) {
-                message.success("收藏成功~") 
-                questionList[questionIndex].collection='1'
-                setShowStar(true)
-            }else{
-                message.error(res.msg)
+        addRecordMutation.mutate(data,{
+            onSuccess:(res:any)=>{
+                if (res.status) {
+                    message.success("收藏成功~") 
+                    questionList[questionIndex].collection='1'
+                    setShowStar(true)
+                }else{
+                    message.error(res.msg)
+                }
             }
         })
     }
@@ -152,14 +155,15 @@ const ExamPage = () => {
             type:'-1',//-1取消收藏
             questionId: questionList[questionIndex].id,
         }
-        deleteRecord(data).then((res:any)=>{
-            console.log(res)
-            if (res.status) {
-                message.warning("已取消收藏") 
-                questionList[questionIndex].collection='-1'
-                setShowStar(false)
-            }else{
-                message.error(res.msg)
+        deleteRecordMutation.mutate(data,{
+            onSuccess:(res:any)=>{
+                if (res.status) {
+                    message.warning("已取消收藏") 
+                    questionList[questionIndex].collection='-1'
+                    setShowStar(false)
+                }else{
+                    message.error(res.msg)
+                }
             }
         })
     }
@@ -181,10 +185,11 @@ const ExamPage = () => {
             (difficulty == 'hard' && passedMinutes <= 20)) {
             return
         }
-        getFinalScore(answer).then(res => {
-            console.log(res);
-            if (res.status) {
-                nav('/question/finishPage', {state: res.data})
+        submitFinalScoreMutation.mutate(answer,{
+            onSuccess:(res:any)=>{
+                if (res.status) {
+                    nav('/question/finishPage', {state: res.data})
+                }
             }
         })
     }
@@ -215,13 +220,15 @@ const ExamPage = () => {
             setIncompleteVisible(true)
             setSubmitLoading(false)
         } else {
-            getFinalScore(answer).then(res => {
-                setSubmitLoading(false)
-                console.log(res);
-                if (res.status) {
-                    nav('/question/finishPage', {state: res.data})
+            submitFinalScoreMutation.mutate(answer,{
+                onSuccess:(res:any)=>{
+                    if (res.status) {
+                        nav('/question/finishPage', {state: res.data})
+                    }
+                },
+                onSettled:()=>{
+                    setSubmitLoading(false)
                 }
-
             })
         }
     }
@@ -246,10 +253,11 @@ const ExamPage = () => {
     const onFinish = () => {
         console.log('时间到');
         //倒计时结束直接交卷
-        getFinalScore(answer).then(res => {
-            console.log(res);
-            if (res.status) {
-                nav('/question/finishPage', {state: res.data})
+        submitFinalScoreMutation.mutate(answer,{
+            onSuccess:(res:any)=>{
+                if (res.status) {
+                    nav('/question/finishPage', {state: res.data})
+                }
             }
         })
     }

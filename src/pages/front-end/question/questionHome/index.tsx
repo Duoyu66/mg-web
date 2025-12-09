@@ -1,10 +1,10 @@
  
 import ExamIcon from "./img/exam.svg";
 import {useEffect, useState} from "react";
-import {reqGetExamList} from "@/pages/front-end/question/hooks/reqGetExamList";
+import {useGetExamList} from "@/pages/front-end/question/hooks/useGetExamList";
 import {useGetQuestionType} from "@/pages/front-end/question/hooks/useGetQuestionType";
-import {reqLvInfo} from "@/pages/front-end/question/hooks/reqLvInfo";
-import {reqAddLvExp} from "@/pages/front-end/question/hooks/reqAddLvExp";
+import {useGetLvInfo} from "@/pages/front-end/question/hooks/useGetLvInfo";
+import {useAddLvExp} from "@/pages/front-end/question/hooks/useAddLvExp";
 import {Button, Checkbox, Descriptions,notification , GetProp, Modal, Popconfirm, Progress, Radio, Skeleton, Tabs} from "antd";
 import {useNavigate} from "react-router-dom";
 import {themeColor} from "../../settings/theme";
@@ -29,6 +29,9 @@ const QuestionHome = () => {
     const { nickName, avatarUrl}: any = userInfo;
     const userId ='4500fbd3-5e3c-407b-b158-51e1ed19ee3a'
     const { data: typeRes, isLoading: laodingType } = useGetQuestionType({id: '4500fbd3-5e3c-407b-b158-51e1ed19ee3a'})
+    const { data: lvInfoRes, refetch: refetchLvInfo } = useGetLvInfo({id: userId});
+    const getExamListMutation = useGetExamList();
+    const addLvExpMutation = useAddLvExp();
     const nav = useNavigate()
     //类型列表
     const [typeList, setTypeList] = useState([])
@@ -42,41 +45,37 @@ const QuestionHome = () => {
         dailySign:"0"
     })
     useEffect(() => {
-        initLvInfo(userId)
-    }, [])
-    const initLvInfo = (userId: string) => {
-        reqLvInfo({id: userId}).then(res => {
-            const exp = res.data.exp;
-            let lv = 1;    // 默认1级
-            let nextLv = 1; // 默认下一级也是1级
+        if (!lvInfoRes?.status) return;
+        const exp = lvInfoRes.data.exp;
+        let lv = 1;    // 默认1级
+        let nextLv = 1; // 默认下一级也是1级
 
-            // 遍历等级数据（注意数组是从0开始的）
-            for (let i = 0; i < lvData.length; i++) {
-                if (exp >= lvData[i].children) {
-                    // 当前等级不能超过100级（数组索引99）
-                    lv = Math.min(i + 1, 100); // id = 数组索引 + 1
-                } else {
-                    // 下一等级也不能超过100级
-                    nextLv = Math.min(i + 1, 100);
-                    break;
-                }
+        // 遍历等级数据（注意数组是从0开始的）
+        for (let i = 0; i < lvData.length; i++) {
+            if (exp >= lvData[i].children) {
+                // 当前等级不能超过100级（数组索引99）
+                lv = Math.min(i + 1, 100); // id = 数组索引 + 1
+            } else {
+                // 下一等级也不能超过100级
+                nextLv = Math.min(i + 1, 100);
+                break;
             }
+        }
 
-            // 特殊处理满级情况
-            if (lv === 100) {
-                nextLv = 100; // 已经是最高级
-            }
+        // 特殊处理满级情况
+        if (lv === 100) {
+            nextLv = 100; // 已经是最高级
+        }
 
-            setLvInfo((prevState: any) => ({
-                ...prevState,
-                lv: lv,
-                exp: exp,
-                nextLvExp: lvData[nextLv - 1]?.children || lvData[lvData.length - 1].children, // 安全访问
-                lastLvExp: lv > 1 ? lvData[lv - 2].children : 0, // 上一级经验
-                dailySign:res.data.dailySign
-            }));
-        });
-    };
+        setLvInfo((prevState: any) => ({
+            ...prevState,
+            lv: lv,
+            exp: exp,
+            nextLvExp: lvData[nextLv - 1]?.children || lvData[lvData.length - 1].children, // 安全访问
+            lastLvExp: lv > 1 ? lvData[lv - 2].children : 0, // 上一级经验
+            dailySign:lvInfoRes.data.dailySign
+        }));
+    }, [lvInfoRes]);
     const CustomDescription = () => (
         <div>
             <ul className="w-[445px] flex flex-wrap">
@@ -133,7 +132,6 @@ const QuestionHome = () => {
         difficulty: 'easy',
         typesList: []
     })
-    const [loading, setLoading] = useState(false)
     const typeChange: GetProp<typeof Checkbox.Group, 'onChange'> = (checkedValues: any) => {
         setExamPloay((prev: any) => ({
             ...prev,
@@ -194,20 +192,20 @@ const QuestionHome = () => {
 
     //获取题目列表
     const getExamListFn = () => {
-        setLoading(true)
         console.log('examPloay', examPloay)
-        reqGetExamList(examPloay).then(res => {
-            setLoading(false)
-            if (res.status) {
-                nav('/question/examPage', {
-                    state: {
-                        questionList: res.data,
-                        firstQuestion: res.data[0],
-                        questionTypeList: typeList,
-                        difficulty: examPloay.difficulty,
-                        num: examPloay.num,
-                    }
-                })
+        getExamListMutation.mutate(examPloay, {
+            onSuccess: (res: any) => {
+                if (res.status) {
+                    nav('/question/examPage', {
+                        state: {
+                            questionList: res.data,
+                            firstQuestion: res.data[0],
+                            questionTypeList: typeList,
+                            difficulty: examPloay.difficulty,
+                            num: examPloay.num,
+                        }
+                    })
+                }
             }
         })
     }
@@ -498,10 +496,12 @@ const QuestionHome = () => {
         if (lvInfo.dailySign==="0") {
             const exp = Math.floor(Math.random() * (25 - 15 + 1)) + 15;
 
-            reqAddLvExp({type:"1",userId, exp}).then(res => {
-                if (res.status) {
-                    openNotification(exp)
-                    initLvInfo(userId)
+            addLvExpMutation.mutate({type:"1",userId, exp},{
+                onSuccess:(res:any)=>{
+                    if (res.status) {
+                        openNotification(exp)
+                        refetchLvInfo()
+                    }
                 }
             })
             setIsSign(true)
@@ -637,7 +637,7 @@ const QuestionHome = () => {
                         />
                     </div>
                 </div>
-                <Button loading={loading} type='primary' className="block mx-auto"
+                <Button loading={getExamListMutation.isPending} type='primary' className="block mx-auto"
                         onClick={getExamListFn}>开始测试</Button>
             </Modal>
         </div>

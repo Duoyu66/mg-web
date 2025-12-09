@@ -2,7 +2,7 @@
 import {Dropdown, MenuProps, Table, Tooltip} from "antd";
 import {useEffect, useState} from "react";
 import SwitchIcon from "./img/switch.svg";
-import {getRankingList} from "@/pages/front-end/question/hooks/getRankingList";
+import {useGetRankingList} from "@/pages/front-end/question/hooks/useGetRankingList";
 
 const RankingList = () => {
     const text = 'Are you sure to delete this task?';
@@ -67,6 +67,7 @@ const RankingList = () => {
         },
     ];
     const [rankList, setRankList]: any = useState([])
+    const { data: rankingData } = useGetRankingList();
     const rankScoreList = [
         {
             id: 0,
@@ -246,35 +247,24 @@ const RankingList = () => {
     });
 
     useEffect(() => {
-        initData()
-        // setRankList(rankAcList)
-    }, []);
-    const initData = () => {
-        getRankingList().then(res => {
-            if (res.status) {
-                console.log("接口返回的shi:", res.data.pointList)
-                if (res.data.pointList.length === 10) {
-                    setRankList(res.data.pointList)
-                } else {
-                    let buArr = []
-                    for (let i = 0; i < 10 - res.data.pointList.length; i++) {
-                        console.log("长度是", 10 - res.data.pointList.length)
-                        let item = {
-                            avatarUrl: "https://img.pawpaw18.cn/user-img/%E9%BB%98%E8%AE%A4%E5%A4%B4%E5%83%8F.svg",
-                            nickName: '虚位以待',
-                            examNum: '--',
-                            pointScore: "--",
-                            id: res.data.pointList.length + 1 + i
-                        }
-                        buArr.push(item)
-
-                    }
-                    setRankList([...res.data.pointList, ...buArr])
-                }
-
+        if (!rankingData?.status) return;
+        const list = rankingData.data?.pointList || [];
+        if (list.length === 10) {
+            setRankList(list);
+        } else {
+            const buArr = [];
+            for (let i = 0; i < 10 - list.length; i++) {
+                buArr.push({
+                    avatarUrl: "https://img.pawpaw18.cn/user-img/%E9%BB%98%E8%AE%A4%E5%A4%B4%E5%83%8F.svg",
+                    nickName: '虚位以待',
+                    examNum: '--',
+                    pointScore: "--",
+                    id: list.length + 1 + i
+                })
             }
-        })
-    }
+            setRankList([...list, ...buArr]);
+        }
+    }, [rankingData]);
 
     const items: MenuProps['items'] = [
         {
