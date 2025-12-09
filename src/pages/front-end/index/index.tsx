@@ -5,12 +5,15 @@ import { useEffect,  useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "@/component/layoutPage/footer";
 import bgIndex from './img/bgIndex.svg';
-
+import { Switch } from 'antd';
+import { useTheme } from '@/component/context/useTheme';
+import {ICONS} from "@/constants/icons";
 
 
 
 export default function Index() {
-    const [mounted, setMounted] = useState(false);
+    const {toggleTheme, theme: currentTheme} = useTheme();
+        const [mounted, setMounted] = useState(false);
     const navigate = useNavigate();
 
     const goHome = () => {
@@ -41,6 +44,16 @@ export default function Index() {
                         <a href="#endpoints" className="text-gray-600 hover:text-gray-900 transition-colors">示例</a>
                         <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">定价</a>
                         <Button onClick={goHome} type="primary" className="transition-all duration-300">快速开始</Button>
+                        <Switch
+                    onClick={toggleTheme}
+                    checkedChildren={
+                        <ICONS.SUN size={16} className="text-white"/>
+                    }
+                    unCheckedChildren={
+                        <ICONS.MOON size={16} className="text-white"/>
+                    }
+                    checked={currentTheme !== 'dark'}
+                />
                     </div>
                 </div>
 
