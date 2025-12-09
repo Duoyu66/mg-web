@@ -38,7 +38,7 @@ interface Record {
     bestComment?: BestComment;
     createTime: number;
 }
-
+// https://img.pawpaw18.cn/user-img/987b1688d3754e4d88371c7f93bb5654.jpg
 const Home = () => {
     const [records, setRecords] = useState<Record[]>([
         {
@@ -326,11 +326,9 @@ const Home = () => {
                                     <div className="flex items-start gap-3 mb-4">
                                         <img 
                                             className="w-12 h-12 rounded-full object-cover flex-shrink-0" 
-                                            src={item.user.userAvatar || 'https://via.placeholder.com/48'} 
+                                            src={item.user.userAvatar} 
                                             alt={item.user.userName}
-                                            onError={(e) => {
-                                                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/48';
-                                            }}
+                                    
                                         />
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 mb-1">
@@ -460,11 +458,9 @@ const Home = () => {
                                     <div key={item.user.id} className="flex items-center gap-3">
                                         <img 
                                             className="w-10 h-10 rounded-full object-cover" 
-                                            src={item.user.userAvatar || 'https://via.placeholder.com/40'} 
+                                            src={item.user.userAvatar } 
                                             alt={item.user.userName}
-                                            onError={(e) => {
-                                                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/40';
-                                            }}
+                                     
                                         />
                                         <div className="flex-1 min-w-0">
                                             <div className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">

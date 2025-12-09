@@ -62,7 +62,7 @@ const LayoutPage = () => {
         </div>
       </div>
       {/* 友情链接 */}
-      <div className="fixed bottom-[50%] translate-y-[-50%] left-0 w-[150px] h-[150px] border">
+      <div className="fixed top-1/2 left-0 -translate-y-1/2 px-6   bg-white dark:bg-gray-800 p-2 rounded-r-2xl flex items-center justify-center">
         <FriendshipLinks />
       </div>
       {/* footer */}

@@ -87,7 +87,7 @@ const Header = () => {
         <Divider orientation="vertical" />
         <span
           className="cursor-pointer"
-          onClick={() => navigate("/front/publishArticle")}
+          onClick={() => navigate("/publishArticle")}
         >
           发布
         </span>

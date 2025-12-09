@@ -57,6 +57,15 @@ const routes = [
         }
     },
     {
+        title: "发布文章",
+        path: "/publishArticle",
+        component: PublishArticle,
+        meta: {
+            age: 1,
+            name: "张三"
+        }
+    },
+    {
         path: "/front",
         component: LayoutPage,
         title: '前端',
@@ -65,15 +74,6 @@ const routes = [
                 title: '主页',
                 path: "home",
                 component: Home,
-                meta: {
-                    age: 1,
-                    name: "张三"
-                }
-            },
-            {
-                title: '发布文章',
-                path: "publishArticle",
-                component: PublishArticle,
                 meta: {
                     age: 1,
                     name: "张三"
