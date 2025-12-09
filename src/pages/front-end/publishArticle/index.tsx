@@ -1,7 +1,8 @@
 import { Editor } from "@tinymce/tinymce-react";
 import { useRef, useState } from "react";
 import "./article.css";
-import { Button, Spin } from "antd";
+import { Button, Spin, message } from "antd";
+import { uploadOssFile } from "@/pages/front-end/utils/UploadOss";
 type TinyMCEEditor = {
   getContent: () => string;
 };
@@ -75,6 +76,41 @@ const PublishArticle = () => {
               "removeformat | help",
             content_style:
               "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+            // 配置图片上传到OSS
+            images_upload_handler: async (
+              blobInfo: { blob: () => Blob; filename: () => string },
+              progress: (percent: number) => void
+            ) => {
+              try {
+                // 显示上传进度（TinyMCE会自动处理）
+                progress(0);
+                
+                const blob = blobInfo.blob();
+                // 转成带文件名的 File，确保 ali-oss 接收正确类型
+                const file = new File([blob], blobInfo.filename(), {
+                  type: blob.type,
+                });
+
+                // 上传到OSS
+                const url = await uploadOssFile(
+                  file,
+                  "articles/images/"
+                );
+                
+                progress(100);
+                message.success('图片上传成功');
+                
+                // 返回OSS的URL
+                return url;
+              } catch (error) {
+                message.error('图片上传失败，请重试');
+                throw error;
+              }
+            },
+            // 允许粘贴图片
+            paste_data_images: true,
+            // 自动上传粘贴的图片
+            automatic_uploads: true,
           }}
         />
         <div className="mt-4">

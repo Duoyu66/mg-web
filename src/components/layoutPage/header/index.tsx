@@ -91,10 +91,9 @@ const Header = () => {
         >
           发布
         </span>
-        <Badge count={100}>
+        <Badge size="small" count={100}       onClick={() => navigate("/front/message")}>
           <Bell
             size={20}
-            onClick={() => navigate("/front/message")}
             className="w-4 h-4 text-primary-500 dark:text-white cursor-pointer"
           />
         </Badge>
