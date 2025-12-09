@@ -15,7 +15,7 @@
 ## 使用方法
 
 ```tsx
-import ArticleTOC from '@/component/ArticleTOC';
+import ArticleTOC from '@/components/ArticleTOC';
 
 function MyComponent() {
     const articleContent = `

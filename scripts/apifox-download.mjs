@@ -1,7 +1,7 @@
 import { writeFile, mkdir } from "fs/promises";
 
-const token = process.env.APIFOX_TOKEN || 'APS-haRIykeACFQx2pp09snFApKM6E27EPEa';
-const projectId = process.env.APIFOX_PROJECT_ID || '7451461';
+const token = process.env.APIFOX_TOKEN || "";
+const projectId = process.env.APIFOX_PROJECT_ID || "";
 const host = process.env.APIFOX_HOST || "https://api.apifox.cn";
 const customUrl = process.env.APIFOX_OPENAPI_URL; // 若已在 Apifox 后台生成开放的 OpenAPI 链接，可直接配置
 const outputDir = "apifox";
@@ -12,9 +12,9 @@ async function main() {
     customUrl ||
     `${host}/api/v1/projects/${projectId}/openapi?scope=project&lang=zh-CN`;
 
-  if (!token && !customUrl) {
+  if (!customUrl && (!token || !projectId)) {
     console.error(
-      "[apifox-download] Missing env: APIFOX_TOKEN (or provide APIFOX_OPENAPI_URL)"
+      "[apifox-download] Missing env: set APIFOX_OPENAPI_URL, or both APIFOX_TOKEN and APIFOX_PROJECT_ID"
     );
     process.exit(1);
   }
@@ -23,11 +23,13 @@ async function main() {
 
   const res = await fetch(url, {
     method: "GET",
+    redirect: "follow",
     headers: {
+      Accept: "application/json, */*",
       "Content-Type": "application/json",
       // 部分环境要求 Bearer 前缀，保守兼容两种写法
       Authorization: token ? `Bearer ${token}` : undefined,
-      "X-Apifox-Token": token,
+      ...(token ? { "X-Apifox-Token": token } : {}),
     },
   });
 
@@ -42,11 +44,21 @@ async function main() {
 
   let data;
   try {
+    const ct = res.headers.get("content-type") || "";
+    if (!ct.includes("application/json")) {
+      throw new Error(`unexpected content-type: ${ct}`);
+    }
     data = JSON.parse(raw);
   } catch (err) {
     const debugFile = `${outputDir}/openapi.debug.txt`;
     await mkdir(outputDir, { recursive: true });
-    await writeFile(debugFile, raw ?? "", "utf8");
+    const debugPayload = [
+      `status: ${res.status} ${res.statusText}`,
+      `headers: ${JSON.stringify(Object.fromEntries(res.headers.entries()), null, 2)}`,
+      "",
+      raw ?? ""
+    ].join("\n");
+    await writeFile(debugFile, debugPayload, "utf8");
     console.error(
       `[apifox-download] parse failed, raw saved to ${debugFile}; error: ${err}`
     );

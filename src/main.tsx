@@ -4,8 +4,8 @@ import './index.css'
 import {ConfigProvider, theme} from 'antd'
 import App from './App.tsx'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import {ThemeProvider} from './component/context/ThemeContext.tsx'
-import {useTheme} from './component/context/useTheme.ts'
+import {ThemeProvider} from './components/context/ThemeContext'
+import {useTheme} from './components/context/useTheme'
 import {BrowserRouter} from 'react-router-dom'
 // 创建 QueryClient 实例
 const queryClient = new QueryClient()

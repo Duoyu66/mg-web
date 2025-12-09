@@ -1,4 +1,4 @@
-import ArticleTOCExample from "@/component/ArticleTOC/example";
+import ArticleTOCExample from "@/components/ArticleTOC/example";
 
 const Nav = () => (
     <div>

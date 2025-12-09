@@ -3,10 +3,10 @@ import { BookMarked, BookOpen, Code, MessageCircleQuestionMark, Music, Rss } fro
 import { Button } from "antd";
 import { useEffect,  useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Footer from "@/component/layoutPage/footer";
+import Footer from "@/components/layoutPage/footer";
 import bgIndex from './img/bgIndex.svg';
 import { Switch } from 'antd';
-import { useTheme } from '@/component/context/useTheme';
+import { useTheme } from '@/components/context/useTheme';
 import {ICONS} from "@/constants/icons";
 
 

@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { Divider, Switch } from "antd";
-import { useTheme } from "@/component/context/useTheme";
-import type { MenuItemType } from "@/component/layoutPage/type";
+import { useTheme } from "@/components/context/useTheme";
+import type { MenuItemType } from "@/components/layoutPage/type";
 import { ICONS } from "@/constants/icons";
 import { Button, Badge } from "antd";
 import { Bell } from "lucide-react";

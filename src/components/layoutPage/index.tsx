@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { useTheme } from "@/component/context/useTheme";
+import { useTheme } from "@/components/context/useTheme";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Footer from "./footer";
 import Header from "./header";

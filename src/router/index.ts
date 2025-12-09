@@ -1,5 +1,5 @@
 import Home from '@/pages/front-end/Home/index'
-import LayoutPage from '@/component/layoutPage'
+import LayoutPage from '@/components/layoutPage'
 import Algorithm from "@/pages/front-end/algorithm";
 import QuestionBank from "@/pages/front-end/questionBank";
 import Message from "@/pages/front-end/message";

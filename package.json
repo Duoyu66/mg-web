@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "apifox:download": "node scripts/apifox-download.mjs",
-    "apifox:types": "openapi-typescript apifox/openapi.json -o src/api/types.ts"
+    "apifox:types": "node -e \"require('fs').mkdirSync('src/api',{recursive:true})\" && openapi-typescript apifox/openapi.json -o src/api/types.ts"
   },
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
