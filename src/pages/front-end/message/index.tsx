@@ -134,7 +134,7 @@ const Message = () => {
                         <button
                             key={item.id}
                             onClick={() => setActiveNav(item.id)}
-                            className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors relative ${
+                            className={`w-full flex items-center gap-3 cursor-pointer px-4 py-3 text-left transition-colors relative ${
                                 item.active || activeNav === item.id
                                     ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
                                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
