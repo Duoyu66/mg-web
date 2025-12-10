@@ -335,7 +335,7 @@ const Home = () => {
                                                 <span className="font-semibold text-gray-900 dark:text-gray-100">
                                                     {item.user.userName}
                                                 </span>
-                                                {item.user.userRole === 'vip' && (
+                                                {item.user.userRole !== 'vip' && (
                                                     <span className="px-2 py-0.5 text-xs bg-gradient-primary text-white rounded-full">
                                                         VIP
                                                     </span>
