@@ -93,6 +93,7 @@ export default function Index() {
 
         {/* 锚点导航 */}
         <div className="flex flex-wrap justify-center gap-3 rounded-full bg-white shadow-lg shadow-indigo-200/50 border border-indigo-100 px-4 py-3 sticky top-6 z-30 backdrop-blur-md">
+       <a >首页</a>
           {webSites.map((item, idx) => (
             <a
               key={idx}
