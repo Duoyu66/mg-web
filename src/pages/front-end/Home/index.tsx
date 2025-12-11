@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { MessageCircle, MessageCircleMore, Eye, ThumbsUp, Bookmark } from 'lucide-react';
 import { Button } from 'antd';
 
@@ -293,6 +293,81 @@ const Home = () => {
         ));
     };
 
+    const [page, setPage] = useState(1);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+
+    // 模拟接口获取更多帖子
+    const fetchMoreRecords = async (nextPage: number) => {
+        // 模拟接口耗时
+        await new Promise((resolve) => setTimeout(resolve, 600));
+
+        // 只模拟 3 页数据，之后为空
+        if (nextPage > 3) {
+            return [];
+        }
+
+        const now = Date.now();
+        return Array.from({ length: 5 }).map((_, idx) => ({
+            id: `${nextPage}-${idx}-${now}`,
+            content: `虚拟帖子第 ${nextPage} 页，第 ${idx + 1} 条\n这是模拟加载的内容。`,
+            category: "交流",
+            tags: idx % 2 === 0 ? ["学习打卡"] : [],
+            thumbNum: Math.floor(Math.random() * 20),
+            favourNum: Math.floor(Math.random() * 10),
+            commentNum: Math.floor(Math.random() * 5),
+            viewNum: Math.floor(Math.random() * 100),
+            hasThumb: false,
+            hasFavour: false,
+            user: {
+                id: `mock-user-${idx}`,
+                userName: `虚拟用户${idx + 1}`,
+                userAvatar: "https://img.pawpaw18.cn/user-img/%E9%BB%98%E8%AE%A4%E5%A4%B4%E5%83%8F.svg",
+                userProfile: "这里是虚拟数据",
+                userRole: idx % 3 === 0 ? "vip" : "user"
+            },
+            bestComment: idx % 2 === 0 ? {
+                id: `mock-comment-${idx}`,
+                plainTextDescription: "这是一个示例最佳评论，用于演示虚拟列表加载。",
+                user: { id: "bot", userName: "智能助手" }
+            } : undefined,
+            createTime: now - idx * 1000 * 60
+        }));
+    };
+
+    const loadMore = useCallback(async () => {
+        if (loadingMore || !hasMore) return;
+        setLoadingMore(true);
+        const nextPage = page + 1;
+        const list = await fetchMoreRecords(nextPage);
+        if (list.length === 0) {
+            setHasMore(false);
+        } else {
+            setRecords((prev) => [...prev, ...list]);
+            setPage(nextPage);
+        }
+        setLoadingMore(false);
+    }, [loadingMore, hasMore, page]);
+
+    // 监听滚动，接近底部时自动加载
+    useEffect(() => {
+        const onScroll = () => {
+            const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+            if (!loadingMore && hasMore && scrollTop + clientHeight >= scrollHeight - 200) {
+                loadMore();
+            }
+        };
+        window.addEventListener("scroll", onScroll, { passive: true });
+        return () => window.removeEventListener("scroll", onScroll);
+    }, [loadingMore, hasMore, loadMore]);
+
+    // 初始加载时确保有数据
+    useEffect(() => {
+        if (records.length === 0) {
+            loadMore();
+        }
+    }, [records.length, loadMore]);
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <div className="max-w-7xl mx-auto px-4 py-6">
@@ -429,6 +504,12 @@ const Home = () => {
                                     </div>
                                 </div>
                             ))}
+
+                            {/* 加载状态 / 没有更多 */}
+                            <div className="text-center text-sm text-gray-500 py-4">
+                                {loadingMore && hasMore && <span>加载中...</span>}
+                                {!hasMore && <span>暂时没有更多了</span>}
+                            </div>
                         </div>
                     </div>
 
