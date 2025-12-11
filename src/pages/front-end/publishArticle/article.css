@@ -27,7 +27,6 @@
 
 .article-content h1 {
   font-size: 2rem;
-  border-bottom: 2px solid #e5e7eb;
   padding-bottom: 8px;
 }
 
@@ -46,7 +45,7 @@
 }
 
 .article-content strong {
-  color: #0f172a;
+  color: inherit; /* 保留来自富文本的颜色样式 */
 }
 
 .article-content em {
@@ -120,6 +119,14 @@
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+aie-footer{
+  display: none!important;
+}
+/* 隐藏 AiEditor 默认底部 footer */
+.ai-editor .ai-editor-footer,
+.ai-editor-footer {
+  display: none !important;
 }
 
 .article-content th,

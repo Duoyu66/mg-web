@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { BookMarked, BookOpen, Code, MessageCircleQuestionMark, Music, Rss } from "lucide-react";
 import Footer from "@/components/layoutPage/footer";
+import { useNavigate } from "react-router-dom";
 
 const webSites = [
   {
@@ -57,6 +58,7 @@ export default function Index() {
   const isManualScrollingRef = useRef(false);
   const navContainerRef = useRef<HTMLDivElement | null>(null);
   const animFrameRef = useRef<number | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const id = requestAnimationFrame(() => setReady(true));
@@ -266,14 +268,14 @@ export default function Index() {
               下载安装豆包桌面端，体验更流畅的 AI 创作与知识管理。
             </p>
           </div>
-          <a
-            href={doubaoUrl}
-            target="_blank"
-            rel="noreferrer"
+          <span
+            onClick={() => {
+              navigate('/front/home')
+            }}
             className="inline-flex items-center justify-center rounded-full bg-indigo-500 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-indigo-500/30 hover:bg-indigo-400 transition"
           >
             立即下载
-          </a>
+          </span>
         </header>
 
         {/* Anchor Navigation */}
