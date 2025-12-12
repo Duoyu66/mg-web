@@ -71,7 +71,7 @@ const Header = () => {
             >
               {item.title}
               {location.pathname.includes(item.path) && (
-                <span className="absolute bottom-[1px] left-[50%] translate-x-[-50%] rounded-2xl opacity-85 bg-primary-500 dark:bg-green-500 inline-block w-[85%] h-[8px]" />
+                <span className="absolute bottom-[2px] left-[50%] translate-x-[-50%] rounded-2xl opacity-85 bg-primary-500 dark:bg-green-500 inline-block w-[85%] h-[8px]" />
               )}
             </li>
           );

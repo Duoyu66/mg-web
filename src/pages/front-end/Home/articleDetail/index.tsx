@@ -384,11 +384,19 @@ export default function ArticleDetail() {
       return;
     }
 
-    console.log("收集到的数据是", commentText);
-    console.log("验证通过，所有 @ 提及都是有效的用户:", validation.validMentions);
+    // 收集所有 @ 的人员的 value 到数组中
+    const mentionedUserValues = validation.validMentions.map((m) => m.value);
+
+    console.log("收集到的评论内容:", commentText);
+    console.log("所有 @ 的人员的 value 数组:", mentionedUserValues);
+    console.log("所有 @ 的人员的详细信息:", validation.validMentions);
 
     // 这里应该调用 API 提交评论
-    // 可以将 validMentions 一起提交，方便后端处理
+    // 提交数据格式：
+    // {
+    //   content: commentText,  // 评论内容（包含 @label）
+    //   mentionedUserIds: mentionedUserValues,  // @ 的人员的 value 数组
+    // }
     const newComment: Comment = {
       id: Date.now().toString(),
       content: commentText,
