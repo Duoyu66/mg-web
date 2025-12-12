@@ -235,7 +235,29 @@ export default function Index() {
     const rect = el.getBoundingClientRect();
     const absoluteTop = rect.top + window.scrollY;
     const navHeight = navContainerRef.current?.offsetHeight ?? 0;
-    const end = id === "topBox" ? 0 : Math.max(absoluteTop - navHeight - 24, 0);
+    const viewportHeight = window.innerHeight;
+    
+    // 计算目标滚动位置
+    let end: number;
+    if (id === "topBox") {
+      end = 0;
+    } else {
+      // 检查是否是最后一个section
+      const match = id.match(/^section-(\d+)$/);
+      const isLastSection = match && parseInt(match[1], 10) === webSites.length - 1;
+      
+      if (isLastSection) {
+        // 对于最后一个section，确保可以完全显示，考虑viewport高度
+        const maxScroll = document.documentElement.scrollHeight - viewportHeight;
+        // 计算让section顶部距离导航栏合适距离的位置
+        const targetScroll = Math.max(absoluteTop - navHeight - 24, 0);
+        // 但不能超过最大可滚动距离
+        end = Math.min(targetScroll, maxScroll);
+      } else {
+        end = Math.max(absoluteTop - navHeight - 24, 0);
+      }
+    }
+    
     const start = window.scrollY;
     const distance = end - start;
 
@@ -284,22 +306,22 @@ export default function Index() {
         <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm uppercase tracking-[0.2em] text-indigo-500">
-              豆包桌面版
+              木瓜生态
             </p>
             <h1 className="text-4xl font-bold leading-tight mt-2 text-indigo-900">
               高效创作与协作，从这里开始
             </h1>
             <p className="text-gray-600 mt-2">
-              下载安装豆包桌面端，体验更流畅的 AI 创作与知识管理。
+              在木瓜生态体验更流畅的 AI 创作与知识管理。
             </p>
           </div>
           <span
             onClick={() => {
               navigate("/front/home");
             }}
-            className="inline-flex items-center justify-center rounded-full bg-indigo-500 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-indigo-500/30 hover:bg-indigo-400 transition"
+            className="cursor-pointer inline-flex items-center justify-center rounded-full bg-indigo-500 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-indigo-500/30 hover:bg-indigo-400 transition"
           >
-            立即下载
+            立即体验
           </span>
         </header>
 
@@ -374,7 +396,7 @@ export default function Index() {
         </div>
 
         {/* Modules List */}
-        <div className="grid gap-12">
+        <div className="grid gap-12 pb-32">
           {webSites.map((item, idx) => {
             const isEven = idx % 2 === 0;
             return (
