@@ -65,6 +65,7 @@ export default function Index() {
   const isManualScrollingRef = useRef(false);
   const navContainerRef = useRef<HTMLDivElement | null>(null);
   const animFrameRef = useRef<number | null>(null);
+  const isScrollingRef = useRef(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -209,11 +210,17 @@ export default function Index() {
   }, [activeIndex, ready]);
 
   const scrollTo = useCallback((id: string) => {
+    // 如果正在滚动，阻止新的滚动操作
+    if (isScrollingRef.current) {
+      return;
+    }
+
     const el = document.getElementById(id);
     if (!el) return;
 
-    // 锁定自动滚动检测
+    // 锁定自动滚动检测和点击限制
     isManualScrollingRef.current = true;
+    isScrollingRef.current = true;
 
     // 立即更新 activeIndex 使指示器秒到位
     let targetIndex = -1;
@@ -250,8 +257,10 @@ export default function Index() {
       if (progress < 1) {
         animFrameRef.current = requestAnimationFrame(animateScroll);
       } else {
+        // 滚动结束后，延迟一点再解除限制，确保滚动完全停止
         setTimeout(() => {
           isManualScrollingRef.current = false;
+          isScrollingRef.current = false;
         }, 200);
       }
     }
@@ -319,9 +328,16 @@ export default function Index() {
             }}
             onClick={(e) => {
               e.preventDefault();
+              if (isScrollingRef.current) {
+                return;
+              }
               scrollTo("topBox");
             }}
-            className={`relative z-10 cursor-pointer px-3 py-1 text-sm font-medium rounded-full transition ${
+            className={`relative z-10 px-3 py-1 text-sm font-medium rounded-full transition ${
+              isScrollingRef.current
+                ? "cursor-not-allowed opacity-50"
+                : "cursor-pointer"
+            } ${
               activeIndex === -1
                 ? "text-indigo-700 font-semibold"
                 : "text-indigo-700 hover:text-indigo-500"
@@ -337,9 +353,16 @@ export default function Index() {
               }}
               onClick={(e) => {
                 e.preventDefault();
+                if (isScrollingRef.current) {
+                  return;
+                }
                 scrollTo(`section-${idx}`);
               }}
               className={`relative z-10 px-3 py-1 text-sm font-medium rounded-full transition ${
+                isScrollingRef.current
+                  ? "cursor-not-allowed opacity-50"
+                  : "cursor-pointer"
+              } ${
                 activeIndex === idx
                   ? "text-indigo-700 font-semibold"
                   : "text-indigo-700 hover:text-indigo-500"
