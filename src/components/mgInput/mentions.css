@@ -1,0 +1,58 @@
+.comment-mentions {
+  position: relative;
+}
+
+/* 确保输入框文本正常显示 */
+.comment-mentions textarea {
+  color: inherit;
+}
+
+/* 高亮 @ 用户名 - 使用 Ant Design Mentions 组件的标准类名 */
+.comment-mentions .ant-mentions-measure .ant-mentions-mention,
+.comment-mentions .ant-mentions-measure span.ant-mentions-mention,
+.comment-mentions .ant-mentions-measure mark.ant-mentions-mention {
+  color: rgb(124, 58, 237) !important;
+  font-weight: 500;
+  background-color: transparent !important;
+}
+
+/* 暗色模式下的高亮 */
+.dark .comment-mentions .ant-mentions-measure .ant-mentions-mention,
+.dark .comment-mentions .ant-mentions-measure span.ant-mentions-mention,
+.dark .comment-mentions .ant-mentions-measure mark.ant-mentions-mention {
+  color: rgb(167, 139, 250) !important;
+}
+
+/* 匹配所有可能的 @ 用户名元素位置（通用选择器） */
+.comment-mentions .ant-mentions-mention {
+  color: rgb(124, 58, 237) !important;
+  font-weight: 500;
+  background-color: transparent !important;
+}
+
+.dark .comment-mentions .ant-mentions-mention {
+  color: rgb(167, 139, 250) !important;
+}
+
+/* 使用主题色变量（如果可用） */
+.comment-mentions .ant-mentions-measure .ant-mentions-mention {
+  color: var(--color-primary-600, rgb(124, 58, 237)) !important;
+}
+
+.dark .comment-mentions .ant-mentions-measure .ant-mentions-mention {
+  color: var(--color-primary-400, rgb(167, 139, 250)) !important;
+}
+
+/* 如果 Mentions 使用其他元素结构，也匹配 */
+.comment-mentions .ant-mentions-measure [class*="mention"],
+.comment-mentions .ant-mentions-measure [data-mention] {
+  color: rgb(124, 58, 237) !important;
+  font-weight: 500;
+}
+
+.dark .comment-mentions .ant-mentions-measure [class*="mention"],
+.dark .comment-mentions .ant-mentions-measure [data-mention] {
+  color: rgb(167, 139, 250) !important;
+}
+
+

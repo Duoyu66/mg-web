@@ -10,14 +10,10 @@ import {
   CheckCircle2,
   Clock,
   SquareStack,
-  Image as ImageIcon,
-  Smile,
-  ArrowUpDown,
 } from "lucide-react";
-import { Button, Mentions, message } from "antd";
+import { message } from "antd";
 import type { MentionsProps } from "antd/es/mentions";
-import EmojiPicker from "@/components/EmojiPicker";
-import "./mentions.css";
+import CommentInput from "@/components/mgInput";
 
 interface User {
   id: string;
@@ -63,7 +59,6 @@ export default function ArticleDetail() {
   const [article, setArticle] = useState<Record | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentText, setCommentText] = useState("");
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [sortType, setSortType] = useState<"all" | "hot" | "new" | "floor">(
     "all"
   );
@@ -675,83 +670,27 @@ export default function ArticleDetail() {
 
               {/* 评论输入框 */}
               <div className="mb-6">
-                <div className="flex items-start gap-3 mb-3">
-                  <img
-                    className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-                    src="https://img.pawpaw18.cn/user-img/default-avatar.jpg"
-                    alt="我的头像"
-                  />
-                  <div className="flex-1">
-                    <Mentions
-                      value={commentText}
-                      onChange={(value) => setCommentText(value)}
-                      placeholder="快来和大家讨论吧~ 输入 @ 可以提及用户"
-                      autoSize={{ minRows: 3, maxRows: 6 }}
-                      className="mb-2 comment-mentions"
-                      options={filteredMentionUsers}
-                      prefix="@"
-                      split=""
-                      filterOption={false}
-                      onSelect={(option) => {
-                        // 当用户通过组件选择时，记录到 selectedMentions 中
-                        // option.value 是用户ID，option.label 是显示名称
-                        // Mentions 组件会插入 label 到文本中
-                        const selectedLabel =
-                          (option as { label?: string })?.label ||
-                          (option as { value?: string })?.value ||
-                          "";
-                        if (selectedLabel) {
-                          setSelectedMentions((prev) =>
-                            new Set(prev).add(selectedLabel)
-                          );
-                          console.log("用户通过组件选择了:", selectedLabel);
-                        }
-                      }}
-                      onSearch={(text) => {
-                        // 更新搜索文本，触发用户列表过滤
-                        setMentionSearchText(text);
-                        // 这里也可以调用API动态搜索用户
-                        // 例如：fetchUsers(text).then(setMentionUsers);
-                      }}
-                    />
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                          className="flex items-center gap-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-                        >
-                          <Smile className="w-4 h-4" />
-                          <span className="text-sm">表情</span>
-                        </button>
-                        <button className="flex items-center gap-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
-                          <ImageIcon className="w-4 h-4" />
-                          <span className="text-sm">图片</span>
-                        </button>
-                        <button className="flex items-center gap-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
-                          <ArrowUpDown className="w-4 h-4" />
-                          <span className="text-sm">切换</span>
-                        </button>
-                      </div>
-                      <Button
-                        type="primary"
-                        onClick={handleSubmitComment}
-                        disabled={!commentText.trim()}
-                      >
-                        发布
-                      </Button>
-                    </div>
-                    {showEmojiPicker && (
-                      <div className="mt-2">
-                        <EmojiPicker
-                          onSelect={(emoji: string) => {
-                            setCommentText((prev) => prev + emoji);
-                            setShowEmojiPicker(false);
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <CommentInput
+                  value={commentText}
+                  onChange={setCommentText}
+                  onSubmit={handleSubmitComment}
+                  mentionUsers={filteredMentionUsers}
+                  onSelectMention={(option) => {
+                    const selectedLabel =
+                      (option as { label?: string })?.label ||
+                      (option as { value?: string })?.value ||
+                      "";
+                    if (selectedLabel) {
+                      setSelectedMentions((prev) => new Set(prev).add(selectedLabel));
+                      console.log("用户通过组件选择了:", selectedLabel);
+                    }
+                  }}
+                  onSearchMention={(text) => {
+                    setMentionSearchText(text);
+                  }}
+                  isSubmitDisabled={!commentText.trim()}
+                  avatarUrl="https://img.pawpaw18.cn/user-img/default-avatar.jpg"
+                />
               </div>
 
               {/* 评论列表 */}
