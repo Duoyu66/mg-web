@@ -6,7 +6,7 @@ import {
   ThumbsUp,
   Bookmark,
 } from "lucide-react";
-import { Button } from "antd";
+import { Button, Skeleton } from "antd";
 import { useNavigate } from "react-router-dom";
 
 interface User {
@@ -559,10 +559,21 @@ const Home = () => {
               ))}
 
               {/* 加载状态 / 没有更多 */}
-              <div className="text-center text-sm text-gray-500 py-4">
-                {loadingMore && hasMore && <span>加载中...</span>}
-                {!hasMore && <span>暂时没有更多了</span>}
-              </div>
+              {loadingMore && hasMore && (
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5">
+                  <Skeleton
+                    avatar={{ size: 48, shape: "circle" }}
+                    title={{ width: "30%" }}
+                    paragraph={{ rows: 3, width: ["100%", "80%", "60%"] }}
+                    active
+                  />
+                </div>
+              )}
+              {!hasMore && (
+                <div className="text-center text-sm text-gray-500 dark:text-gray-400 py-4">
+                  <span>暂时没有更多了</span>
+                </div>
+              )}
             </div>
           </div>
 
