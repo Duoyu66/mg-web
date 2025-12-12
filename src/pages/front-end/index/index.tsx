@@ -1,5 +1,12 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import { BookMarked, BookOpen, Code, MessageCircleQuestionMark, Music, Rss } from "lucide-react";
+import {
+  BookMarked,
+  BookOpen,
+  Code,
+  MessageCircleQuestionMark,
+  Music,
+  Rss,
+} from "lucide-react";
 import Footer from "@/components/layoutPage/footer";
 import { useNavigate } from "react-router-dom";
 
@@ -143,11 +150,15 @@ export default function Index() {
     }
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", () => {
-      if (!isManualScrollingRef.current) {
-        updateActiveIndex();
-      }
-    }, { passive: true });
+    window.addEventListener(
+      "resize",
+      () => {
+        if (!isManualScrollingRef.current) {
+          updateActiveIndex();
+        }
+      },
+      { passive: true }
+    );
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -183,7 +194,9 @@ export default function Index() {
       // 直接更新，使用 CSS transition 实现平滑动画
       if (indicatorRef.current) {
         // 如果正在手动滚动，使用更快的过渡时间
-        const transitionDuration = isManualScrollingRef.current ? "0.2s" : "0.25s";
+        const transitionDuration = isManualScrollingRef.current
+          ? "0.2s"
+          : "0.25s";
         indicatorRef.current.style.transition = `transform ${transitionDuration} cubic-bezier(0.4, 0, 0.2, 1), width ${transitionDuration} cubic-bezier(0.4, 0, 0.2, 1)`;
         indicatorRef.current.style.transform = `translateX(${left}px)`;
         indicatorRef.current.style.width = `${width}px`;
@@ -198,10 +211,10 @@ export default function Index() {
   const scrollTo = useCallback((id: string) => {
     const el = document.getElementById(id);
     if (!el) return;
-  
+
     // 锁定自动滚动检测
     isManualScrollingRef.current = true;
-  
+
     // 立即更新 activeIndex 使指示器秒到位
     let targetIndex = -1;
     if (id === "topBox") {
@@ -211,29 +224,29 @@ export default function Index() {
       if (match) targetIndex = parseInt(match[1], 10);
     }
     setActiveIndex(targetIndex);
-  
+
     const rect = el.getBoundingClientRect();
     const absoluteTop = rect.top + window.scrollY;
     const navHeight = navContainerRef.current?.offsetHeight ?? 0;
     const end = id === "topBox" ? 0 : Math.max(absoluteTop - navHeight - 24, 0);
     const start = window.scrollY;
     const distance = end - start;
-  
+
     const duration = Math.min(Math.max(Math.abs(distance) / 1.6, 450), 1100);
     const startTime = performance.now();
-  
+
     function animateScroll(now: number) {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-  
+
       // easeInOutCubic（比 smooth 更稳定）
       const eased =
         progress < 0.5
           ? 4 * progress * progress * progress
           : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-  
+
       window.scrollTo(0, start + distance * eased);
-  
+
       if (progress < 1) {
         animFrameRef.current = requestAnimationFrame(animateScroll);
       } else {
@@ -242,13 +255,12 @@ export default function Index() {
         }, 200);
       }
     }
-  
+
     if (animFrameRef.current !== null) {
       cancelAnimationFrame(animFrameRef.current);
     }
     animFrameRef.current = requestAnimationFrame(animateScroll);
   }, []);
-  
 
   return (
     <div
@@ -262,15 +274,19 @@ export default function Index() {
       <div className="mx-auto max-w-6xl px-6 pb-16 space-y-10">
         <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-indigo-500">豆包桌面版</p>
-            <h1 className="text-4xl font-bold leading-tight mt-2 text-indigo-900">高效创作与协作，从这里开始</h1>
+            <p className="text-sm uppercase tracking-[0.2em] text-indigo-500">
+              豆包桌面版
+            </p>
+            <h1 className="text-4xl font-bold leading-tight mt-2 text-indigo-900">
+              高效创作与协作，从这里开始
+            </h1>
             <p className="text-gray-600 mt-2">
               下载安装豆包桌面端，体验更流畅的 AI 创作与知识管理。
             </p>
           </div>
           <span
             onClick={() => {
-              navigate('/front/home')
+              navigate("/front/home");
             }}
             className="inline-flex items-center justify-center rounded-full bg-indigo-500 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-indigo-500/30 hover:bg-indigo-400 transition"
           >
@@ -279,7 +295,10 @@ export default function Index() {
         </header>
 
         {/* Anchor Navigation */}
-        <div ref={navContainerRef} className="relative flex bg-gradient-to-br from-[rgba(235,237,240,0.85)] via-[rgba(233,236,238,0.81)] to-[rgba(254,254,255,0.87)] flex-wrap justify-center gap-3 rounded-full shadow-lg shadow-indigo-200/50 border border-indigo-100 px-4 py-3 sticky top-6 z-30 backdrop-blur-md">
+        <div
+          ref={navContainerRef}
+          className="relative flex bg-gradient-to-br from-[rgba(235,237,240,0.85)] via-[rgba(233,236,238,0.81)] to-[rgba(254,254,255,0.87)] flex-wrap justify-center gap-3 rounded-full shadow-lg shadow-indigo-200/50 border border-indigo-100 px-4 py-3 sticky top-6 z-30 backdrop-blur-md"
+        >
           {/* 滑动背景指示器 */}
           <div
             ref={indicatorRef}
@@ -289,7 +308,8 @@ export default function Index() {
               width: 0,
               opacity: 0,
               transform: "translateX(0px)",
-              transition: "transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s ease-out",
+              transition:
+                "transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s ease-out",
               willChange: "transform, width",
             }}
           />
@@ -339,11 +359,17 @@ export default function Index() {
                 id={`section-${idx}`}
                 key={idx}
                 className={`group overflow-hidden rounded-2xl bg-white border border-indigo-100 shadow-xl shadow-indigo-100/50 transition-all duration-500 ${
-                  ready ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+                  ready
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-6"
                 }`}
                 style={{ scrollMarginTop: "120px" }}
               >
-                <div className={`flex flex-col md:flex-row ${isEven ? "" : "md:flex-row-reverse"}`}>
+                <div
+                  className={`flex flex-col md:flex-row ${
+                    isEven ? "" : "md:flex-row-reverse"
+                  }`}
+                >
                   {/* Image Section */}
                   <div
                     className={`w-full md:w-1/2 h-64 md:h-auto bg-cover bg-center flex-shrink-0 ${
@@ -355,12 +381,16 @@ export default function Index() {
                   <div className="w-full md:w-1/2 p-8 space-y-4 flex flex-col justify-center">
                     <div className="flex items-center gap-2 text-indigo-600">
                       {item.icon}
-                      <span className="text-sm">{item.url.replace(/^https?:\/\//, "")}</span>
+                      <span className="text-sm">
+                        {item.url.replace(/^https?:\/\//, "")}
+                      </span>
                     </div>
                     <h3 className="text-3xl font-semibold text-indigo-900 group-hover:text-indigo-700 transition">
                       {item.title}
                     </h3>
-                    <p className="text-gray-600 text-lg leading-relaxed">{item.description}</p>
+                    <p className="text-gray-600 text-lg leading-relaxed">
+                      {item.description}
+                    </p>
                     <div className="flex justify-start pt-2">
                       <a
                         href={item.url}

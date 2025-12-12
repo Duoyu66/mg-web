@@ -93,16 +93,21 @@ const Header = () => {
         </span>
         <Input.Search
           placeholder="搜索"
-          className="w-48"
+          className="w-[80px]"
           allowClear
+          style={{ width: "180px" }}
           onSearch={(value) => {
             if (value.trim()) {
               // 这里可以添加搜索逻辑
-              console.log('搜索:', value);
+              console.log("搜索:", value);
             }
           }}
         />
-        <Badge size="small" count={100}       onClick={() => navigate("/front/message")}>
+        <Badge
+          size="small"
+          count={100}
+          onClick={() => navigate("/front/message")}
+        >
           <Bell
             size={20}
             className="w-4 h-4 text-primary-500 dark:text-white cursor-pointer"
