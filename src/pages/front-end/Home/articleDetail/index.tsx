@@ -12,7 +12,6 @@ import {
   SquareStack,
 } from "lucide-react";
 import { message } from "antd";
-import type { MentionsProps } from "antd/es/mentions";
 import CommentInput from "@/components/mgInput";
 
 interface User {
@@ -65,9 +64,12 @@ export default function ArticleDetail() {
   const [activeTab, setActiveTab] = useState<"comments" | "related">(
     "comments"
   );
-  const [mentionUsers, setMentionUsers] = useState<
-    MentionsProps["options"]
-  >([]);
+  type MentionOption = {
+    value: string;
+    label?: string;
+  };
+
+  const [mentionUsers, setMentionUsers] = useState<MentionOption[]>([]);
   const [mentionSearchText, setMentionSearchText] = useState("");
   // 记录用户通过组件选择的提及（用于验证）
   const [selectedMentions, setSelectedMentions] = useState<Set<string>>(
@@ -78,8 +80,10 @@ export default function ArticleDetail() {
   useEffect(() => {
     // 这里应该调用API获取可@的用户列表
     // 暂时使用模拟数据，包括文章作者和评论用户
-    const mockUsers: MentionsProps["options"] = [
+    // value 用于 Mentions 插入文本，所以用 label；真实 ID 用 realValue 存储
+    const mockUsers: MentionOption[] = [
       { value: "123", label: "竹叶" },
+      { value: "12322", label: "赵睿" },
       { value: "1232", label: "用户A" },
       { value: "sdfss", label: "智能助手" },
       { value: "sdf", label: "管理员" },
@@ -89,37 +93,37 @@ export default function ArticleDetail() {
     setMentionUsers(mockUsers);
   }, []);
 
-  // 根据搜索文本过滤用户列表
+  const mentionOptions: MentionOption[] = (mentionUsers || []) as MentionOption[];
+
   const filteredMentionUsers = mentionSearchText
-    ? (mentionUsers || []).filter((user) =>
-        String(user?.value || "")
-          .toLowerCase()
-          .includes(mentionSearchText.toLowerCase())
-      )
+    ? mentionOptions.filter((user: MentionOption) => {
+        const label = String(user?.label || user?.value || "");
+        const displayValue = String(user?.value || "");
+        const text = mentionSearchText.toLowerCase();
+        return (
+          label.toLowerCase().includes(text) ||
+          displayValue.toLowerCase().includes(text)
+        );
+      })
     : mentionUsers || [];
 
-  // 获取所有有效的用户 value 和 label 映射（用于验证）
-  const validUserValues = (mentionUsers || []).map(
-    (user) => user?.value as string
-  );
-  const validUserLabels = (mentionUsers || []).map(
-    (user) => user?.label as string
-  );
+  const extractValue = (user: MentionOption): string =>
+    (user?.value as string) || "";
+  const extractLabel = (user: MentionOption): string =>
+    (user?.label as string) || (user?.value as string) || "";
+
+  // 获取所有有效的用户 value(label)/realValue(id) 和 label 映射（用于验证与收集）
+  const validUserValues = mentionOptions.map((user) => extractValue(user));
+  const validUserLabels = mentionOptions.map((user) => extractLabel(user));
   const validUserValuesSet = new Set(validUserValues);
   const validUserLabelsSet = new Set(validUserLabels);
-  // 创建 value 到 label 的映射
-  const valueToLabelMap = new Map(
-    (mentionUsers || []).map((user) => [
-      user?.value as string,
-      user?.label as string,
-    ])
+  // 创建 value(id) 到 label 的映射
+  const valueToLabelMap = new Map<string, string>(
+    mentionOptions.map((user) => [extractValue(user), extractLabel(user)])
   );
-  // 创建 label 到 value 的映射
-  const labelToValueMap = new Map(
-    (mentionUsers || []).map((user) => [
-      user?.label as string,
-      user?.value as string,
-    ])
+  // 创建 label 到 value(id) 的映射
+  const labelToValueMap = new Map<string, string>(
+    mentionOptions.map((user) => [extractLabel(user), extractValue(user)])
   );
 
   // 验证评论内容中的 @ 提及是否都是通过组件选择的
@@ -387,7 +391,9 @@ export default function ArticleDetail() {
     const validation = validateMentions(commentText);
     
     // 收集所有有效的 @ 的人员的 value 到数组中（无效的会被忽略）
-    const mentionedUserValues = validation.validMentions.map((m) => m.value);
+  const mentionedUserValues = validation.validMentions.map(
+    (m) => labelToValueMap.get(m.value) || m.value
+  );
 
     console.log("收集到的评论内容:", commentText);
     console.log("所有有效的 @ 的人员的 value 数组:", mentionedUserValues);
@@ -672,13 +678,17 @@ export default function ArticleDetail() {
               <div className="mb-6">
                 <CommentInput
                   value={commentText}
-                  onChange={setCommentText}
+                  onChange={(val) => setCommentText(val)}
                   onSubmit={handleSubmitComment}
                   mentionUsers={filteredMentionUsers}
+                  displayTransform={(val, option) =>
+                    option?.label || valueToLabelMap.get(val) || val
+                  }
                   onSelectMention={(option) => {
                     const selectedLabel =
-                      (option as { label?: string })?.label ||
-                      (option as { value?: string })?.value ||
+                      option.label ||
+                      valueToLabelMap.get(option.value) ||
+                      option.value ||
                       "";
                     if (selectedLabel) {
                       setSelectedMentions((prev) => new Set(prev).add(selectedLabel));

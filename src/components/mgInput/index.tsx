@@ -1,20 +1,29 @@
 import { useState } from "react";
 import { Button, Mentions } from "antd";
-import type { MentionsProps } from "antd";
+import type { MentionsOptionProps } from "antd/es/mentions";
 import { Smile, Image as ImageIcon, ArrowUpDown } from "lucide-react";
 import EmojiPicker from "../EmojiPicker";
 import "./mentions.css";
 
-type MentionOption = NonNullable<MentionsProps["options"]>[number];
+type MentionOption = {
+  value: string;
+  label?: string;
+  realValue?: string;
+};
+
+type MentionsWithDisplayProps = React.ComponentProps<typeof Mentions> & {
+  displayTransform?: (value: string, option?: MentionOption) => string;
+};
 
 interface CommentInputProps {
   avatarUrl?: string;
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
-  mentionUsers: MentionsProps["options"];
+  mentionUsers: MentionOption[];
   onSelectMention: (option: MentionOption) => void;
   onSearchMention: (text: string) => void;
+  displayTransform?: (value: string, option?: MentionOption) => string;
   placeholder?: string;
   isSubmitDisabled?: boolean;
   minRows?: number;
@@ -29,12 +38,41 @@ export default function CommentInput({
   mentionUsers = [],
   onSelectMention,
   onSearchMention,
+  displayTransform,
   placeholder = "快来和大家讨论吧~ 输入 @ 可以提及用户",
   isSubmitDisabled,
   minRows = 3,
   maxRows = 6,
 }: CommentInputProps) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
+  const mentionProps: MentionsWithDisplayProps = {
+    value,
+    onChange: (val: string) => onChange(val),
+    placeholder,
+    autoSize: { minRows, maxRows },
+    className: "mb-2 comment-mentions",
+    options: mentionUsers,
+    prefix: "@",
+    split: "",
+    filterOption: false,
+    notFoundContent: null,
+    displayTransform,
+    onSelect: (option: MentionsOptionProps) => {
+      const opt = option as MentionsOptionProps & { realValue?: string };
+      const normalized: MentionOption = {
+        value: String(opt.value ?? opt.label ?? ""),
+        label:
+          opt.label !== undefined
+            ? String(opt.label)
+            : opt.value !== undefined
+            ? String(opt.value)
+            : undefined,
+      };
+      onSelectMention(normalized);
+    },
+    onSearch: onSearchMention,
+  };
 
   return (
     <div className="flex items-start gap-3 mb-3">
@@ -44,19 +82,7 @@ export default function CommentInput({
         alt="我的头像"
       />
       <div className="flex-1">
-        <Mentions
-          value={value}
-          onChange={(val) => onChange(val)}
-          placeholder={placeholder}
-          autoSize={{ minRows, maxRows }}
-          className="mb-2 comment-mentions"
-          options={mentionUsers}
-          prefix="@"
-          split=""
-          filterOption={false}
-          onSelect={onSelectMention}
-          onSearch={onSearchMention}
-        />
+        <Mentions {...mentionProps} />
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button

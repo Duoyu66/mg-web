@@ -55,4 +55,9 @@
   color: rgb(167, 139, 250) !important;
 }
 
+/* 下拉无数据时隐藏空白长条（全局作用于 Mentions 下拉） */
+.ant-mentions-dropdown .ant-mentions-dropdown-menu:empty {
+  display: none !important;
+}
+
 
