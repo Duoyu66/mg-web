@@ -13,6 +13,7 @@ import QuestionHome from "@/pages/front-end/question/questionHome";
 import ExamPage from "@/pages/front-end/question/questionHome/examPage";
 import FinishPage from "@/pages/front-end/question/questionHome/finishPage";
 import PublishArticle from "@/pages/front-end/publishArticle";
+import ArticleDetail from "@/pages/front-end/Home/articleDetail";
 
 const routes = [
     {
@@ -120,6 +121,15 @@ const routes = [
                 title: '测试',
                 path: "test",
                 component: TestBox,
+                meta: {
+                    age: 1,
+                    name: "张三"
+                }
+            },
+            {
+                title: '文章详情',
+                path: "articleDetail/:id",
+                component: ArticleDetail,
                 meta: {
                     age: 1,
                     name: "张三"

@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { MessageCircle, MessageCircleMore, Eye, ThumbsUp, Bookmark } from 'lucide-react';
 import { Button } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 interface User {
     id: string;
@@ -40,6 +41,7 @@ interface Record {
 }
 // https://img.pawpaw18.cn/user-img/987b1688d3754e4d88371c7f93bb5654.jpg
 const Home = () => {
+    const navigate = useNavigate();
     const [records, setRecords] = useState<Record[]>([
         {
             "id": "1998194863023136770",
@@ -395,7 +397,8 @@ const Home = () => {
                             {records.map((item) => (
                                 <div 
                                     key={item.id} 
-                                    className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow"
+                                    className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow cursor-pointer"
+                                    onClick={() => navigate(`/front/articleDetail/${item.id}`)}
                                 >
                                     {/* 用户信息 */}
                                     <div className="flex items-start gap-3 mb-4">
@@ -468,7 +471,10 @@ const Home = () => {
                                     )}
 
                                     {/* 操作栏 */}
-                                    <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
+                                    <div 
+                                        className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
                                         <div className="flex items-center gap-6">
                                             <button
                                                 onClick={() => handleThumb(item.id)}

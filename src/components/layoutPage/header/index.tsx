@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Divider, Switch } from "antd";
+import { Divider, Switch, Input } from "antd";
 import { useTheme } from "@/components/context/useTheme";
 import type { MenuItemType } from "@/components/layoutPage/type";
 import { ICONS } from "@/constants/icons";
@@ -91,6 +91,17 @@ const Header = () => {
         >
           发布
         </span>
+        <Input.Search
+          placeholder="搜索"
+          className="w-48"
+          allowClear
+          onSearch={(value) => {
+            if (value.trim()) {
+              // 这里可以添加搜索逻辑
+              console.log('搜索:', value);
+            }
+          }}
+        />
         <Badge size="small" count={100}       onClick={() => navigate("/front/message")}>
           <Bell
             size={20}
