@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, Mentions } from "antd";
 import type { MentionsOptionProps } from "antd/es/mentions";
 import { Smile, Image as ImageIcon, ArrowUpDown } from "lucide-react";
@@ -46,32 +46,145 @@ export default function CommentInput({
 }: CommentInputProps) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
+  // 转换 options：将 value 设置为 label，这样插入到文本中的就是 label
+  // 同时保留原始 value（真实ID）用于提交
+  const transformedOptions = mentionUsers.map((user) => ({
+    value: user.label || user.value, // 插入文本时使用 label
+    label: user.label || user.value, // 下拉列表显示 label
+  }));
+
+  // 监听下拉框，当选项为空时立即隐藏下拉框
+  useEffect(() => {
+    const hideEmptyDropdown = () => {
+      // 只在有下拉框时才执行检查
+      const dropdowns = document.querySelectorAll('.ant-mentions-dropdown');
+      if (dropdowns.length === 0) return;
+
+      dropdowns.forEach((dropdown) => {
+        const dropdownEl = dropdown as HTMLElement;
+        const menu = dropdown.querySelector('.ant-mentions-dropdown-menu');
+        
+        if (!menu) {
+          // 如果没有菜单元素，立即隐藏
+          dropdownEl.style.display = 'none';
+          dropdownEl.style.visibility = 'hidden';
+          dropdownEl.style.opacity = '0';
+          dropdownEl.classList.add('ant-mentions-dropdown-hidden');
+          return;
+        }
+
+        // 检查是否有有效的菜单项（排除空状态提示和隐藏项）
+        const allMenuItems = menu.querySelectorAll('.ant-mentions-dropdown-menu-item');
+        const visibleMenuItems = Array.from(allMenuItems).filter((item) => {
+          const el = item as HTMLElement;
+          return (
+            el.style.display !== 'none' &&
+            !el.classList.contains('ant-mentions-dropdown-menu-item-empty') &&
+            el.textContent?.trim() !== '' &&
+            el.textContent?.trim() !== '无数据'
+          );
+        });
+        
+        const isEmpty = visibleMenuItems.length === 0;
+        
+        // 如果没有有效的菜单项，立即隐藏下拉框
+        if (isEmpty) {
+          dropdownEl.style.display = 'none';
+          dropdownEl.style.visibility = 'hidden';
+          dropdownEl.style.opacity = '0';
+          dropdownEl.classList.add('ant-mentions-dropdown-hidden');
+        } else {
+          // 如果有有效的菜单项，确保下拉框显示
+          dropdownEl.style.display = '';
+          dropdownEl.style.visibility = '';
+          dropdownEl.style.opacity = '';
+          dropdownEl.classList.remove('ant-mentions-dropdown-hidden');
+        }
+      });
+    };
+
+    // 使用 MutationObserver 只监听下拉框的变化
+    const observer = new MutationObserver((mutations) => {
+      // 只在下拉框相关变化时执行
+      const hasDropdownChange = mutations.some((mutation) => {
+        const target = mutation.target as Element;
+        return target.classList?.contains('ant-mentions-dropdown') ||
+               target.closest('.ant-mentions-dropdown') !== null;
+      });
+      
+      if (hasDropdownChange) {
+        // 使用 requestAnimationFrame 避免阻塞输入
+        requestAnimationFrame(() => {
+          hideEmptyDropdown();
+        });
+      }
+    });
+
+    // 只监听下拉框容器
+    const dropdownContainer = document.body;
+    observer.observe(dropdownContainer, {
+      childList: true,
+      subtree: true,
+      attributes: false, // 不监听属性变化，避免干扰
+    });
+
+    // 减少检查频率，避免干扰输入
+    const interval = setInterval(() => {
+      // 只在有下拉框时才检查
+      if (document.querySelector('.ant-mentions-dropdown')) {
+        hideEmptyDropdown();
+      }
+    }, 200);
+
+    // 初始检查
+    hideEmptyDropdown();
+
+    return () => {
+      observer.disconnect();
+      clearInterval(interval);
+    };
+  }, [mentionUsers]);
+
+  // 自定义 displayTransform：确保显示的是 label
+  const handleDisplayTransform = (val: string, option?: MentionOption) => {
+    if (displayTransform) {
+      return displayTransform(val, option);
+    }
+    // 如果没有传入 displayTransform，尝试从原始数据中找到对应的 label
+    const foundUser = mentionUsers.find((u) => u.value === val || u.label === val);
+    return foundUser?.label || val;
+  };
+
   const mentionProps: MentionsWithDisplayProps = {
     value,
     onChange: (val: string) => onChange(val),
     placeholder,
     autoSize: { minRows, maxRows },
     className: "mb-2 comment-mentions",
-    options: mentionUsers,
+    options: transformedOptions.length > 0 ? transformedOptions : undefined, // 空数组时不显示下拉
     prefix: "@",
     split: "",
     filterOption: false,
     notFoundContent: null,
-    displayTransform,
+    displayTransform: handleDisplayTransform,
     onSelect: (option: MentionsOptionProps) => {
-      const opt = option as MentionsOptionProps & { realValue?: string };
+      // 找到原始用户数据（通过 label 匹配）
+      const selectedLabel = String(option.label || option.value || "");
+      const originalUser = mentionUsers.find(
+        (u) => u.label === selectedLabel || u.value === selectedLabel
+      );
+      
       const normalized: MentionOption = {
-        value: String(opt.value ?? opt.label ?? ""),
-        label:
-          opt.label !== undefined
-            ? String(opt.label)
-            : opt.value !== undefined
-            ? String(opt.value)
-            : undefined,
+        value: originalUser?.value || String(option.value ?? ""),
+        label: originalUser?.label || selectedLabel,
       };
       onSelectMention(normalized);
+      // 选择后清空搜索文本，允许再次 @
+      onSearchMention("");
     },
-    onSearch: onSearchMention,
+    onSearch: (text: string) => {
+      onSearchMention(text);
+    },
   };
 
   return (

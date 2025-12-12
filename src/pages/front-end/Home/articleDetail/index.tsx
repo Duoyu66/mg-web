@@ -338,7 +338,7 @@ export default function ArticleDetail() {
   // 解析评论内容，只高亮有效的 @ 用户名
   const renderCommentContent = (content: string): ReactNode => {
     // 匹配 @ 用户名，支持中英文、数字、下划线等字符
-    // 格式：@用户名 或 @用户名后面跟空格、标点等
+    // 格式：@用户名 或 @用户名后面跟其他字符
     const mentionRegex = /@([\w\u4e00-\u9fa5]+)/g;
     const parts: (string | ReactNode)[] = [];
     let lastIndex = 0;
@@ -350,30 +350,53 @@ export default function ArticleDetail() {
       if (match.index > lastIndex) {
         parts.push(content.slice(lastIndex, match.index));
       }
-      // 检查 @ 用户名是否有效（在用户列表或已选择集合中）
-      const username = match[1];
-      const isValidMention =
-        selectedMentions.has(username) ||
-        validUserLabelsSet.has(username) ||
-        validUserValuesSet.has(username) ||
-        labelToValueMap.has(username) ||
-        valueToLabelMap.has(username);
+      
+      const matchedText = match[1];
+      let foundUsername = "";
+      let usernameEndIndex = match.index + 1 + matchedText.length;
 
-      if (isValidMention) {
-        // 只有有效的 @ 提及才高亮
+      // 尝试找到最长的有效用户名匹配
+      // 例如：如果内容是 "@竹叶你好"，而用户列表中有 "竹叶"
+      // 我们应该只匹配 "竹叶" 而不是 "竹叶你好"
+      for (let i = matchedText.length; i > 0; i--) {
+        const candidate = matchedText.slice(0, i);
+        const isValidMention =
+          selectedMentions.has(candidate) ||
+          validUserLabelsSet.has(candidate) ||
+          validUserValuesSet.has(candidate) ||
+          labelToValueMap.has(candidate) ||
+          valueToLabelMap.has(candidate);
+
+        if (isValidMention) {
+          foundUsername = candidate;
+          usernameEndIndex = match.index + 1 + candidate.length;
+          break;
+        }
+      }
+
+      if (foundUsername) {
+        // 找到有效的 @ 提及，高亮显示
         parts.push(
           <span
             key={`mention-${keyIndex++}-${match.index}`}
             className="text-primary-600 dark:text-primary-400 font-medium hover:underline cursor-pointer"
           >
-            @{username}
+            @{foundUsername}
           </span>
         );
+        // 如果匹配的文本比找到的用户名长，说明后面还有字符，需要作为普通文本添加
+        if (matchedText.length > foundUsername.length) {
+          const remainingText = matchedText.slice(foundUsername.length);
+          parts.push(remainingText);
+          lastIndex = match.index + 1 + matchedText.length;
+        } else {
+          lastIndex = usernameEndIndex;
+        }
       } else {
         // 无效的 @ 提及当作普通文本显示
-        parts.push(`@${username}`);
+        parts.push(`@${matchedText}`);
+        lastIndex = mentionRegex.lastIndex;
       }
-      lastIndex = mentionRegex.lastIndex;
     }
 
     // 添加剩余的文本
@@ -681,18 +704,12 @@ export default function ArticleDetail() {
                   onChange={(val) => setCommentText(val)}
                   onSubmit={handleSubmitComment}
                   mentionUsers={filteredMentionUsers}
-                  displayTransform={(val, option) =>
-                    option?.label || valueToLabelMap.get(val) || val
-                  }
                   onSelectMention={(option) => {
-                    const selectedLabel =
-                      option.label ||
-                      valueToLabelMap.get(option.value) ||
-                      option.value ||
-                      "";
+                    // option.value 是真实ID，option.label 是显示名称
+                    const selectedLabel = option.label || option.value || "";
                     if (selectedLabel) {
                       setSelectedMentions((prev) => new Set(prev).add(selectedLabel));
-                      console.log("用户通过组件选择了:", selectedLabel);
+                      console.log("用户通过组件选择了:", selectedLabel, "真实ID:", option.value);
                     }
                   }}
                   onSearchMention={(text) => {
