@@ -110,6 +110,8 @@ export default function ArticleDetail() {
   const validUserLabels = (mentionUsers || []).map(
     (user) => user?.label as string
   );
+  const validUserValuesSet = new Set(validUserValues);
+  const validUserLabelsSet = new Set(validUserLabels);
   // 创建 value 到 label 的映射
   const valueToLabelMap = new Map(
     (mentionUsers || []).map((user) => [
@@ -334,7 +336,7 @@ export default function ArticleDetail() {
     }
   };
 
-  // 解析评论内容，高亮 @ 的用户名
+  // 解析评论内容，只高亮有效的 @ 用户名
   const renderCommentContent = (content: string): ReactNode => {
     // 匹配 @ 用户名，支持中英文、数字、下划线等字符
     // 格式：@用户名 或 @用户名后面跟空格、标点等
@@ -349,16 +351,29 @@ export default function ArticleDetail() {
       if (match.index > lastIndex) {
         parts.push(content.slice(lastIndex, match.index));
       }
-      // 添加高亮的 @ 用户名
+      // 检查 @ 用户名是否有效（在用户列表或已选择集合中）
       const username = match[1];
-      parts.push(
-        <span
-          key={`mention-${keyIndex++}-${match.index}`}
-          className="text-primary-600 dark:text-primary-400 font-medium hover:underline cursor-pointer"
-        >
-          @{username}
-        </span>
-      );
+      const isValidMention =
+        selectedMentions.has(username) ||
+        validUserLabelsSet.has(username) ||
+        validUserValuesSet.has(username) ||
+        labelToValueMap.has(username) ||
+        valueToLabelMap.has(username);
+
+      if (isValidMention) {
+        // 只有有效的 @ 提及才高亮
+        parts.push(
+          <span
+            key={`mention-${keyIndex++}-${match.index}`}
+            className="text-primary-600 dark:text-primary-400 font-medium hover:underline cursor-pointer"
+          >
+            @{username}
+          </span>
+        );
+      } else {
+        // 无效的 @ 提及当作普通文本显示
+        parts.push(`@${username}`);
+      }
       lastIndex = mentionRegex.lastIndex;
     }
 
@@ -373,23 +388,18 @@ export default function ArticleDetail() {
   const handleSubmitComment = () => {
     if (!commentText.trim()) return;
 
-    // 验证 @ 提及的用户是否有效
+    // 验证 @ 提及的用户，收集有效的 @ 提及（不阻断流程）
     const validation = validateMentions(commentText);
-    if (!validation.isValid) {
-      message.warning(
-        `以下用户提及无效，请通过 @ 选择用户：${validation.invalidMentions
-          .map((m) => `@${m}`)
-          .join(", ")}`
-      );
-      return;
-    }
-
-    // 收集所有 @ 的人员的 value 到数组中
+    
+    // 收集所有有效的 @ 的人员的 value 到数组中（无效的会被忽略）
     const mentionedUserValues = validation.validMentions.map((m) => m.value);
 
     console.log("收集到的评论内容:", commentText);
-    console.log("所有 @ 的人员的 value 数组:", mentionedUserValues);
-    console.log("所有 @ 的人员的详细信息:", validation.validMentions);
+    console.log("所有有效的 @ 的人员的 value 数组:", mentionedUserValues);
+    console.log("所有有效的 @ 的人员的详细信息:", validation.validMentions);
+    if (validation.invalidMentions.length > 0) {
+      console.log("无效的 @ 提及（将作为普通文本处理）:", validation.invalidMentions);
+    }
 
     // 这里应该调用 API 提交评论
     // 提交数据格式：
