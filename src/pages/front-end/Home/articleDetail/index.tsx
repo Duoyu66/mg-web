@@ -1,11 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { createPortal } from "react-dom";
 import type { ReactNode } from "react";
 import { useParams } from "react-router-dom";
 import {
   ThumbsUp,
-  Bookmark,
-  Share2,
-  MoreVertical,
   MessageCircle,
   CheckCircle2,
   Clock,
@@ -53,6 +51,90 @@ interface Comment {
   thumbNum: number;
 }
 
+// 解析HTML内容并生成目录（不更新状态，只返回结果）
+const parseHtmlContent = (htmlContent: string) => {
+  // 创建临时DOM来解析HTML
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlContent, "text/html");
+  const tocItems: Array<{ id: string; text: string; level: number }> = [];
+  
+  // 查找所有标题标签 (h1-h6) 和加粗的段落（可能是标题）
+  const headings = doc.querySelectorAll("h1, h2, h3, h4, h5, h6, p strong");
+  
+  headings.forEach((heading, index) => {
+    const tagName = heading.tagName.toLowerCase();
+    let level = 1;
+    
+    if (tagName.startsWith("h")) {
+      level = parseInt(tagName.charAt(1));
+    } else if (tagName === "strong" && heading.parentElement?.tagName === "P") {
+      // 加粗的段落作为二级标题
+      level = 2;
+    }
+    
+    const text = heading.textContent?.trim() || "";
+    if (text) {
+      const id = `heading-${index}`;
+      heading.setAttribute("id", id);
+      tocItems.push({ id, text, level });
+    }
+  });
+  
+  return { html: doc.body.innerHTML, toc: tocItems };
+};
+
+// 解析文章内容（兼容旧格式和HTML格式，不更新状态）
+const parseContent = (content: string) => {
+  // 检查是否是HTML格式
+  if (content.includes("<p>") || content.includes("<h") || content.includes("<blockquote>")) {
+    const parsedHtml = parseHtmlContent(content);
+    return { type: "html", html: parsedHtml.html, toc: parsedHtml.toc };
+  }
+  
+  // 旧格式解析
+  const lines = content.split("\n");
+  const sections: {
+    type: "title" | "today" | "tomorrow" | "reflection" | "text";
+    content: string[];
+  }[] = [];
+
+  let currentSection: {
+    type: "title" | "today" | "tomorrow" | "reflection" | "text";
+    content: string[];
+  } | null = null;
+
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith("Day ")) {
+      if (currentSection) sections.push(currentSection);
+      currentSection = { type: "title", content: [trimmed] };
+    } else if (
+      trimmed.includes("今天做了:") ||
+      trimmed.includes("今天做了：")
+    ) {
+      if (currentSection) sections.push(currentSection);
+      currentSection = { type: "today", content: [] };
+    } else if (
+      trimmed.includes("明天计划:") ||
+      trimmed.includes("明天计划：")
+    ) {
+      if (currentSection) sections.push(currentSection);
+      currentSection = { type: "tomorrow", content: [] };
+    } else if (
+      trimmed.includes("今日感悟:") ||
+      trimmed.includes("今日感悟：")
+    ) {
+      if (currentSection) sections.push(currentSection);
+      currentSection = { type: "reflection", content: [] };
+    } else if (trimmed && currentSection) {
+      currentSection.content.push(trimmed);
+    }
+  });
+  if (currentSection) sections.push(currentSection);
+
+  return { type: "sections", sections, toc: [] };
+};
+
 export default function ArticleDetail() {
   const { id } = useParams<{ id: string }>();
   const [article, setArticle] = useState<Record | null>(null);
@@ -75,6 +157,10 @@ export default function ArticleDetail() {
   const [selectedMentions, setSelectedMentions] = useState<Set<string>>(
     new Set()
   );
+  // 目录相关
+  const [toc, setToc] = useState<Array<{ id: string; text: string; level: number }>>([]);
+  const [activeTocId, setActiveTocId] = useState<string>("");
+  const commentsRef = useRef<HTMLDivElement>(null);
 
   // 模拟可@的用户列表（实际应该从API获取）
   useEffect(() => {
@@ -197,19 +283,183 @@ export default function ArticleDetail() {
     // 暂时使用模拟数据
     const mockArticle: Record = {
       id: id || "",
-      content: `Day 49
+      content: `<h3>一、Websocket基础</h3>
+<h4>连接建立流程:</h4>
+<pre class="language-markup"><code>Client                      Server
+  |                           |
+  |------ HTTP Upgrade ------&gt;|  // 发起升级请求
+  |                           |
+  |&lt;---- 101 Switching -------|  // 服务器同意升级
+  |                           |
+  |&lt;===== WebSocket =========&gt;|  // 建立全双工连接</code></pre>
+<h4>&nbsp;二、Spring WebSocket核心组件</h4>
+<h5>1.WebSocketHandler</h5>
+<pre class="language-java"><code>@Component
+public class MessageWebSocketHandler extends TextWebSocketHandler {
+    // 连接建立时
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) {
+        String userId = getUserId(session);
+        sessions.put(userId, session);
+    }
+    
+    // 处理消息
+    @Override
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+        // 处理接收到的消息
+    }
+    
+    // 连接关闭时
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+        sessions.remove(getUserId(session));
+    }
+}
+</code></pre>
+<h5>2.WebSocketConfigurer</h5>
+<pre class="language-java"><code>@Component
+public class MessageWebSocketHandler extends TextWebSocketHandler {
+    // 连接建立时
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) {
+        String userId = getUserId(session);
+        sessions.put(userId, session);
+    }
+    
+    // 处理消息
+    @Override
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+        // 处理接收到的消息
+    }
+    
+    // 连接关闭时
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+        sessions.remove(getUserId(session));
+    }
+}
+</code></pre>
+<h3>三、会话管理</h3>
+<h4>Session存储</h4>
+<pre class="language-java"><code>public class MessageWebSocketHandler {
+    // 使用线程安全的Map存储会话
+    private final Map&lt;String, WebSocketSession&gt; sessions = 
+        new ConcurrentHashMap&lt;&gt;();
+        
+    // 发送消息
+    public void sendMessage(String userId, String message) {
+        WebSocketSession session = sessions.get(userId);
+        if (session != null &amp;&amp; session.isOpen()) {
+            session.sendMessage(new TextMessage(message));
+        }
+    }
+}
+</code></pre>
+<h4>心跳检测</h4>
+<pre class="language-java"><code>@Configuration
+public class WebSocketConfig {
+    @Bean
+    public ServletServerContainerFactoryBean createWebSocketContainer() {
+        ServletServerContainerFactoryBean container = 
+            new ServletServerContainerFactoryBean();
+        // 设置消息大小限制
+        container.setMaxTextMessageBufferSize(8192);
+        // 设置心跳超时时间
+        container.setMaxSessionIdleTimeout(60000L);
+        return container;
+    }
+}
+</code></pre>
+<h3>&nbsp;四、消息类型</h3>
+<h4>1.TextMessage</h4>
+<pre class="language-java"><code>// 发送文本消息
+session.sendMessage(new TextMessage("Hello"));
 
-今天做了:
-学习 MySQL 中 InnoDB 引擎的插入缓冲功能。
-学习 Java 并发中的 ConcurrentHashMap.
-学习其它并发知识。
+// 接收文本消息
+@Override
+protected void handleTextMessage(WebSocketSession session, 
+                               TextMessage message) {
+    String payload = message.getPayload();
+}
+</code></pre>
+<h4>2.BinaryMessage</h4>
+<h4>&nbsp;</h4>
+<pre class="language-java"><code>// 发送二进制消息
+byte[] bytes = ...;
+session.sendMessage(new BinaryMessage(bytes));
 
-明天计划:
-继续学习 MySQL 中的 InnoDB 引擎。
-学习 Java 并发知识
-
-今日感悟:
-永远对知识保持敬畏之心。`,
+// 接收二进制消息
+@Override
+protected void handleBinaryMessage(WebSocketSession session, 
+                                 BinaryMessage message) {
+    byte[] payload = message.getPayload().array();
+}
+</code></pre>
+<h3>五、安全处理</h3>
+<h4>握手拦截</h4>
+<pre class="language-java"><code>public class WebSocketInterceptor implements HandshakeInterceptor {
+    @Override
+    public boolean beforeHandshake(...) {
+        // 验证token
+        String token = request.getHeaders().get("token").get(0);
+        if (!isValidToken(token)) {
+            return false; // 拒绝连接
+        }
+        return true;
+    }
+}
+</code></pre>
+<h4>异常处理</h4>
+<pre class="language-java"><code>@Override
+public void handleTransportError(WebSocketSession session, 
+                               Throwable exception) {
+    log.error("WebSocket传输错误", exception);
+    if (session.isOpen()) {
+        session.close();
+    }
+}
+</code></pre>
+<h3>六、lSTOMP支持</h3>
+<h4>Spring也支持STOMP协议</h4>
+<pre class="language-java"><code>@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/topic");  // 广播消息前缀
+        config.setApplicationDestinationPrefixes("/app"); // 应用前缀
+    }
+}
+</code></pre>
+<h3>七、最佳实践</h3>
+<h4>错误处理</h4>
+<pre class="language-java"><code>try {
+    session.sendMessage(new TextMessage(message));
+} catch (IOException e) {
+    log.error("发送消息失败", e);
+    sessions.remove(userId);
+}
+</code></pre>
+<h4>消息序列化</h4>
+<pre class="language-java"><code>// 发送JSON消息
+ObjectMapper mapper = new ObjectMapper();
+String json = mapper.writeValueAsString(messageObject);
+session.sendMessage(new TextMessage(json));
+</code></pre>
+<h4>连接状态检查</h4>
+<pre class="language-java"><code>public void sendMessage(String userId, String message) {
+    WebSocketSession session = sessions.get(userId);
+    if (session != null &amp;&amp; session.isOpen()) {
+        try {
+            session.sendMessage(new TextMessage(message));
+        } catch (IOException e) {
+            log.error("发送失败", e);
+            closeSession(session);
+        }
+    }
+}
+</code></pre>
+<p>PS:这些是Spring WebSocket的主要知识点，在实际应用中要根据具体需求选择合适的实现方式。</p>`,
       category: "交流",
       tags: ["训练营打卡"],
       thumbNum: 3,
@@ -249,51 +499,6 @@ export default function ArticleDetail() {
     setComments(mockComments);
   }, [id]);
 
-  // 解析文章内容
-  const parseContent = (content: string) => {
-    const lines = content.split("\n");
-    const sections: {
-      type: "title" | "today" | "tomorrow" | "reflection" | "text";
-      content: string[];
-    }[] = [];
-
-    let currentSection: {
-      type: "title" | "today" | "tomorrow" | "reflection" | "text";
-      content: string[];
-    } | null = null;
-
-    lines.forEach((line) => {
-      const trimmed = line.trim();
-      if (trimmed.startsWith("Day ")) {
-        if (currentSection) sections.push(currentSection);
-        currentSection = { type: "title", content: [trimmed] };
-      } else if (
-        trimmed.includes("今天做了:") ||
-        trimmed.includes("今天做了：")
-      ) {
-        if (currentSection) sections.push(currentSection);
-        currentSection = { type: "today", content: [] };
-      } else if (
-        trimmed.includes("明天计划:") ||
-        trimmed.includes("明天计划：")
-      ) {
-        if (currentSection) sections.push(currentSection);
-        currentSection = { type: "tomorrow", content: [] };
-      } else if (
-        trimmed.includes("今日感悟:") ||
-        trimmed.includes("今日感悟：")
-      ) {
-        if (currentSection) sections.push(currentSection);
-        currentSection = { type: "reflection", content: [] };
-      } else if (trimmed && currentSection) {
-        currentSection.content.push(trimmed);
-      }
-    });
-    if (currentSection) sections.push(currentSection);
-
-    return sections;
-  };
-
   const formatTime = (timestamp: number) => {
     const now = Date.now();
     const diff = now - timestamp;
@@ -311,6 +516,21 @@ export default function ArticleDetail() {
     ).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
   };
 
+  // 使用useMemo缓存解析结果，避免重复解析和无限循环
+  const parsedContent = useMemo(() => {
+    if (!article?.content) return null;
+    return parseContent(article.content);
+  }, [article?.content]);
+
+  // 解析文章内容并更新目录（只在解析结果变化时执行）
+  useEffect(() => {
+    if (parsedContent?.toc && parsedContent.toc.length > 0) {
+      setToc(parsedContent.toc);
+    } else {
+      setToc([]);
+    }
+  }, [parsedContent?.toc]);
+
   const handleThumb = () => {
     if (article) {
       setArticle({
@@ -323,17 +543,50 @@ export default function ArticleDetail() {
     }
   };
 
-  const handleFavour = () => {
-    if (article) {
-      setArticle({
-        ...article,
-        hasFavour: !article.hasFavour,
-        favourNum: article.hasFavour
-          ? article.favourNum - 1
-          : article.favourNum + 1,
+
+  // 滚动到评论区域
+  const scrollToComments = () => {
+    commentsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  // 滚动到指定标题
+  const scrollToHeading = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      const offset = 100; // 预留顶部空间
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
       });
+      setActiveTocId(id);
     }
   };
+
+  // 监听滚动，更新当前激活的目录项
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 150; // 偏移量
+      
+      // 检查每个标题位置
+      for (let i = toc.length - 1; i >= 0; i--) {
+        const element = document.getElementById(toc[i].id);
+        if (element) {
+          const elementTop = element.offsetTop;
+          if (scrollPosition >= elementTop) {
+            setActiveTocId(toc[i].id);
+            break;
+          }
+        }
+      }
+    };
+
+    if (toc.length > 0) {
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
+  }, [toc]);
 
   // 解析评论内容，只高亮有效的 @ 用户名
   const renderCommentContent = (content: string): ReactNode => {
@@ -449,7 +702,7 @@ export default function ArticleDetail() {
     message.success("评论发布成功！");
   };
 
-  if (!article) {
+  if (!article || !parsedContent) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         加载中...
@@ -457,11 +710,115 @@ export default function ArticleDetail() {
     );
   }
 
-  const contentSections = parseContent(article.content);
+  // 左侧操作栏组件 - 定位在内容区域左侧外，距离内容区域左边约2rem
+  const LeftActionBar = () => (
+    <div 
+      className="fixed top-1/2 -translate-y-1/2 z-[9999] flex flex-col gap-4"
+      style={{ 
+        left: 'clamp(1rem, calc((100vw - 80rem) / 2 - 2rem), calc(50vw - 40rem - 2rem))'
+      }}
+    >
+      <button
+        onClick={handleThumb}
+        className={`w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-lg ${
+          article.hasThumb
+            ? "bg-primary-600 text-white"
+            : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/30"
+        }`}
+        title="点赞"
+      >
+        <ThumbsUp
+          className={`w-5 h-5 ${
+            article.hasThumb ? "fill-current" : ""
+          }`}
+        />
+      </button>
+      <div className="text-center text-xs text-gray-500 dark:text-gray-400">
+        {article.thumbNum}
+      </div>
+      <button
+        onClick={scrollToComments}
+        className="w-12 h-12 rounded-full bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 flex items-center justify-center transition-all shadow-lg"
+        title="评论"
+      >
+        <MessageCircle className="w-5 h-5" />
+      </button>
+      <div className="text-center text-xs text-gray-500 dark:text-gray-400">
+        {article.commentNum}
+      </div>
+    </div>
+  );
+
+  // 右侧目录组件 - 定位在内容区域右侧外，与侧边栏占位对齐
+  const RightToc = () => {
+    if (toc.length === 0) return null;
+    
+    // 计算位置：主容器 max-w-7xl (80rem) 居中，目录应该在内容区域右侧外
+    // 主容器右边距 = (100vw - 80rem) / 2
+    // 目录应该在主容器右侧外，距离主容器右边约 1rem
+    const getRightPosition = () => {
+      if (typeof window === 'undefined') return '1rem';
+      const viewportWidth = window.innerWidth;
+      const maxContentWidth = 1280; // 80rem = 1280px
+      const rightPadding = 16; // 1rem = 16px (主容器的右边padding)
+      
+      if (viewportWidth <= maxContentWidth) {
+        // 小屏幕时，目录紧贴视口右边，减去右边padding
+        return `${rightPadding}px`;
+      }
+      
+      // 大屏幕时，计算内容区域右边界的位置
+      // 主容器居中后的左边距 = (100vw - 1280px) / 2
+      // 内容区域右边界 = 左边距 + 1280px - 16px (右边padding)
+      // 目录的 right = 视口宽度 - 内容区域右边界
+      const leftMargin = (viewportWidth - maxContentWidth) / 2;
+      const contentRightEdge = leftMargin + maxContentWidth - rightPadding;
+      const rightPosition = viewportWidth - contentRightEdge;
+      
+      return `${rightPosition}px`;
+    };
+
+    return (
+      <div 
+        className="fixed top-16 z-[9998] w-80"
+        style={{ 
+          right: getRightPosition()
+        }}
+      >
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 max-h-[calc(100vh-3rem)] overflow-y-auto">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">
+            目录
+          </h3>
+          <div className="space-y-1">
+            {toc.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => scrollToHeading(item.id)}
+                className={`w-full text-left px-3 py-2 rounded-lg transition-colors text-sm ${
+                  activeTocId === item.id
+                    ? "bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 border-l-2 border-primary-600 dark:border-primary-400"
+                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                }`}
+                style={{ paddingLeft: `${(item.level - 1) * 12 + 12}px` }}
+              >
+                {item.text}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 py-6">
+    <>
+      {/* 使用 Portal 将 fixed 元素渲染到 body，避免受父容器 transform 影响 */}
+      {typeof document !== 'undefined' && createPortal(<LeftActionBar />, document.body)}
+      {typeof document !== 'undefined' && createPortal(<RightToc />, document.body)}
+
+      {/* 主容器 */}
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex gap-6">
           {/* 主内容区 */}
           <div className="flex-1 min-w-0">
@@ -500,70 +857,77 @@ export default function ArticleDetail() {
               </div>
 
               {/* 文章内容 */}
-              <div className="text-gray-800 dark:text-gray-200 mb-6">
-                {contentSections.map((section, index) => (
-                  <div key={index} className="mb-4">
-                    {section.type === "title" && (
-                      <h1 className="text-2xl font-bold mb-4">
-                        {section.content[0]}
-                      </h1>
-                    )}
-                    {section.type === "today" && (
-                      <div className="mb-4">
-                        <div className="flex items-center gap-2 mb-2 text-gray-700 dark:text-gray-300">
-                          <CheckCircle2 className="w-5 h-5 text-green-500" />
-                          <span className="font-semibold">今天做了:</span>
+              <div className="text-gray-800 dark:text-gray-200 mb-6 prose prose-gray dark:prose-invert max-w-none">
+                {parsedContent.type === "html" ? (
+                  <div
+                    dangerouslySetInnerHTML={{ __html: parsedContent.html || "" }}
+                    className="article-content"
+                  />
+                ) : (
+                  parsedContent.sections?.map((section, index) => (
+                    <div key={index} className="mb-4">
+                      {section.type === "title" && (
+                        <h1 className="text-2xl font-bold mb-4">
+                          {section.content[0]}
+                        </h1>
+                      )}
+                      {section.type === "today" && (
+                        <div className="mb-4">
+                          <div className="flex items-center gap-2 mb-2 text-gray-700 dark:text-gray-300">
+                            <CheckCircle2 className="w-5 h-5 text-green-500" />
+                            <span className="font-semibold">今天做了:</span>
+                          </div>
+                          <div className="ml-7 space-y-1">
+                            {section.content.map((line, i) => (
+                              <div
+                                key={i}
+                                className="text-gray-600 dark:text-gray-400"
+                              >
+                                {line}
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                        <div className="ml-7 space-y-1">
-                          {section.content.map((line, i) => (
-                            <div
-                              key={i}
-                              className="text-gray-600 dark:text-gray-400"
-                            >
-                              {line}
-                            </div>
-                          ))}
+                      )}
+                      {section.type === "tomorrow" && (
+                        <div className="mb-4">
+                          <div className="flex items-center gap-2 mb-2 text-gray-700 dark:text-gray-300">
+                            <Clock className="w-5 h-5 text-red-500" />
+                            <span className="font-semibold">明天计划:</span>
+                          </div>
+                          <div className="ml-7 space-y-1">
+                            {section.content.map((line, i) => (
+                              <div
+                                key={i}
+                                className="text-gray-600 dark:text-gray-400"
+                              >
+                                {line}
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    {section.type === "tomorrow" && (
-                      <div className="mb-4">
-                        <div className="flex items-center gap-2 mb-2 text-gray-700 dark:text-gray-300">
-                          <Clock className="w-5 h-5 text-red-500" />
-                          <span className="font-semibold">明天计划:</span>
+                      )}
+                      {section.type === "reflection" && (
+                        <div className="mb-4">
+                          <div className="flex items-center gap-2 mb-2 text-gray-700 dark:text-gray-300">
+                            <SquareStack className="w-5 h-5 text-blue-500" />
+                            <span className="font-semibold">今日感悟:</span>
+                          </div>
+                          <div className="ml-7">
+                            {section.content.map((line, i) => (
+                              <div
+                                key={i}
+                                className="text-gray-600 dark:text-gray-400"
+                              >
+                                {line}
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                        <div className="ml-7 space-y-1">
-                          {section.content.map((line, i) => (
-                            <div
-                              key={i}
-                              className="text-gray-600 dark:text-gray-400"
-                            >
-                              {line}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {section.type === "reflection" && (
-                      <div className="mb-4">
-                        <div className="flex items-center gap-2 mb-2 text-gray-700 dark:text-gray-300">
-                          <SquareStack className="w-5 h-5 text-blue-500" />
-                          <span className="font-semibold">今日感悟:</span>
-                        </div>
-                        <div className="ml-7">
-                          {section.content.map((line, i) => (
-                            <div
-                              key={i}
-                              className="text-gray-600 dark:text-gray-400"
-                            >
-                              {line}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                      )}
+                    </div>
+                  ))
+                )}
               </div>
 
               {/* 标签 */}
@@ -580,53 +944,10 @@ export default function ArticleDetail() {
                 </div>
               )}
 
-              {/* 操作栏 */}
-              <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
-                <div className="flex items-center gap-4">
-                  <button
-                    onClick={handleThumb}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                      article.hasThumb
-                        ? "text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30"
-                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    }`}
-                  >
-                    <ThumbsUp
-                      className={`w-5 h-5 ${
-                        article.hasThumb ? "fill-current" : ""
-                      }`}
-                    />
-                    <span>{article.thumbNum}</span>
-                  </button>
-                  <button
-                    onClick={handleFavour}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                      article.hasFavour
-                        ? "text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/30"
-                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    }`}
-                  >
-                    <Bookmark
-                      className={`w-5 h-5 ${
-                        article.hasFavour ? "fill-current" : ""
-                      }`}
-                    />
-                    <span>{article.favourNum}</span>
-                  </button>
-                  <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                    <Share2 className="w-5 h-5" />
-                    <span>分享</span>
-                  </button>
-                  <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                    <MoreVertical className="w-5 h-5" />
-                    <span>操作</span>
-                  </button>
-                </div>
-              </div>
             </div>
 
             {/* 评论区域 */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6" ref={commentsRef}>
               {/* 标签页 */}
               <div className="flex items-center gap-4 mb-4 border-b border-gray-100 dark:border-gray-700">
                 <button
@@ -779,77 +1100,11 @@ export default function ArticleDetail() {
             </div>
           </div>
 
-          {/* 侧边栏 */}
-          <div className="w-80 flex-shrink-0 space-y-4">
-            {/* 热门话题 */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-                  热门话题
-                </h3>
-                <button className="text-sm text-primary-600 dark:text-primary-400 hover:underline">
-                  更多&gt;
-                </button>
-              </div>
-              <div className="space-y-2">
-                {[
-                  { name: "学习打卡", views: 2179 },
-                  { name: "求职", views: 449 },
-                  { name: "交流", views: 196 },
-                  { name: "训练营打卡", views: 154 },
-                  { name: "Java", views: 114 },
-                  { name: "面经", views: 83 },
-                  { name: "简历", views: 76 },
-                  { name: "提问", views: 75 },
-                  { name: "职场", views: 74 },
-                  { name: "AI", views: 65 },
-                ].map((topic, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
-                  >
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                      #{topic.name}
-                    </span>
-                    <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                      <MessageCircle className="w-3 h-3" />
-                      <span>{topic.views}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* 广告 */}
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg shadow-sm p-4 border border-blue-100 dark:border-blue-800">
-              <div className="flex items-start gap-3 mb-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className="font-bold text-gray-900 dark:text-gray-100">
-                      MOCK INTERVIEW
-                    </h3>
-                    <span className="px-2 py-0.5 text-xs bg-green-500 text-white rounded-full">
-                      1v1 模拟面试
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">
-                    面多多 Offer多多
-                  </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-                    针对性预测面试题
-                  </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                    详细复盘报告
-                  </p>
-                  <span className="inline-block px-2 py-1 text-xs bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded">
-                    新品限时福利
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* 侧边栏占位 - 保持布局 */}
+          <div className="w-80 flex-shrink-0"></div>
+        </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
