@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
   MessageCircle,
   MessageCircleMore,
@@ -324,6 +324,15 @@ const Home = () => {
   const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  // 跟踪每个帖子是否展开
+  const [expandedPosts, setExpandedPosts] = useState<Map<string, boolean>>(
+    new Map()
+  );
+  // 跟踪每个帖子是否超过8行
+  const [overflowsMap, setOverflowsMap] = useState<Map<string, boolean>>(
+    new Map()
+  );
+  const contentRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   // 模拟接口获取更多帖子
   const fetchMoreRecords = async (nextPage: number) => {
@@ -408,6 +417,30 @@ const Home = () => {
     }
   }, [records.length, loadMore]);
 
+  // 检测内容是否超过8行
+  useEffect(() => {
+    const checkOverflow = () => {
+      const newOverflowsMap = new Map<string, boolean>();
+      contentRefs.current.forEach((ref, id) => {
+        if (ref) {
+          const lineHeight = parseFloat(
+            window.getComputedStyle(ref).lineHeight
+          );
+          const maxHeight = lineHeight * 8; // 8行的高度
+          const actualHeight = ref.scrollHeight;
+          newOverflowsMap.set(id, actualHeight > maxHeight);
+        }
+      });
+      setOverflowsMap(newOverflowsMap);
+    };
+
+    // 延迟检查，确保DOM已渲染
+    const timer = setTimeout(checkOverflow, 100);
+    checkOverflow();
+
+    return () => clearTimeout(timer);
+  }, [records]);
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 py-6">
@@ -487,8 +520,58 @@ const Home = () => {
                   )}
 
                   {/* 内容 */}
-                  <div className="text-gray-800 dark:text-gray-200 mb-4 whitespace-pre-wrap leading-relaxed">
-                    {formatContent(item.content)}
+                  <div className="mb-4 relative">
+                    <div
+                      ref={(el) => {
+                        if (el) {
+                          contentRefs.current.set(item.id, el);
+                        } else {
+                          contentRefs.current.delete(item.id);
+                        }
+                      }}
+                      className={`text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed ${
+                        !expandedPosts.get(item.id) &&
+                        overflowsMap.get(item.id)
+                          ? "line-clamp-8"
+                          : ""
+                      }`}
+                    >
+                      {formatContent(item.content)}
+                    </div>
+                    {!expandedPosts.get(item.id) &&
+                      overflowsMap.get(item.id) && (
+                        <div className="relative -mt-4">
+                          {/* 模糊遮罩层 */}
+                          <div
+                            className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none dark:hidden"
+                            style={{
+                              background:
+                                "linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 1))",
+                            }}
+                          />
+                          <div
+                            className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none hidden dark:block"
+                            style={{
+                              background:
+                                "linear-gradient(to bottom, rgba(31, 41, 55, 0), rgba(31, 41, 55, 0.7), rgba(31, 41, 55, 1))",
+                            }}
+                          />
+                          {/* 查看更多按钮 */}
+                          <div className="relative pt-6 flex justify-center">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const newMap = new Map(expandedPosts);
+                                newMap.set(item.id, true);
+                                setExpandedPosts(newMap);
+                              }}
+                              className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 text-sm font-medium transition-colors"
+                            >
+                              查看更多
+                            </button>
+                          </div>
+                        </div>
+                      )}
                   </div>
 
                   {/* 最佳评论 */}
