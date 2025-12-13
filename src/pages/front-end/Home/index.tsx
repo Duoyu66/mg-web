@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Button, Skeleton } from "antd";
 import { useNavigate } from "react-router-dom";
+import CommentInput from "@/components/mgInput";
 
 interface User {
   id: string;
@@ -46,8 +47,29 @@ interface Record {
   createTime: number;
 }
 // https://img.pawpaw18.cn/user-img/987b1688d3754e4d88371c7f93bb5654.jpg
+type MentionOption = {
+  value: string;
+  label?: string;
+  realValue?: string;
+};
+
 const Home = () => {
   const navigate = useNavigate();
+  // 跟踪哪个帖子的评论区域是展开的
+  const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
+  // 每个帖子的评论内容
+  const [commentTexts, setCommentTexts] = useState<Map<string, string>>(new Map());
+  // 每个帖子的提及用户搜索文本
+  const [mentionSearchTexts, setMentionSearchTexts] = useState<Map<string, string>>(new Map());
+  // 每个帖子已选择的提及用户
+  const [selectedMentions, setSelectedMentions] = useState<Map<string, Set<string>>>(new Map());
+  
+  // 模拟用户列表（实际应该从API获取）
+  const mentionOptions: MentionOption[] = [
+    { value: "user1", label: "用户1" },
+    { value: "user2", label: "用户2" },
+    { value: "user3", label: "用户3" },
+  ];
   const [records, setRecords] = useState<Record[]>([
     {
       id: "1998194863023136770",
@@ -613,7 +635,18 @@ const Home = () => {
                         />
                         <span className="text-sm">{item.thumbNum}</span>
                       </button>
-                      <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                      <button 
+                        onClick={() => {
+                          const newExpanded = new Set(expandedComments);
+                          if (newExpanded.has(item.id)) {
+                            newExpanded.delete(item.id);
+                          } else {
+                            newExpanded.add(item.id);
+                          }
+                          setExpandedComments(newExpanded);
+                        }}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      >
                         <MessageCircle className="w-4 h-4" />
                         <span className="text-sm">{item.commentNum}</span>
                       </button>
@@ -638,6 +671,124 @@ const Home = () => {
                       <span>{item.viewNum}</span>
                     </div>
                   </div>
+
+                  {/* 评论区域 - 展开时显示 */}
+                  {expandedComments.has(item.id) && (
+                    <div 
+                      className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {/* 评论列表标题 */}
+                      <div className="flex items-center justify-between mb-4">
+                        <h4 className="font-semibold text-gray-900 dark:text-gray-100">
+                          {item.commentNum} 个评论
+                        </h4>
+                        <div className="flex items-center gap-2">
+                          <button className="text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 px-2 py-1 rounded">
+                            全部评论
+                          </button>
+                          <button className="text-sm text-primary-600 dark:text-primary-400 px-2 py-1 rounded bg-primary-50 dark:bg-primary-900/30">
+                            最热
+                          </button>
+                          <button className="text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 px-2 py-1 rounded">
+                            最新
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* 评论输入框 */}
+                      <div className="mb-4">
+                        <CommentInput
+                          value={commentTexts.get(item.id) || ""}
+                          onChange={(val) => {
+                            const newTexts = new Map(commentTexts);
+                            newTexts.set(item.id, val);
+                            setCommentTexts(newTexts);
+                          }}
+                          onSubmit={() => {
+                            const commentText = commentTexts.get(item.id) || "";
+                            if (!commentText.trim()) {
+                              return;
+                            }
+                            // TODO: 发送评论逻辑
+                            console.log("发送评论", item.id, commentText);
+                            // 清空评论内容
+                            const newTexts = new Map(commentTexts);
+                            newTexts.set(item.id, "");
+                            setCommentTexts(newTexts);
+                            // 清空已选择的提及
+                            const newMentions = new Map(selectedMentions);
+                            newMentions.set(item.id, new Set());
+                            setSelectedMentions(newMentions);
+                          }}
+                          mentionUsers={mentionSearchTexts.get(item.id)
+                            ? mentionOptions.filter((user) =>
+                                (user.label || user.value)
+                                  .toLowerCase()
+                                  .includes(mentionSearchTexts.get(item.id)!.toLowerCase())
+                              )
+                            : []}
+                          onSelectMention={(option) => {
+                            const selectedLabel = option.label || option.value || "";
+                            if (selectedLabel) {
+                              const newMentions = new Map(selectedMentions);
+                              const currentMentions = newMentions.get(item.id) || new Set<string>();
+                              currentMentions.add(selectedLabel);
+                              newMentions.set(item.id, currentMentions);
+                              setSelectedMentions(newMentions);
+                            }
+                          }}
+                          onSearchMention={(text) => {
+                            const newSearchTexts = new Map(mentionSearchTexts);
+                            newSearchTexts.set(item.id, text);
+                            setMentionSearchTexts(newSearchTexts);
+                          }}
+                          placeholder="快来和大家讨论吧~ 输入 @ 可以提及用户"
+                          isSubmitDisabled={!commentTexts.get(item.id)?.trim()}
+                        />
+                      </div>
+
+                      {/* 评论列表 */}
+                      <div className="space-y-4">
+                        {item.commentNum > 0 ? (
+                          // 示例评论
+                          <div className="flex items-start gap-3">
+                            <img
+                              className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                              src="https://img.pawpaw18.cn/user-img/default-avatar.jpg"
+                              alt="评论者头像"
+                            />
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+                                  用户昵称
+                                </span>
+                                <span className="text-xs text-gray-500 dark:text-gray-400">
+                                  今天 15:03
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                                这是一条示例评论内容...
+                              </p>
+                              <div className="flex items-center gap-4">
+                                <button className="flex items-center gap-1 text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                                  <ThumbsUp className="w-4 h-4" />
+                                  <span className="text-xs">0</span>
+                                </button>
+                                <button className="text-xs text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                                  回复
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-center text-sm text-gray-500 dark:text-gray-400 py-8">
+                            暂无评论，快来抢沙发吧~
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
 
