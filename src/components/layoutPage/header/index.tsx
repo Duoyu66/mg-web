@@ -113,7 +113,7 @@ const Header = () => {
             className="w-4 h-4 text-primary-500 dark:text-white cursor-pointer"
           />
         </Badge>
-        <Button onClick={() => navigate("/question/nav")}>刷题</Button>
+        <Button onClick={() => navigate("/question/questionHome")}>刷题</Button>
         <span className="cursor-pointer" onClick={goLogin}>
           登录/注册
         </span>

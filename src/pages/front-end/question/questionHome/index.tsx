@@ -722,7 +722,8 @@ const QuestionHome = () => {
                 {lvInfo.dailySign === "0" ? "立即签到" : "今日已签到"}
               </div>
             </div>
-          </div>
+          </div>  
+          <Button onClick={() => nav("/")}>返回首页</Button>
           <div
             style={{ display: "none" }}
             className="w-full flex justify-start items-center"
