@@ -1,12 +1,22 @@
 status: 200 OK
+content-type: text/html
+content-length: unknown
 headers: {
-  "access-control-allow-credentials": "true",
+  "cache-control": "max-age=300",
   "connection": "keep-alive",
-  "content-length": "0",
-  "date": "Tue, 09 Dec 2025 10:52:36 GMT",
-  "set-cookie": "acw_tc=0a005a8a17652775560661327e76e5fb11b03e397255875393698ae3f70767;path=/;HttpOnly;Max-Age=1800",
-  "vary": "Origin",
+  "content-encoding": "gzip",
+  "content-type": "text/html",
+  "date": "Wed, 17 Dec 2025 05:58:02 GMT",
+  "etag": "W/\"693aa6f9-4b\"",
+  "last-modified": "Thu, 11 Dec 2025 11:11:53 GMT",
+  "set-cookie": "acw_tc=0a03834117659510829072378e5fded77e00609a5acf6d72092d9671e0812e;path=/;HttpOnly;Max-Age=1800",
+  "transfer-encoding": "chunked",
+  "vary": "Accept-Encoding",
   "x-waf-access": "1",
   "x-waf-client-ip": "222.128.2.51"
 }
 
+Response body (first 1000 chars):
+<script>
+  window.location.href = 'https://www.apifox.cn/help/';
+</script>

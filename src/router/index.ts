@@ -14,6 +14,7 @@ import ExamPage from "@/pages/front-end/question/questionHome/examPage";
 import FinishPage from "@/pages/front-end/question/questionHome/finishPage";
 import PublishArticle from "@/pages/front-end/publishArticle";
 import ArticleDetail from "@/pages/front-end/Home/articleDetail";
+import CodeEdit from "@/pages/front-end/codeEdit";
 
 const routes = [
     {
@@ -137,6 +138,16 @@ const routes = [
             },
 
         ]
+    },
+    {
+        title: '代码编辑器',
+        path: "/codeEdit",
+        component: CodeEdit,
+        meta: {
+            age: 1,
+            name: "张三",
+            showFooter: false
+        }
     }
 ]
 
