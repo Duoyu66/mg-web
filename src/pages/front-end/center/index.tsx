@@ -12,7 +12,8 @@ import {
   Activity
 } from 'lucide-react';
 import { useTheme } from '@/components/context/useTheme';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as echarts from 'echarts';
 
 const CapabilityRadar = () => {
@@ -100,6 +101,8 @@ const CapabilityRadar = () => {
 
 const UserCenter = () => {
   const { theme } = useTheme();
+  const navigate = useNavigate();
+  const [selectedFrame, setSelectedFrame] = useState<'none' | 'neon' | 'gold' | 'gradient'>('neon');
 
   const renderContent = () => {
     return (
@@ -110,11 +113,22 @@ const UserCenter = () => {
             <div className="h-48 bg-gradient-to-r from-blue-400 to-purple-500"></div>
             <div className="px-8 pb-8">
               <div className="flex flex-col md:flex-row items-start md:items-end -mt-16 gap-6">
-                <Avatar 
-                  size={128} 
-                  className="border-4 border-white dark:border-gray-800 shadow-lg"
-                  src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
-                />
+                <div
+                  className={`
+                    relative rounded-2xl p-[3px]
+                    ${selectedFrame === 'neon' ? 'bg-gradient-to-tr from-cyan-400 via-blue-500 to-purple-500 shadow-[0_0_20px_rgba(59,130,246,0.6)]' : ''}
+                    ${selectedFrame === 'gold' ? 'bg-gradient-to-tr from-yellow-300 via-amber-400 to-orange-500 shadow-[0_0_18px_rgba(251,191,36,0.7)]' : ''}
+                    ${selectedFrame === 'gradient' ? 'bg-gradient-to-tr from-pink-400 via-purple-500 to-indigo-500 shadow-[0_0_18px_rgba(244,114,182,0.5)]' : ''}
+                  `}
+                >
+                  <div className="rounded-2xl bg-white dark:bg-gray-900 p-1">
+                    <Avatar 
+                      size={120} 
+                      className="border-4 border-white dark:border-gray-800 shadow-lg"
+                      src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
+                    />
+                  </div>
+                </div>
                 <div className="flex-1 mb-2">
                   <div className="flex items-center gap-4">
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">张三</h1>
@@ -124,9 +138,56 @@ const UserCenter = () => {
                     全栈开发工程师 | 热爱技术，持续学习 | GitHub: @zhangsan
                   </p>
                 </div>
-                <div className="flex gap-3 mb-2">
-                  <Button icon={<Edit3 size={16} />}>编辑资料</Button>
-                  <Button icon={<Settings size={16} />}>设置</Button>
+                <div className="flex flex-col gap-3 mb-2">
+                  <div className="flex gap-3">
+                    <Button icon={<Edit3 size={16} />}>编辑资料</Button>
+                    <Button icon={<Settings size={16} />}>设置</Button>
+                    <Button 
+                      type="primary" 
+                      onClick={() => navigate('/front/member')}
+                    >
+                      会员积分
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                    <span className="mr-2 text-gray-600 dark:text-gray-300">头像框</span>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedFrame('neon')}
+                      className={`
+                        px-3 py-1 rounded-full border text-xs transition-all
+                        ${selectedFrame === 'neon'
+                          ? 'border-cyan-400 text-cyan-300 bg-cyan-500/10'
+                          : 'border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-cyan-400 hover:text-cyan-300'}
+                      `}
+                    >
+                      霓虹蓝
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedFrame('gold')}
+                      className={`
+                        px-3 py-1 rounded-full border text-xs transition-all
+                        ${selectedFrame === 'gold'
+                          ? 'border-amber-400 text-amber-300 bg-amber-500/10'
+                          : 'border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-amber-400 hover:text-amber-300'}
+                      `}
+                    >
+                      黄金荣誉
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedFrame('gradient')}
+                      className={`
+                        px-3 py-1 rounded-full border text-xs transition-all
+                        ${selectedFrame === 'gradient'
+                          ? 'border-pink-400 text-pink-300 bg-pink-500/10'
+                          : 'border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-pink-400 hover:text-pink-300'}
+                      `}
+                    >
+                      渐变炫彩
+                    </button>
+                  </div>
                 </div>
               </div>
 
