@@ -90,7 +90,21 @@ const getRecords = (): InterviewRecord[] => {
 export const CompanyService = {
   getAllCompanies: async (): Promise<Company[]> => {
     return new Promise((resolve) => {
-      setTimeout(() => resolve(getCompanies()), 300);
+      setTimeout(() => {
+        const companies = getCompanies();
+        const records = getRecords();
+        // Ensure recordCount is accurate
+        const companiesWithCount = companies.map(c => {
+            const count = records.filter(r => r.companyId === c.id).length;
+            if (c.recordCount !== count) {
+                // Return updated object, but ideally we should persist this eventually
+                // For now, just returning correct data is enough for display
+                return { ...c, recordCount: count };
+            }
+            return c;
+        });
+        resolve(companiesWithCount);
+      }, 300);
     });
   },
 
@@ -173,13 +187,46 @@ export const CompanyService = {
       }, 300);
     });
   },
+
+  updateRecord: async (id: string, updates: Partial<InterviewRecord>): Promise<InterviewRecord> => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const records = getRecords();
+        const index = records.findIndex((r) => r.id === id);
+        if (index === -1) {
+          reject('Record not found');
+          return;
+        }
+        records[index] = { ...records[index], ...updates };
+        localStorage.setItem(STORAGE_KEY_RECORDS, JSON.stringify(records));
+        
+        // Also update company lastUpdated
+        CompanyService.updateCompany(records[index].companyId, {});
+
+        resolve(records[index]);
+      }, 300);
+    });
+  },
   
   deleteRecord: async (id: string): Promise<void> => {
     return new Promise((resolve) => {
         setTimeout(() => {
             const records = getRecords();
+            const record = records.find(r => r.id === id);
+            if (!record) {
+                resolve();
+                return;
+            }
+            const companyId = record.companyId;
             const newRecords = records.filter(r => r.id !== id);
             localStorage.setItem(STORAGE_KEY_RECORDS, JSON.stringify(newRecords));
+            
+            // Update company record count
+            const companyRecords = newRecords.filter(r => r.companyId === companyId);
+            CompanyService.updateCompany(companyId, { 
+                recordCount: companyRecords.length 
+            });
+            
             resolve();
         }, 300);
     });

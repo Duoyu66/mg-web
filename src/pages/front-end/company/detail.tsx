@@ -17,7 +17,8 @@ import {
   Select, 
   DatePicker, 
   Descriptions,
-  Popconfirm
+  Popconfirm,
+  Space
 } from 'antd';
 import { 
   ArrowLeftOutlined, 
@@ -28,7 +29,8 @@ import {
   CloseCircleOutlined, 
   SyncOutlined,
   DeleteOutlined,
-  LinkOutlined
+  LinkOutlined,
+  EditOutlined
 } from '@ant-design/icons';
 import { CompanyService } from './service';
 import { Company, CompanyStatus, InterviewRecord } from './types';
@@ -44,8 +46,9 @@ const CompanyDetail = () => {
   const [records, setRecords] = useState<InterviewRecord[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Add Record Modal
+  // Modal State
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<InterviewRecord | null>(null);
   const [form] = Form.useForm();
 
   const fetchData = async () => {
@@ -77,10 +80,25 @@ const CompanyDetail = () => {
     fetchData();
   }, [id]);
 
-  const handleAddRecord = async (values: any) => {
+  const showAddModal = () => {
+    setEditingRecord(null);
+    form.resetFields();
+    setIsModalVisible(true);
+  };
+
+  const showEditModal = (record: InterviewRecord) => {
+    setEditingRecord(record);
+    form.setFieldsValue({
+      ...record,
+      date: dayjs(record.date),
+    });
+    setIsModalVisible(true);
+  };
+
+  const handleSubmit = async (values: any) => {
     if (!company) return;
     try {
-      const newRecord = await CompanyService.addRecord({
+      const recordData = {
         companyId: company.id,
         round: values.round,
         date: values.date.format('YYYY-MM-DD'),
@@ -90,15 +108,25 @@ const CompanyDetail = () => {
         answers: values.answers,
         result: values.result,
         feedback: values.feedback,
-      });
+      };
+
+      if (editingRecord) {
+        await CompanyService.updateRecord(editingRecord.id, recordData);
+        message.success('记录更新成功');
+      } else {
+        await CompanyService.addRecord(recordData);
+        message.success('记录添加成功');
+      }
       
       // Update company status based on the latest record result
-      // This is a simple logic; could be more complex
+      // Logic: If updating, we should probably re-evaluate status based on the *latest* record by date
+      // But for simplicity, we'll keep the existing logic that assumes the user is editing/adding relevant info
+      
       let newStatus = company.status;
       if (values.result === '通过') {
         if (values.round.includes('一')) newStatus = CompanyStatus.Interview2;
         if (values.round.includes('二')) newStatus = CompanyStatus.Interview3;
-        if (values.round.includes('三')) newStatus = CompanyStatus.Offer; // Assume offer after 3 rounds
+        if (values.round.includes('三')) newStatus = CompanyStatus.Offer; 
         if (values.round === 'HR面') newStatus = CompanyStatus.Offer;
       } else if (values.result === '未通过') {
         newStatus = CompanyStatus.Rejected;
@@ -112,12 +140,12 @@ const CompanyDetail = () => {
           await CompanyService.updateCompany(company.id, { status: newStatus });
       }
 
-      message.success('记录添加成功');
       setIsModalVisible(false);
       form.resetFields();
+      setEditingRecord(null);
       fetchData(); // Refresh data
     } catch (error) {
-      message.error('添加失败');
+      message.error(editingRecord ? '更新失败' : '添加失败');
     }
   };
   
@@ -157,7 +185,7 @@ const CompanyDetail = () => {
         {/* Navigation & Actions */}
         <div className="flex justify-between items-center">
           <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/front/company')}>返回列表</Button>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
+          <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal}>
             添加面试记录
           </Button>
         </div>
@@ -205,7 +233,7 @@ const CompanyDetail = () => {
         {/* Timeline Section */}
         <Card title="面试时间轴" className="shadow-md rounded-xl">
           {records.length > 0 ? (
-            <Timeline mode="left" className="mt-4">
+            <Timeline mode="alternate" className="mt-4">
               {records.map(record => (
                 <Timeline.Item 
                   key={record.id} 
@@ -220,9 +248,17 @@ const CompanyDetail = () => {
                     title={
                         <div className="flex justify-between items-center">
                             <span>{record.round} - {record.format}</span>
-                            <Popconfirm title="确定删除这条记录吗？" onConfirm={() => handleDeleteRecord(record.id)}>
-                                <Button type="text" danger icon={<DeleteOutlined />} size="small" />
-                            </Popconfirm>
+                            <Space>
+                                <Button 
+                                  type="text" 
+                                  icon={<EditOutlined />} 
+                                  size="small" 
+                                  onClick={() => showEditModal(record)}
+                                />
+                                <Popconfirm title="确定删除这条记录吗？" onConfirm={() => handleDeleteRecord(record.id)}>
+                                    <Button type="text" danger icon={<DeleteOutlined />} size="small" />
+                                </Popconfirm>
+                            </Space>
                         </div>
                     }
                   >
@@ -260,15 +296,48 @@ const CompanyDetail = () => {
           )}
         </Card>
 
-        {/* Add Record Modal */}
+        {/* Add/Edit Record Modal */}
         <Modal
-          title="添加面试记录"
+          title={editingRecord ? "编辑面试记录" : "添加面试记录"}
           open={isModalVisible}
-          onOk={() => form.submit()}
-          onCancel={() => setIsModalVisible(false)}
+          onCancel={() => {
+            setIsModalVisible(false);
+            setEditingRecord(null);
+            form.resetFields();
+          }}
           width={700}
+          footer={[
+            <Button key="cancel" onClick={() => {
+                setIsModalVisible(false);
+                setEditingRecord(null);
+                form.resetFields();
+            }}>
+                取消
+            </Button>,
+            !editingRecord && (
+                <Button 
+                    key="saveAndAdd" 
+                    onClick={() => {
+                        setSaveAndAddMode(true);
+                        form.submit();
+                    }}
+                >
+                    保存并添加下一条
+                </Button>
+            ),
+            <Button 
+                key="submit" 
+                type="primary" 
+                onClick={() => {
+                    setSaveAndAddMode(false);
+                    form.submit();
+                }}
+            >
+                确定
+            </Button>
+          ]}
         >
-          <Form form={form} layout="vertical" onFinish={handleAddRecord}>
+          <Form form={form} layout="vertical" onFinish={handleSubmit}>
             <div className="grid grid-cols-2 gap-4">
                 <Form.Item name="round" label="面试轮次" rules={[{ required: true }]}>
                   <Select placeholder="选择轮次">

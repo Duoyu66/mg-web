@@ -166,6 +166,9 @@ const CompanyList = () => {
                     <div key="view" className="text-gray-400 text-[10px] flex justify-center items-center gap-1">
                       <EyeOutlined /> {company.viewCount}
                     </div>,
+                    <div key="records" className="text-gray-400 text-[10px] flex justify-center items-center gap-1">
+                      <FileTextOutlined /> {company.recordCount || 0}
+                    </div>,
                     <div key="date" className="text-gray-400 text-[10px] flex justify-center items-center gap-1">
                       <ClockCircleOutlined /> {dayjs(company.lastUpdated).format('MM-DD')}
                     </div>

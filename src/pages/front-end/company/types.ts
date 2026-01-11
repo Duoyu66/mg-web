@@ -35,4 +35,5 @@ export interface Company {
   location?: string;
   salaryRange?: string; // e.g., "20k-30k"
   tags?: string[];
+  recordCount?: number;
 }
