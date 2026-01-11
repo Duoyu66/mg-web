@@ -1,5 +1,5 @@
 //此时服务器连接的ip
-import {bgUrl} from "@/utils/themeTools";
+import { bgUrl } from "@/pages/front-end/utils/themeTools";
 
 export const serverIp = 'https://www.pawpaw18.cn'
 

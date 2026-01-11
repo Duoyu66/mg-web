@@ -1,52 +1,72 @@
-import React, { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { frontendRoadmap, backendRoadmap, RoadmapNode } from './data';
-import { CheckCircle2, Circle, ArrowRight, Laptop, Server } from 'lucide-react';
+import { frontendRoadmap, backendRoadmap } from './data';
+import type { RoadmapNode } from './data';
+import { CheckCircle2, Laptop, Server, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-// Grid Configuration
 const GRID = {
-  NODE_WIDTH: 260,
-  NODE_HEIGHT: 120,
-  GAP_X: 60,
-  GAP_Y: 80,
-  PADDING: 40
+  NODE_WIDTH: 280,
+  NODE_HEIGHT: 124,
+  GAP_X: 56,
+  GAP_Y: 44,
+  PADDING: 48,
+  COLS: 3
 };
 
 const RoadmapPage = () => {
   const [activeTab, setActiveTab] = useState<'frontend' | 'backend'>('frontend');
+  const navigate = useNavigate();
   
   const currentRoadmap = activeTab === 'frontend' ? frontendRoadmap : backendRoadmap;
 
-  // Calculate canvas size
-  const maxRow = Math.max(...currentRoadmap.map(n => n.row));
-  const maxCol = Math.max(...currentRoadmap.map(n => n.col));
-  
-  // Center alignment offset
-  // Assuming max 3 columns for now based on data
-  const totalWidth = maxCol * GRID.NODE_WIDTH + (maxCol - 1) * GRID.GAP_X;
-  const totalHeight = maxRow * GRID.NODE_HEIGHT + (maxRow - 1) * GRID.GAP_Y;
-  
-  const canvasWidth = totalWidth + GRID.PADDING * 2;
-  const canvasHeight = totalHeight + GRID.PADDING * 2;
+  const orderedRoadmap = useMemo(
+    () => [...currentRoadmap].sort((a, b) => a.order - b.order),
+    [currentRoadmap]
+  );
 
-  // Helper to get node center coordinates
-  const getNodeCenter = (row: number, col: number) => {
-    const x = GRID.PADDING + (col - 1) * (GRID.NODE_WIDTH + GRID.GAP_X) + GRID.NODE_WIDTH / 2;
-    const y = GRID.PADDING + (row - 1) * (GRID.NODE_HEIGHT + GRID.GAP_Y) + GRID.NODE_HEIGHT / 2;
-    return { x, y };
+  const rows = Math.ceil(orderedRoadmap.length / GRID.COLS);
+  const canvasWidth = GRID.PADDING * 2 + GRID.COLS * GRID.NODE_WIDTH + (GRID.COLS - 1) * GRID.GAP_X;
+  const canvasHeight = GRID.PADDING * 2 + rows * GRID.NODE_HEIGHT + (rows - 1) * GRID.GAP_Y;
+
+  const getNodeRectByIndex = (index: number) => {
+    const rowIndex = Math.floor(index / GRID.COLS);
+    const colIndex = index % GRID.COLS;
+    const left = GRID.PADDING + colIndex * (GRID.NODE_WIDTH + GRID.GAP_X);
+    const top = GRID.PADDING + rowIndex * (GRID.NODE_HEIGHT + GRID.GAP_Y);
+    const centerX = left + GRID.NODE_WIDTH / 2;
+    const centerY = top + GRID.NODE_HEIGHT / 2;
+    return { left, top, centerX, centerY, rowIndex, colIndex };
   };
 
-  // Helper to get connection points (bottom of source, top of target)
-  const getConnectionPoints = (source: RoadmapNode, target: RoadmapNode) => {
-    const sourceCenter = getNodeCenter(source.row, source.col);
-    const targetCenter = getNodeCenter(target.row, target.col);
-    
-    return {
-      x1: sourceCenter.x,
-      y1: sourceCenter.y + GRID.NODE_HEIGHT / 2, // Bottom of source
-      x2: targetCenter.x,
-      y2: targetCenter.y - GRID.NODE_HEIGHT / 2  // Top of target
-    };
+  const indexById = useMemo(() => {
+    const map = new Map<string, number>();
+    orderedRoadmap.forEach((n, i) => map.set(n.id, i));
+    return map;
+  }, [orderedRoadmap]);
+
+  const getConnectionPath = (source: RoadmapNode, target: RoadmapNode) => {
+    const si = indexById.get(source.id);
+    const ti = indexById.get(target.id);
+    if (si == null || ti == null) return null;
+
+    const s = getNodeRectByIndex(si);
+    const t = getNodeRectByIndex(ti);
+
+    const sameRow = s.rowIndex === t.rowIndex && t.colIndex > s.colIndex;
+    const x1 = sameRow ? s.left + GRID.NODE_WIDTH : s.centerX;
+    const y1 = sameRow ? s.centerY : s.top + GRID.NODE_HEIGHT;
+    const x2 = sameRow ? t.left : t.centerX;
+    const y2 = sameRow ? t.centerY : t.top;
+
+    const midX = (x1 + x2) / 2;
+    const midY = (y1 + y2) / 2;
+
+    const d = sameRow
+      ? `M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`
+      : `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
+
+    return d;
   };
 
   return (
@@ -124,21 +144,18 @@ const RoadmapPage = () => {
                 </linearGradient>
               </defs>
               
-              {currentRoadmap.map(node => {
+              {orderedRoadmap.map(node => {
                 if (!node.next) return null;
                 return node.next.map(nextId => {
-                  const targetNode = currentRoadmap.find(n => n.id === nextId);
+                  const targetNode = orderedRoadmap.find(n => n.id === nextId);
                   if (!targetNode) return null;
-                  
-                  const { x1, y1, x2, y2 } = getConnectionPoints(node, targetNode);
-                  
-                  // Calculate control points for smooth bezier curve
-                  const midY = (y1 + y2) / 2;
+                  const d = getConnectionPath(node, targetNode);
+                  if (!d) return null;
                   
                   return (
                     <g key={`${node.id}-${nextId}`}>
                       <path
-                        d={`M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`}
+                        d={d}
                         fill="none"
                         stroke="url(#lineGradient)"
                         strokeWidth="2"
@@ -153,8 +170,8 @@ const RoadmapPage = () => {
             </svg>
 
             {/* Nodes Layer */}
-            {currentRoadmap.map((node, index) => {
-              const { x, y } = getNodeCenter(node.row, node.col);
+            {orderedRoadmap.map((node, index) => {
+              const { left, top } = getNodeRectByIndex(index);
               const Icon = node.icon;
               
               return (
@@ -162,29 +179,30 @@ const RoadmapPage = () => {
                   key={node.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ delay: index * 0.06 }}
                   className="absolute z-10"
                   style={{
-                    left: x - GRID.NODE_WIDTH / 2,
-                    top: y - GRID.NODE_HEIGHT / 2,
+                    left,
+                    top,
                     width: GRID.NODE_WIDTH,
                     height: GRID.NODE_HEIGHT,
                   }}
                 >
                   <div 
                     className={`
-                      w-full h-full p-4 rounded-xl border-2 transition-all duration-300 group cursor-pointer hover:shadow-lg
+                      w-full h-full p-4 rounded-2xl border transition-all duration-300 group cursor-pointer hover:shadow-lg active:scale-[0.99]
                       ${node.status === 'completed' 
-                        ? 'bg-green-50 border-green-200 dark:bg-green-900/10 dark:border-green-800' 
+                        ? 'bg-gradient-to-br from-green-50 to-white border-green-200 dark:from-green-900/10 dark:to-gray-900 dark:border-green-800' 
                         : node.status === 'learning'
-                          ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/10 dark:border-blue-800'
-                          : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700'
+                          ? 'bg-gradient-to-br from-blue-50 to-white border-blue-200 dark:from-blue-900/10 dark:to-gray-900 dark:border-blue-800'
+                          : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700'
                       }
                     `}
+                    onClick={() => navigate(`/front/route/${activeTab}/${node.id}`)}
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className={`
-                        p-2 rounded-lg 
+                        p-2.5 rounded-xl 
                         ${node.status === 'completed' ? 'bg-green-100 text-green-600' : 
                           node.status === 'learning' ? 'bg-blue-100 text-blue-600' : 
                           'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'}
@@ -202,12 +220,15 @@ const RoadmapPage = () => {
                       )}
                     </div>
                     
-                    <h3 className="font-bold text-gray-900 dark:text-white mb-1 flex items-center gap-1">
-                      {node.title}
-                      {node.type === 'milestone' && (
-                        <span className="text-amber-500">★</span>
-                      )}
-                    </h3>
+                    <div className="flex items-center justify-between gap-3">
+                      <h3 className="font-bold text-gray-900 dark:text-white mb-1 flex items-center gap-1">
+                        {node.title}
+                        {node.type === 'milestone' && (
+                          <span className="text-amber-500">★</span>
+                        )}
+                      </h3>
+                      <ArrowRight size={16} className="text-gray-300 dark:text-gray-700 group-hover:text-primary-500 transition-colors" />
+                    </div>
                     <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
                       {node.description}
                     </p>

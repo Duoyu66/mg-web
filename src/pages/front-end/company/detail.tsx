@@ -23,6 +23,7 @@ import {
   ArrowLeftOutlined, 
   PlusOutlined, 
   ClockCircleOutlined, 
+  EyeOutlined,
   CheckCircleOutlined, 
   CloseCircleOutlined, 
   SyncOutlined,
@@ -184,7 +185,7 @@ const CompanyDetail = () => {
                             <LinkOutlined /> 官网
                         </a>
                     )}
-                    <span className="flex items-center gap-1"><ClockCircleOutlined /> 更新于 {dayjs(company.lastUpdated).fromNow()}</span>
+                    <span className="flex items-center gap-1"><ClockCircleOutlined /> 更新于 {dayjs(company.lastUpdated).format('YYYY-MM-DD HH:mm')}</span>
                     <span className="flex items-center gap-1"><EyeOutlined /> {company.viewCount} 次浏览</span>
                   </div>
                 </div>

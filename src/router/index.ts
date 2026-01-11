@@ -24,6 +24,7 @@ import CompanyDetail from "@/pages/front-end/company/detail";
 import ResumeBuilder from "@/pages/front-end/resume";
 import RankPage from "@/pages/front-end/rank";
 import RoadmapPage from "@/pages/front-end/route";
+import RoadmapDetailPage from "@/pages/front-end/route/detail";
 import DocumentPage from "@/pages/front-end/document";
 
 const routes = [
@@ -209,6 +210,15 @@ const routes = [
                 title: '学习路线',
                 path: "route",
                 component: RoadmapPage,
+                meta: {
+                    age: 1,
+                    name: "张三"
+                }
+            },
+            {
+                title: '学习路线详情',
+                path: "route/:track/:id",
+                component: RoadmapDetailPage,
                 meta: {
                     age: 1,
                     name: "张三"

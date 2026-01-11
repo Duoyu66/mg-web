@@ -6,6 +6,7 @@ import { uploadOssFile } from "@/pages/front-end/utils/UploadOss";
 
 type TinyMCEEditor = {
   getContent: () => string;
+  ui?: any;
 };
 
 const PublishArticle = () => {
@@ -17,7 +18,7 @@ const PublishArticle = () => {
   useEffect(() => {
     // 在组件加载时手动设置编辑器语言
     if (editorRef.current) {
-      const editor = editorRef.current;
+      const editor = editorRef.current as any;
       editor.ui.registry.addContextToolbar("textSelection", {
         items: "bold italic | link",
         position: "bottom",
@@ -116,10 +117,6 @@ const PublishArticle = () => {
               forced_root_block: "p", // 强制父元素为p标签
               force_br_newlines: false, // 禁止换行符会替换掉br
               force_p_newlines: false, // 禁止换行符会替换掉p
-              // 其他增强输入体验的配置
-              plugins: [
-                "textpattern", "table", "lists", "media", "fullscreen", "autolink", "link", "searchreplace"
-              ]
             }}
           />
           <div className="mt-4">
