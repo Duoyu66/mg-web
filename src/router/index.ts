@@ -32,6 +32,7 @@ import UserCenter from "@/pages/front-end/center";
 import NotePage from "@/pages/front-end/note";
 import TodoPage from "@/pages/front-end/todo";
 import BoardPage from "@/pages/front-end/board";
+import MemberPage from "@/pages/front-end/member";
 import AdminLayout from '@/pages/admin/layout';
 import AdminDashboard from '@/pages/admin/home';
 import AdminCompanyList from '@/pages/admin/company';
@@ -316,6 +317,14 @@ const routes = [
                 title: '留言板',
                 path: "board",
                 component: BoardPage,
+                meta: {
+                    showFooter: false
+                }
+            },
+            {
+                title: '会员积分机制',
+                path: "member",
+                component: MemberPage,
                 meta: {
                     showFooter: false
                 }

@@ -21,7 +21,6 @@ function AppWithTheme() {
                 "token": {
                     "colorPrimary": "#722ed1",
                     "colorInfo": "#722ed1",
-                    "colorTextBase": "#535151",
                     "borderRadius": 12,
                     "colorSuccess": "#13c2c2"
                 }

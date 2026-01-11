@@ -14,6 +14,7 @@ import {
   HomeOutlined
 } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useTheme } from '@/components/context/useTheme';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -84,6 +85,7 @@ const AdminLayout: React.FC = () => {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+  const { theme: currentTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -113,12 +115,30 @@ const AdminLayout: React.FC = () => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider theme="light" collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)} style={{ borderRight: '1px solid #f0f0f0' }}>
-        <div style={{ height: 32, margin: 16, background: '#e6f7ff', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1890ff', fontWeight: 'bold', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+      <Sider 
+        theme={currentTheme === 'dark' ? 'dark' : 'light'} 
+        collapsible 
+        collapsed={collapsed} 
+        onCollapse={(value) => setCollapsed(value)} 
+        style={{ borderRight: currentTheme === 'dark' ? 'none' : '1px solid #f0f0f0' }}
+      >
+        <div style={{ 
+            height: 32, 
+            margin: 16, 
+            background: currentTheme === 'dark' ? 'rgba(255, 255, 255, 0.2)' : '#e6f7ff', 
+            borderRadius: 6, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            color: currentTheme === 'dark' ? '#fff' : '#1890ff', 
+            fontWeight: 'bold', 
+            overflow: 'hidden', 
+            whiteSpace: 'nowrap' 
+        }}>
            {collapsed ? 'MG' : 'MG 后台管理'}
         </div>
         <Menu 
-            theme="light" 
+            theme={currentTheme === 'dark' ? 'dark' : 'light'}
             defaultSelectedKeys={[location.pathname]} 
             selectedKeys={[location.pathname]}
             mode="inline" 
@@ -128,14 +148,14 @@ const AdminLayout: React.FC = () => {
         />
       </Sider>
       <Layout>
-        <Header style={{ padding: 0, background: colorBgContainer, display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingRight: 24, boxShadow: '0 1px 4px rgba(0,21,41,.08)', zIndex: 1 }}>
+        <Header style={{ padding: 0, background: colorBgContainer, display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingRight: 24, boxShadow: currentTheme === 'dark' ? '0 1px 4px rgba(0,0,0,0.5)' : '0 1px 4px rgba(0,21,41,.08)', zIndex: 1 }}>
            <div className="px-4">
              {/* Header Content Left */}
-             <span className="text-lg font-bold" style={{ color: '#1890ff' }}>MG 编程管理系统</span>
+             <span className="text-lg font-bold" style={{ color: currentTheme === 'dark' ? '#fff' : '#1890ff' }}>MG 编程管理系统</span>
            </div>
            <div>
              <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} />
-             <span className="ml-2">管理员</span>
+             <span className={`ml-2 ${currentTheme === 'dark' ? 'text-white' : ''}`}>管理员</span>
            </div>
         </Header>
         <Content style={{ margin: '0 16px', overflow: 'hidden' }}>

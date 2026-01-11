@@ -51,6 +51,7 @@ const Header = () => {
                 { id: "14", title: "笔记", path: "/front/note" },
                 { id: "15", title: "代办", path: "/front/todo" },
                 { id: "16", title: "留言板", path: "/front/board" },
+                   { id: "17", title: "会员积分机制", path: "/front/member" },
             ]
         },
         { id: "13", title: "管理后台", path: "/front/admin" },

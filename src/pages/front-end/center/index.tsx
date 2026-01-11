@@ -1,4 +1,4 @@
-import { Button, Avatar, Tabs, Card, Progress, Tag, List } from 'antd';
+import { Button, Avatar, Tabs, Card, Progress, Tag } from 'antd';
 import { 
   User, 
   Settings, 
@@ -220,31 +220,31 @@ const UserCenter = () => {
                       key: '1',
                       label: <span className="flex items-center gap-2"><History size={16} />最近活动</span>,
                       children: (
-                        <List
-                          itemLayout="horizontal"
-                          dataSource={[
+                        <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                          {[
                             { title: '完成了算法题：两数之和', time: '10分钟前', type: 'code' },
                             { title: '阅读了文章：React Hooks 最佳实践', time: '2小时前', type: 'read' },
                             { title: '在讨论区回复了帖子', time: '昨天', type: 'comment' },
                             { title: '收藏了知识点：TypeScript 高级类型', time: '3天前', type: 'star' },
-                          ]}
-                          renderItem={(item) => (
-                            <List.Item>
-                              <List.Item.Meta
-                                avatar={
-                                  <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-500">
-                                    {item.type === 'code' && <Code2Icon size={20} />}
-                                    {item.type === 'read' && <BookOpen size={20} />}
-                                    {item.type === 'comment' && <MessageSquare size={20} />}
-                                    {item.type === 'star' && <Star size={20} />}
-                                  </div>
-                                }
-                                title={<a href="#" className="text-gray-900 dark:text-gray-100">{item.title}</a>}
-                                description={<span className="text-gray-500 dark:text-gray-400">{item.time}</span>}
-                              />
-                            </List.Item>
-                          )}
-                        />
+                          ].map((item, index) => (
+                            <div key={index} className="flex items-center gap-3 py-3">
+                              <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-500 flex-shrink-0">
+                                {item.type === 'code' && <Code2Icon size={20} />}
+                                {item.type === 'read' && <BookOpen size={20} />}
+                                {item.type === 'comment' && <MessageSquare size={20} />}
+                                {item.type === 'star' && <Star size={20} />}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                                  {item.title}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  {item.time}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       ),
                     },
                     {

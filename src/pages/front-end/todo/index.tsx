@@ -153,7 +153,7 @@ const TodoPage: React.FC = () => {
 
   const TaskCard = ({ task }: { task: Task }) => (
     <Card 
-      className="mb-4 shadow-sm hover:shadow-md transition-all duration-300 border-t-4"
+      className="mb-4 shadow-sm hover:shadow-md transition-all duration-300 border-t-4 bg-white dark:bg-gray-800 dark:border-gray-700"
       style={{ borderTopColor: priorityColors[task.priority] }}
       size="small"
       actions={[
@@ -176,14 +176,14 @@ const TodoPage: React.FC = () => {
       ].filter(Boolean)}
     >
       <div className="flex justify-between items-start mb-2">
-        <h4 className="font-bold text-gray-800 m-0 truncate flex-1" title={task.title}>{task.title}</h4>
+        <h4 className="font-bold text-gray-800 dark:text-gray-100 m-0 truncate flex-1" title={task.title}>{task.title}</h4>
         <Tag color={priorityColors[task.priority]} className="mr-0 ml-2 text-xs">
           {task.priority.toUpperCase()}
         </Tag>
       </div>
-      <p className="text-gray-500 text-sm mb-3 line-clamp-2 min-h-[40px]">{task.description}</p>
+      <p className="text-gray-500 dark:text-gray-400 text-sm mb-3 line-clamp-2 min-h-[40px]">{task.description}</p>
       
-      <div className="flex justify-between items-center text-xs text-gray-400">
+      <div className="flex justify-between items-center text-xs text-gray-400 dark:text-gray-500">
         <div className="flex items-center gap-1">
           <ClockCircleOutlined />
           <span>{dayjs(task.dueDate).format('MM-DD')}</span>
@@ -198,14 +198,14 @@ const TodoPage: React.FC = () => {
   );
 
   return (
-    <div className="p-6 h-[calc(100vh-64px)] overflow-hidden bg-gray-50 flex flex-col">
+    <div className="p-6 h-[calc(100vh-64px)] overflow-hidden bg-gray-50 dark:bg-gray-900 flex flex-col transition-colors duration-300">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-bold m-0 flex items-center gap-2">
+          <h2 className="text-2xl font-bold m-0 flex items-center gap-2 text-gray-900 dark:text-gray-100">
             <CheckCircleOutlined className="text-primary-500" />
             任务看板
           </h2>
-          <p className="text-gray-500 mt-1">管理您的日常待办事项</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">管理您的日常待办事项</p>
         </div>
         <Button type="primary" icon={<PlusOutlined />} onClick={() => {
           setEditingTask(null);
@@ -218,9 +218,9 @@ const TodoPage: React.FC = () => {
 
       <div className="flex-1 flex gap-6 overflow-x-auto pb-4">
         {/* Todo Column */}
-        <div className="flex-1 min-w-[300px] bg-gray-100/50 rounded-xl p-4 flex flex-col h-full">
+        <div className="flex-1 min-w-[300px] bg-gray-100/50 dark:bg-gray-800/60 rounded-xl p-4 flex flex-col h-full transition-colors duration-300">
           <div className="flex justify-between items-center mb-4 px-2">
-            <h3 className="font-bold text-gray-700 m-0">待办 (Todo)</h3>
+            <h3 className="font-bold text-gray-700 dark:text-gray-200 m-0">待办 (Todo)</h3>
             <Tag color="default">{tasks.filter(t => t.status === 'todo').length}</Tag>
           </div>
           <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
@@ -231,9 +231,9 @@ const TodoPage: React.FC = () => {
         </div>
 
         {/* In Progress Column */}
-        <div className="flex-1 min-w-[300px] bg-blue-50/50 rounded-xl p-4 flex flex-col h-full">
+        <div className="flex-1 min-w-[300px] bg-blue-50/50 dark:bg-sky-900/40 rounded-xl p-4 flex flex-col h-full transition-colors duration-300">
           <div className="flex justify-between items-center mb-4 px-2">
-            <h3 className="font-bold text-blue-700 m-0">进行中 (In Progress)</h3>
+            <h3 className="font-bold text-blue-700 dark:text-blue-200 m-0">进行中 (In Progress)</h3>
             <Tag color="blue">{tasks.filter(t => t.status === 'in_progress').length}</Tag>
           </div>
           <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
@@ -244,9 +244,9 @@ const TodoPage: React.FC = () => {
         </div>
 
         {/* Done Column */}
-        <div className="flex-1 min-w-[300px] bg-green-50/50 rounded-xl p-4 flex flex-col h-full">
+        <div className="flex-1 min-w-[300px] bg-green-50/50 dark:bg-emerald-900/40 rounded-xl p-4 flex flex-col h-full transition-colors duration-300">
           <div className="flex justify-between items-center mb-4 px-2">
-            <h3 className="font-bold text-green-700 m-0">已完成 (Done)</h3>
+            <h3 className="font-bold text-green-700 dark:text-green-200 m-0">已完成 (Done)</h3>
             <Tag color="green">{tasks.filter(t => t.status === 'done').length}</Tag>
           </div>
           <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">

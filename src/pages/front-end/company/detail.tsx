@@ -186,7 +186,7 @@ const CompanyDetail = () => {
   if (!company) return null;
 
   return (
-    <div className="p-6 min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="p-6 min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <div className="max-w-5xl mx-auto space-y-6">
         
         {/* Navigation & Actions */}
@@ -198,9 +198,9 @@ const CompanyDetail = () => {
         </div>
 
         {/* Company Header Card */}
-        <Card className="shadow-md rounded-xl border-t-4 border-t-primary-500">
+        <Card className="shadow-md rounded-xl border-t-4 border-t-primary-500 bg-white dark:bg-gray-800 dark:border-gray-700">
           <div className="flex flex-col md:flex-row gap-6 items-start">
-            <div className="w-24 h-24 rounded-full bg-gray-100 flex-shrink-0 flex items-center justify-center overflow-hidden border border-gray-200">
+            <div className="w-24 h-24 rounded-full bg-gray-100 dark:bg-gray-700 flex-shrink-0 flex items-center justify-center overflow-hidden border border-gray-200 dark:border-gray-600">
                {company.logo ? (
                  <img src={company.logo} alt={company.name} className="w-full h-full object-cover" />
                ) : (
@@ -214,7 +214,7 @@ const CompanyDetail = () => {
                     {company.name}
                     <Tag color="blue" className="text-sm font-normal">{company.status}</Tag>
                   </h1>
-                  <div className="flex gap-4 mt-2 text-gray-500 text-sm">
+                  <div className="flex gap-4 mt-2 text-gray-500 dark:text-gray-400 text-sm">
                     {company.website && (
                         <a href={company.website} target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-primary-500">
                             <LinkOutlined /> 官网
@@ -238,7 +238,7 @@ const CompanyDetail = () => {
         </Card>
 
         {/* Timeline Section */}
-        <Card title="面试时间轴" className="shadow-md rounded-xl">
+        <Card title="面试时间轴" className="shadow-md rounded-xl bg-white dark:bg-gray-800 dark:border-gray-700">
           {records.length > 0 ? (
             <Timeline 
               mode="alternate" 

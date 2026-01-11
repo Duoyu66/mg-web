@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { 
   Layout, 
-  List, 
   Card, 
   Input, 
   Button, 
@@ -186,32 +185,29 @@ const NotePage: React.FC = () => {
         
         <div className="flex-1 overflow-y-auto">
           {filteredNotes.length > 0 ? (
-            <List
-              itemLayout="horizontal"
-              dataSource={filteredNotes}
-              renderItem={item => (
-                <div 
-                  onClick={() => handleNoteSelect(item.id)}
-                  className={`cursor-pointer p-4 border-b border-gray-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-                    selectedNoteId === item.id ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-l-primary-500' : 'border-l-4 border-l-transparent'
-                  }`}
-                >
-                  <div className="flex justify-between items-start mb-1">
-                    <Text strong className="truncate flex-1 text-gray-800 dark:text-gray-200">{item.title}</Text>
-                    <Text type="secondary" className="text-xs ml-2 whitespace-nowrap">
-                      {dayjs(item.updatedAt).format('MM-DD')}
-                    </Text>
-                  </div>
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {item.tags.map(tag => (
-                      <Tag key={tag} className="mr-0 text-[10px] px-1 bg-white border-gray-200 text-gray-500">
-                        {tag}
-                      </Tag>
-                    ))}
-                  </div>
+            filteredNotes.map(item => (
+              <div 
+                key={item.id}
+                onClick={() => handleNoteSelect(item.id)}
+                className={`cursor-pointer p-4 border-b border-gray-50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+                  selectedNoteId === item.id ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-l-primary-500' : 'border-l-4 border-l-transparent'
+                }`}
+              >
+                <div className="flex justify-between items-start mb-1">
+                  <Text strong className="truncate flex-1 text-gray-800 dark:text-gray-200">{item.title}</Text>
+                  <Text type="secondary" className="text-xs ml-2 whitespace-nowrap">
+                    {dayjs(item.updatedAt).format('MM-DD')}
+                  </Text>
                 </div>
-              )}
-            />
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {item.tags.map(tag => (
+                    <Tag key={tag} className="mr-0 text-[10px] px-1 bg-white border-gray-200 text-gray-500">
+                      {tag}
+                    </Tag>
+                  ))}
+                </div>
+              </div>
+            ))
           ) : (
             <Empty description="暂无笔记" className="mt-10" />
           )}
@@ -261,7 +257,7 @@ const NotePage: React.FC = () => {
                   defaultLanguage="markdown"
                   value={editContent}
                   onChange={(value) => setEditContent(value || '')}
-                  theme="vs-light" // or vs-dark based on context
+                  theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
                   options={{
                     minimap: { enabled: false },
                     fontSize: 14,
