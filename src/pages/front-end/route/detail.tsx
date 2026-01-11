@@ -125,9 +125,14 @@ const RoadmapDetailPage = () => {
                     <div className="font-bold text-gray-900 dark:text-gray-100">{g.title}</div>
                     <ul className="mt-3 space-y-2 text-gray-600 dark:text-gray-300">
                       {g.points.map((p, pi) => (
-                        <li key={pi} className="flex gap-2">
-                          <span className="mt-2 h-1.5 w-1.5 rounded-full bg-gray-400/70 dark:bg-gray-600 shrink-0" />
-                          <span className="leading-relaxed">{p}</span>
+                        <li key={pi}>
+                          <Link 
+                            to={`/front/route/${track}/${id}/${encodeURIComponent(p)}`}
+                            className="flex gap-2 group hover:text-primary-500 transition-colors cursor-pointer"
+                          >
+                            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-gray-400/70 dark:bg-gray-600 shrink-0 group-hover:bg-primary-500 transition-colors" />
+                            <span className="leading-relaxed">{p}</span>
+                          </Link>
                         </li>
                       ))}
                     </ul>

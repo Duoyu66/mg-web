@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Badge, Button, Input, Tooltip } from "antd";
+import { Badge, Button, Input, Tooltip, Dropdown } from "antd";
+import type { MenuProps } from "antd";
 import { useTheme } from "@/components/context/useTheme";
 import type { MenuItemType } from "@/components/layoutPage/type";
 import { 
@@ -10,7 +11,8 @@ import {
   PenLine, 
   Code2, 
   Terminal,
-  UserCircle2
+  UserCircle2,
+  ChevronDown
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -35,12 +37,18 @@ const Header = () => {
         { id: "3", title: "题库", path: "/front/questionBank" },
         { id: "5", title: "快捷导航", path: "/front/nav" },
         { id: "6", title: "测试", path: "/front/test" },
-        { id: "7", title: "面试公司", path: "/front/company" },
-             { id: "8", title: "简历制作模板", path: "/front/resume" },
-             { id: "9", title: "学习排行榜", path: "/front/rank" },
-             { id: "10", title: "学习路线", path: "/front/route" },
-                  { id: "11", title: "文档管理", path: "/front/document" },
-
+        { 
+            id: "more", 
+            title: "更多", 
+            path: "",
+            children: [
+                { id: "7", title: "面试公司", path: "/front/company" },
+                { id: "8", title: "简历制作模板", path: "/front/resume" },
+                { id: "9", title: "学习排行榜", path: "/front/rank" },
+                { id: "10", title: "学习路线", path: "/front/route" },
+                { id: "11", title: "文档管理", path: "/front/document" },
+            ]
+        },
     ];
 
     const goIndex = () => navigate("/");
@@ -72,6 +80,35 @@ const Header = () => {
                 <nav className="hidden md:flex items-center mx-8">
                     <ul className="flex items-center gap-1">
                         {menuData.map((item) => {
+                            if (item.children) {
+                                const dropdownItems: MenuProps['items'] = item.children.map(child => ({
+                                    key: child.id,
+                                    label: child.title,
+                                    onClick: () => navigate(child.path)
+                                }));
+
+                                const isChildActive = item.children.some(child => location.pathname.includes(child.path));
+
+                                return (
+                                    <li key={item.id}>
+                                        <Dropdown menu={{ items: dropdownItems }} placement="bottom" arrow>
+                                            <div
+                                                className={`
+                                                    relative px-4 py-2 rounded-full cursor-pointer text-sm font-medium transition-all duration-300 flex items-center gap-1
+                                                    ${isChildActive
+                                                        ? "text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/10" 
+                                                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                                    }
+                                                `}
+                                            >
+                                                {item.title}
+                                                <ChevronDown size={14} />
+                                            </div>
+                                        </Dropdown>
+                                    </li>
+                                );
+                            }
+
                             const isActive = location.pathname.includes(item.path);
                             return (
                                 <li key={item.id}>
