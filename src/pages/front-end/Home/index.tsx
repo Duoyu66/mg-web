@@ -487,7 +487,18 @@ const Home = () => {
 
             {/* 帖子列表 */}
             <div className="space-y-4">
-              {records.map((item) => (
+              {records.map((item, index) => {
+                const frameIndex = index % 4;
+                const frameClass =
+                  frameIndex === 0
+                    ? 'bg-gradient-to-tr from-cyan-400 via-blue-500 to-purple-500 shadow-[0_0_16px_rgba(59,130,246,0.6)] animate-pulse'
+                    : frameIndex === 1
+                    ? 'bg-gradient-to-tr from-yellow-300 via-amber-400 to-orange-500 shadow-[0_0_14px_rgba(251,191,36,0.7)]'
+                    : frameIndex === 2
+                    ? 'bg-gradient-to-tr from-pink-400 via-purple-500 to-indigo-500 shadow-[0_0_14px_rgba(244,114,182,0.5)]'
+                    : 'bg-[conic-gradient(at_top,_#22c55e,_#0ea5e9,_#6366f1,_#22c55e)]';
+
+              return (
                 <div
                   key={item.id}
                   className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow cursor-pointer"
@@ -495,11 +506,15 @@ const Home = () => {
                 >
                   {/* 用户信息 */}
                   <div className="flex items-start gap-3 mb-4">
-                    <img
-                      className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-                      src={item.user.userAvatar}
-                      alt={item.user.userName}
-                    />
+                    <div className={`w-12 h-12 rounded-full p-[2px] flex-shrink-0 ${frameClass}`}>
+                      <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center">
+                        <img
+                          className="w-10 h-10 rounded-full object-cover"
+                          src={item.user.userAvatar}
+                          alt={item.user.userName}
+                        />
+                      </div>
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-semibold text-gray-900 dark:text-gray-100">
@@ -790,7 +805,7 @@ const Home = () => {
                     </div>
                   )}
                 </div>
-              ))}
+              );})}
 
               {/* 加载状态 / 没有更多 */}
               {loadingMore && hasMore && (
@@ -847,32 +862,48 @@ const Home = () => {
                 推荐关注
               </h3>
               <div className="space-y-3">
-                {records.slice(0, 3).map((item) => (
-                  <div key={item.user.id} className="flex items-center gap-3">
-                    <img
-                      className="w-10 h-10 rounded-full object-cover"
-                      src={item.user.userAvatar}
-                      alt={item.user.userName}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">
-                        {item.user.userName}
-                      </div>
-                      {item.user.userProfile && (
-                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                          {item.user.userProfile}
+                {records.slice(0, 3).map((item, index) => {
+                  const frameIndex = index % 4;
+                  const frameClass =
+                    frameIndex === 0
+                      ? 'bg-gradient-to-tr from-cyan-400 via-blue-500 to-purple-500 shadow-[0_0_12px_rgba(59,130,246,0.6)] animate-pulse'
+                      : frameIndex === 1
+                      ? 'bg-gradient-to-tr from-yellow-300 via-amber-400 to-orange-500 shadow-[0_0_10px_rgba(251,191,36,0.7)]'
+                      : frameIndex === 2
+                      ? 'bg-gradient-to-tr from-pink-400 via-purple-500 to-indigo-500 shadow-[0_0_10px_rgba(244,114,182,0.5)]'
+                      : 'bg-[conic-gradient(at_top,_#22c55e,_#0ea5e9,_#6366f1,_#22c55e)] animate-spin';
+
+                  return (
+                    <div key={item.user.id} className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full p-[2px] ${frameClass}`}>
+                        <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center">
+                          <img
+                            className="w-8 h-8 rounded-full object-cover"
+                            src={item.user.userAvatar}
+                            alt={item.user.userName}
+                          />
                         </div>
-                      )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">
+                          {item.user.userName}
+                        </div>
+                        {item.user.userProfile && (
+                          <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                            {item.user.userProfile}
+                          </div>
+                        )}
+                      </div>
+                      <Button
+                        size="small"
+                        type="primary"
+                        className="!rounded-full"
+                      >
+                        关注
+                      </Button>
                     </div>
-                    <Button
-                      size="small"
-                      type="primary"
-                      className="!rounded-full"
-                    >
-                      关注
-                    </Button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 

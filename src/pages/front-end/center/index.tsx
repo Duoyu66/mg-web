@@ -102,7 +102,9 @@ const CapabilityRadar = () => {
 const UserCenter = () => {
   const { theme } = useTheme();
   const navigate = useNavigate();
-  const [selectedFrame, setSelectedFrame] = useState<'none' | 'neon' | 'gold' | 'gradient'>('neon');
+  const [selectedFrame, setSelectedFrame] = useState<
+    'neon' | 'gold' | 'gradient' | 'pulse' | 'cyber' | 'ocean'
+  >('neon');
 
   const renderContent = () => {
     return (
@@ -116,9 +118,12 @@ const UserCenter = () => {
                 <div
                   className={`
                     relative rounded-2xl p-[3px]
-                    ${selectedFrame === 'neon' ? 'bg-gradient-to-tr from-cyan-400 via-blue-500 to-purple-500 shadow-[0_0_20px_rgba(59,130,246,0.6)]' : ''}
+                    ${selectedFrame === 'neon' ? 'bg-gradient-to-tr from-cyan-400 via-blue-500 to-purple-500 shadow-[0_0_20px_rgba(59,130,246,0.6)] animate-pulse' : ''}
                     ${selectedFrame === 'gold' ? 'bg-gradient-to-tr from-yellow-300 via-amber-400 to-orange-500 shadow-[0_0_18px_rgba(251,191,36,0.7)]' : ''}
                     ${selectedFrame === 'gradient' ? 'bg-gradient-to-tr from-pink-400 via-purple-500 to-indigo-500 shadow-[0_0_18px_rgba(244,114,182,0.5)]' : ''}
+                    ${selectedFrame === 'pulse' ? 'bg-gradient-to-tr from-emerald-400 via-teal-400 to-sky-400 shadow-[0_0_18px_rgba(34,197,94,0.6)] animate-pulse' : ''}
+                    ${selectedFrame === 'cyber' ? 'bg-[conic-gradient(at_top,_#22c55e,_#0ea5e9,_#6366f1,_#22c55e)] animate-spin' : ''}
+                    ${selectedFrame === 'ocean' ? 'bg-gradient-to-tr from-sky-500 via-indigo-500 to-slate-900 shadow-[0_0_18px_rgba(59,130,246,0.7)]' : ''}
                   `}
                 >
                   <div className="rounded-2xl bg-white dark:bg-gray-900 p-1">
@@ -186,6 +191,42 @@ const UserCenter = () => {
                       `}
                     >
                       渐变炫彩
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedFrame('pulse')}
+                      className={`
+                        px-3 py-1 rounded-full border text-xs transition-all
+                        ${selectedFrame === 'pulse'
+                          ? 'border-emerald-400 text-emerald-300 bg-emerald-500/10'
+                          : 'border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-emerald-400 hover:text-emerald-300'}
+                      `}
+                    >
+                      绿野律动
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedFrame('cyber')}
+                      className={`
+                        px-3 py-1 rounded-full border text-xs transition-all
+                        ${selectedFrame === 'cyber'
+                          ? 'border-sky-400 text-sky-300 bg-sky-500/10'
+                          : 'border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-sky-400 hover:text-sky-300'}
+                      `}
+                    >
+                      赛博环
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedFrame('ocean')}
+                      className={`
+                        px-3 py-1 rounded-full border text-xs transition-all
+                        ${selectedFrame === 'ocean'
+                          ? 'border-indigo-400 text-indigo-300 bg-indigo-500/10'
+                          : 'border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-indigo-400 hover:text-indigo-300'}
+                      `}
+                    >
+                      深海星环
                     </button>
                   </div>
                 </div>
