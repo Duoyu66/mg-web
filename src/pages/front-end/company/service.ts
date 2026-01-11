@@ -150,6 +150,17 @@ export const CompanyService = {
     });
   },
 
+  deleteCompany: async (id: string): Promise<void> => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            const companies = getCompanies();
+            const newCompanies = companies.filter(c => c.id !== id);
+            localStorage.setItem(STORAGE_KEY_COMPANIES, JSON.stringify(newCompanies));
+            resolve();
+        }, 300);
+    });
+  },
+
   incrementViewCount: async (id: string): Promise<void> => {
     const companies = getCompanies();
     const index = companies.findIndex((c) => c.id === id);

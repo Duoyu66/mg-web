@@ -140,9 +140,16 @@ const CompanyDetail = () => {
           await CompanyService.updateCompany(company.id, { status: newStatus });
       }
 
-      setIsModalVisible(false);
-      form.resetFields();
-      setEditingRecord(null);
+      if (saveAndAddMode) {
+          form.resetFields();
+          setEditingRecord(null);
+          message.success('已保存，请继续添加');
+      } else {
+          setIsModalVisible(false);
+          form.resetFields();
+          setEditingRecord(null);
+      }
+      
       fetchData(); // Refresh data
     } catch (error) {
       message.error(editingRecord ? '更新失败' : '添加失败');
@@ -233,14 +240,15 @@ const CompanyDetail = () => {
         {/* Timeline Section */}
         <Card title="面试时间轴" className="shadow-md rounded-xl">
           {records.length > 0 ? (
-            <Timeline mode="alternate" className="mt-4">
-              {records.map(record => (
-                <Timeline.Item 
-                  key={record.id} 
-                  label={record.date}
-                  dot={getResultIcon(record.result)}
-                  color={getResultColor(record.result)}
-                >
+            <Timeline 
+              mode="alternate" 
+              className="mt-4"
+              items={records.map(record => ({
+                key: record.id,
+                label: record.date,
+                dot: getResultIcon(record.result),
+                color: getResultColor(record.result),
+                children: (
                   <Card 
                     size="small" 
                     className="mb-4 hover:shadow-sm border-l-4" 
@@ -275,10 +283,10 @@ const CompanyDetail = () => {
                     
                     {record.answers && (
                       <div className="mb-3">
-                         <div className="font-semibold text-gray-700 dark:text-gray-300 mb-1">我的回答/复盘:</div>
-                         <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm whitespace-pre-wrap text-gray-600 dark:text-gray-400">
-                           {record.answers}
-                         </div>
+                        <div className="font-semibold text-gray-700 dark:text-gray-300 mb-1">我的回答/复盘:</div>
+                        <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm whitespace-pre-wrap text-gray-600 dark:text-gray-400">
+                          {record.answers}
+                        </div>
                       </div>
                     )}
                     
@@ -288,9 +296,9 @@ const CompanyDetail = () => {
                        </div>
                     )}
                   </Card>
-                </Timeline.Item>
-              ))}
-            </Timeline>
+                )
+              }))}
+            />
           ) : (
             <Empty description="暂无面试记录，快去添加一条吧！" image={Empty.PRESENTED_IMAGE_SIMPLE} />
           )}

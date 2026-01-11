@@ -29,6 +29,12 @@ import RoadmapDetailPage from "@/pages/front-end/route/detail";
 import PointDetailPage from "@/pages/front-end/route/pointDetail";
 import DocumentPage from "@/pages/front-end/document";
 import UserCenter from "@/pages/front-end/center";
+import AdminLayout from '@/pages/admin/layout';
+import AdminDashboard from '@/pages/admin/home';
+import AdminCompanyList from '@/pages/admin/company';
+import AdminQuestion from '@/pages/admin/question';
+import AdminArticle from '@/pages/admin/article';
+import AdminUser from '@/pages/admin/user';
 
 const routes = [
     {
@@ -89,6 +95,38 @@ const routes = [
             age: 1,
             name: "张三"
         }
+    },
+    {
+        path: "/front/admin",
+        component: AdminLayout,
+        title: "后台管理",
+        children: [
+            {
+                path: "",
+                component: AdminDashboard,
+                title: "控制台"
+            },
+            {
+                path: "company",
+                component: AdminCompanyList,
+                title: "面试公司管理"
+            },
+            {
+                path: "question",
+                component: AdminQuestion,
+                title: "题库管理"
+            },
+            {
+                path: "article",
+                component: AdminArticle,
+                title: "文章管理"
+            },
+            {
+                path: "user",
+                component: AdminUser,
+                title: "用户管理"
+            }
+        ]
     },
     {
         path: "/front",

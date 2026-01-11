@@ -50,6 +50,7 @@ const Header = () => {
                 { id: "12", title: "个人中心", path: "/front/center" },
             ]
         },
+               { id: "13", title: "管理后台", path: "/front/admin" },
     
     ];
 
