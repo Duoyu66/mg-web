@@ -1,7 +1,11 @@
 import Home from '@/pages/front-end/Home/index'
 import LayoutPage from '@/components/layoutPage'
 import Algorithm from "@/pages/front-end/algorithm";
-import QuestionBank from "@/pages/front-end/questionBank";
+import QuestionBankLayout from "@/pages/front-end/questionBank";
+import CategoryList from "@/pages/front-end/questionBank/CategoryList";
+import SubCategoryList from "@/pages/front-end/questionBank/SubCategoryList";
+import QuestionList from "@/pages/front-end/questionBank/QuestionList";
+import QuestionDetail from "@/pages/front-end/questionBank/QuestionDetail";
 import Message from "@/pages/front-end/message";
 import Nav from "@/pages/front-end/nav";
 import Index from "@/pages/front-end/index";
@@ -93,11 +97,33 @@ const routes = [
             {
                 title: '题库',
                 path: "questionBank",
-                component: QuestionBank,
+                component: QuestionBankLayout,
                 meta: {
                     age: 1,
                     name: "张三"
-                }
+                },
+                children: [
+                    {
+                        path: "",
+                        component: CategoryList,
+                        title: '题库分类'
+                    },
+                    {
+                        path: ":categoryId",
+                        component: SubCategoryList,
+                        title: '子分类列表'
+                    },
+                    {
+                        path: ":categoryId/:subCategoryId",
+                        component: QuestionList,
+                        title: '题目列表'
+                    },
+                    {
+                        path: ":categoryId/:subCategoryId/:questionId",
+                        component: QuestionDetail,
+                        title: '题目详情'
+                    }
+                ]
             },
             {
                 title: '消息',
