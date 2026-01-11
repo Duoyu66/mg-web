@@ -20,7 +20,8 @@ import {
   PlusOutlined, 
   EyeOutlined, 
   GlobalOutlined, 
-  ClockCircleOutlined 
+  ClockCircleOutlined,
+  FileTextOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { CompanyService } from './service';
@@ -107,17 +108,17 @@ const CompanyList = () => {
         
         {/* Header & Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card bordered={false} className="shadow-sm">
+          <Card variant="borderless" className="shadow-sm">
             <Statistic title="总投递公司" value={stats.total} prefix={<GlobalOutlined />} />
           </Card>
-          <Card bordered={false} className="shadow-sm">
-            <Statistic title="面试中" value={stats.interviewing} valueStyle={{ color: '#faad14' }} />
+          <Card variant="borderless" className="shadow-sm">
+            <Statistic title="面试中" value={stats.interviewing} styles={{ content: { color: '#faad14' } }} />
           </Card>
-          <Card bordered={false} className="shadow-sm">
-            <Statistic title="已拿Offer" value={stats.offer} valueStyle={{ color: '#3f8600' }} />
+          <Card variant="borderless" className="shadow-sm">
+            <Statistic title="已拿Offer" value={stats.offer} styles={{ content: { color: '#3f8600' } }} />
           </Card>
-          <Card bordered={false} className="shadow-sm">
-            <Statistic title="已结束/挂" value={stats.rejected} valueStyle={{ color: '#cf1322' }} />
+          <Card variant="borderless" className="shadow-sm">
+            <Statistic title="已结束/挂" value={stats.rejected} styles={{ content: { color: '#cf1322' } }} />
           </Card>
         </div>
 
@@ -203,7 +204,7 @@ const CompanyList = () => {
 
                   <div className="flex flex-wrap gap-1 justify-center min-h-[20px]">
                     {company.tags?.slice(0, 2).map((tag, idx) => (
-                      <Tag key={idx} bordered={false} className="text-[10px] px-1 py-0 bg-gray-50 dark:bg-gray-700 mr-0 scale-90">
+                      <Tag key={idx} variant="borderless" className="text-[10px] px-1 py-0 bg-gray-50 dark:bg-gray-700 mr-0 scale-90">
                         {tag}
                       </Tag>
                     ))}

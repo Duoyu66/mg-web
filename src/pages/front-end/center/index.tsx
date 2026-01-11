@@ -8,9 +8,95 @@ import {
   Edit3, 
   Star,
   MessageSquare,
-  FileText
+  FileText,
+  Activity
 } from 'lucide-react';
 import { useTheme } from '@/components/context/useTheme';
+import { useEffect, useRef } from 'react';
+import * as echarts from 'echarts';
+
+const CapabilityRadar = () => {
+  const chartRef = useRef<HTMLDivElement>(null);
+  const { theme } = useTheme();
+
+  useEffect(() => {
+    if (!chartRef.current) return;
+
+    const chartInstance = echarts.init(chartRef.current, theme === 'dark' ? 'dark' : undefined);
+    
+    const option = {
+      backgroundColor: 'transparent',
+      tooltip: {},
+      radar: {
+        indicator: [
+          { name: '算法基础', max: 100 },
+          { name: '前端工程', max: 100 },
+          { name: '后端开发', max: 100 },
+          { name: '系统设计', max: 100 },
+          { name: '团队协作', max: 100 },
+          { name: '持续学习', max: 100 }
+        ],
+        splitNumber: 4,
+        axisName: {
+          color: theme === 'dark' ? '#9ca3af' : '#4b5563'
+        },
+        splitLine: {
+          lineStyle: {
+            color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+          }
+        },
+        splitArea: {
+          show: false
+        },
+        axisLine: {
+          lineStyle: {
+            color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+          }
+        }
+      },
+      series: [
+        {
+          name: '能力维度',
+          type: 'radar',
+          data: [
+            {
+              value: [85, 90, 60, 70, 80, 95],
+              name: '当前能力',
+              areaStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  { offset: 0, color: 'rgba(59, 130, 246, 0.5)' },
+                  { offset: 1, color: 'rgba(59, 130, 246, 0.1)' }
+                ])
+              },
+              lineStyle: {
+                color: '#3b82f6',
+                width: 2
+              },
+              itemStyle: {
+                color: '#3b82f6'
+              }
+            }
+          ]
+        }
+      ]
+    };
+
+    chartInstance.setOption(option);
+
+    const handleResize = () => {
+      chartInstance.resize();
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      chartInstance.dispose();
+    };
+  }, [theme]);
+
+  return <div ref={chartRef} style={{ width: '100%', height: '300px' }} />;
+};
 
 const UserCenter = () => {
   const { theme } = useTheme();
@@ -69,6 +155,14 @@ const UserCenter = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Sidebar */}
             <div className="space-y-6">
+              {/* Capability Radar */}
+              <Card 
+                title={<div className="flex items-center gap-2"><Activity size={20} className="text-blue-500" />能力分析</div>}
+                className="shadow-sm border-gray-200 dark:border-gray-700 dark:bg-gray-800"
+              >
+                <CapabilityRadar />
+              </Card>
+
               {/* Learning Progress */}
               <Card 
                 title={<div className="flex items-center gap-2"><Trophy size={20} className="text-yellow-500" />学习进度</div>}

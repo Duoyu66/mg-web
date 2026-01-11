@@ -118,11 +118,11 @@ export default function Index() {
                                     style={{
                                         width: 300,
                                         cursor: 'pointer',
-                                        border: activeIndex === index ? '2px solid #3d0bf0ff ' : '2px solid #d9d9d9',
                                         transition: 'all 0.3s ease',
                                         backgroundColor: activeIndex === index ? '#b0bff0ff' : 'white',
+                                        border: activeIndex === index ? '2px solid #3d0bf0ff' : '2px solid #d9d9d9',
                                     }}  
-
+                                    variant="outlined"
                                     onClick={() => handleCardClick(index)}
                                     hoverable
                                 >

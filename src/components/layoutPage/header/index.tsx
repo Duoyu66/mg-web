@@ -48,9 +48,12 @@ const Header = () => {
                 { id: "10", title: "学习路线", path: "/front/route" },
                 { id: "11", title: "文档管理", path: "/front/document" },
                 { id: "12", title: "个人中心", path: "/front/center" },
+                { id: "14", title: "笔记", path: "/front/note" },
+                { id: "15", title: "代办", path: "/front/todo" },
+                { id: "16", title: "留言板", path: "/front/board" },
             ]
         },
-               { id: "13", title: "管理后台", path: "/front/admin" },
+        { id: "13", title: "管理后台", path: "/front/admin" },
     
     ];
 

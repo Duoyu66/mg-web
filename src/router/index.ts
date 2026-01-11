@@ -29,6 +29,9 @@ import RoadmapDetailPage from "@/pages/front-end/route/detail";
 import PointDetailPage from "@/pages/front-end/route/pointDetail";
 import DocumentPage from "@/pages/front-end/document";
 import UserCenter from "@/pages/front-end/center";
+import NotePage from "@/pages/front-end/note";
+import TodoPage from "@/pages/front-end/todo";
+import BoardPage from "@/pages/front-end/board";
 import AdminLayout from '@/pages/admin/layout';
 import AdminDashboard from '@/pages/admin/home';
 import AdminCompanyList from '@/pages/admin/company';
@@ -290,6 +293,30 @@ const routes = [
                 meta: {
                     age: 1,
                     name: "张三",
+                    showFooter: false
+                }
+            },
+            {
+                title: '笔记',
+                path: "note",
+                component: NotePage,
+                meta: {
+                    showFooter: false
+                }
+            },
+            {
+                title: '代办',
+                path: "todo",
+                component: TodoPage,
+                meta: {
+                    showFooter: false
+                }
+            },
+            {
+                title: '留言板',
+                path: "board",
+                component: BoardPage,
+                meta: {
                     showFooter: false
                 }
             },
