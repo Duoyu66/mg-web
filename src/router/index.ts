@@ -19,6 +19,12 @@ import FinishPage from "@/pages/front-end/question/questionHome/finishPage";
 import PublishArticle from "@/pages/front-end/publishArticle";
 import ArticleDetail from "@/pages/front-end/Home/articleDetail";
 import CodeEdit from "@/pages/front-end/codeEdit";
+import CompanyList from "@/pages/front-end/company";
+import CompanyDetail from "@/pages/front-end/company/detail";
+import ResumeBuilder from "@/pages/front-end/resume";
+import RankPage from "@/pages/front-end/rank";
+import RoadmapPage from "@/pages/front-end/route";
+import DocumentPage from "@/pages/front-end/document";
 
 const routes = [
     {
@@ -160,6 +166,62 @@ const routes = [
                 meta: {
                     age: 1,
                     name: "张三"
+                }
+            },
+               {
+                title: '面试公司',
+                path: "company",
+                component: CompanyList,
+                meta: {
+                    age: 1,
+                    name: "张三"
+                }
+            },
+            {
+                title: '面试公司详情',
+                path: "company/:id",
+                component: CompanyDetail,
+                meta: {
+                    age: 1,
+                    name: "张三"
+                }
+            },
+            {
+                title: '简历制作',
+                path: "resume",
+                component: ResumeBuilder,
+                meta: {
+                    age: 1,
+                    name: "张三",
+                    showFooter: false
+                }
+            },
+            {
+                title: '学习排行榜',
+                path: "rank",
+                component: RankPage,
+                meta: {
+                    age: 1,
+                    name: "张三"
+                }
+            },
+            {
+                title: '学习路线',
+                path: "route",
+                component: RoadmapPage,
+                meta: {
+                    age: 1,
+                    name: "张三"
+                }
+            },
+            {
+                title: '文档管理',
+                path: "document",
+                component: DocumentPage,
+                meta: {
+                    age: 1,
+                    name: "张三",
+                    showFooter: false
                 }
             },
 

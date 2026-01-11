@@ -1,128 +1,174 @@
-import {useLocation, useNavigate} from "react-router-dom";
-import {Badge, Button, Divider, Input, Switch} from "antd";
-import {useTheme} from "@/components/context/useTheme";
-import type {MenuItemType} from "@/components/layoutPage/type";
-import {ICONS} from "@/constants/icons";
-import {Bell} from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Badge, Button, Input, Tooltip, Dropdown } from "antd";
+import { useTheme } from "@/components/context/useTheme";
+import type { MenuItemType } from "@/components/layoutPage/type";
+import { 
+  Bell, 
+  Search, 
+  Sun, 
+  Moon, 
+  PenLine, 
+  Code2, 
+  Terminal,
+  UserCircle2
+} from "lucide-react";
+import { useState, useEffect } from "react";
 
 const Header = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const {toggleTheme, theme: currentTheme} = useTheme();
+    const { toggleTheme, theme: currentTheme } = useTheme();
+    const [scrolled, setScrolled] = useState(false);
+
+    // 监听滚动以改变头部样式
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 10);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
     const menuData: MenuItemType[] = [
-        {
-            id: "1",
-            title: "首页",
-            path: "/front/home",
-        },
-        {
-            id: "2",
-            title: "算法",
-            path: "/front/algorithm",
-        },
-        {
-            id: "3",
-            title: "题库",
-            path: "/front/questionBank",
-        },
-        // {
-        //     id: '4',
-        //     title: '消息',
-        //     path: '/front/message'
-        // },
-        {
-            id: "5",
-            title: "快捷导航",
-            path: "/front/nav",
-        },
-        {
-            id: "6",
-            title: "测试",
-            path: "/front/test",
-        },
+        { id: "1", title: "首页", path: "/front/home" },
+        { id: "2", title: "算法", path: "/front/algorithm" },
+        { id: "3", title: "题库", path: "/front/questionBank" },
+        { id: "5", title: "快捷导航", path: "/front/nav" },
+        { id: "6", title: "测试", path: "/front/test" },
+        { id: "7", title: "面试公司", path: "/front/company" },
+             { id: "8", title: "简历制作模板", path: "/front/resume" },
+             { id: "9", title: "学习排行榜", path: "/front/rank" },
+             { id: "10", title: "学习路线", path: "/front/route" },
+                  { id: "11", title: "文档管理", path: "/front/document" },
+
     ];
 
-    const goIndex = () => {
-        navigate("/");
-    };
-    const goLogin = () => {
-        navigate("/login");
-    };
+    const goIndex = () => navigate("/");
+    const goLogin = () => navigate("/login");
+
     return (
-        <div
-            className="w-[100%] pl-[15%] pr-[25px] shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1)] fixed top-0 left-0 h-[60px] flex justify-start items-center bg-white dark:bg-gray-800 transition-colors duration-300 z-50">
-      <span
-          className=" cursor-pointer mr-[80px] flex justify-center items-center"
-          onClick={goIndex}
-      >
-        <div
-            className="w-[32px] h-[32px] border border-amber-200 rounded-md bg-amber-200 flex justify-center items-center text-white font-bold mr-1">
-          mg
-        </div>
-        木瓜编程
-      </span>
-            <ul className="flex [&_li]:mr-4">
-                {menuData.map((item: MenuItemType) => {
-                    return (
-                        <li
-                            className={`relative mx-2 cursor-pointer rounded-3xl hover:ease-linear ${
-                                location.pathname.includes(item.path) ? " font-bold" : ""
-                            }`}
-                            key={item.id}
-                            onClick={() => navigate(item.path)}
+        <header 
+            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${
+                scrolled 
+                    ? "h-[60px] bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-gray-200/50 dark:border-gray-700/50 shadow-sm" 
+                    : "h-[64px] bg-white dark:bg-gray-900 border-transparent"
+            }`}
+        >
+            <div className="max-w-[1920px] mx-auto px-6 h-full flex items-center justify-between">
+                {/* Logo Section */}
+                <div 
+                    className="flex items-center gap-3 cursor-pointer group" 
+                    onClick={goIndex}
+                >
+                    <div className="relative w-8 h-8 flex items-center justify-center bg-gradient-to-br from-amber-300 to-orange-500 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+                        <span className="text-white font-bold text-lg leading-none font-mono">mg</span>
+                    </div>
+                    <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300">
+                        木瓜编程
+                    </span>
+                </div>
+
+                {/* Navigation Menu */}
+                <nav className="hidden md:flex items-center mx-8">
+                    <ul className="flex items-center gap-1">
+                        {menuData.map((item) => {
+                            const isActive = location.pathname.includes(item.path);
+                            return (
+                                <li key={item.id}>
+                                    <div
+                                        onClick={() => navigate(item.path)}
+                                        className={`
+                                            relative px-4 py-2 rounded-full cursor-pointer text-sm font-medium transition-all duration-300
+                                            ${isActive 
+                                                ? "text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/10" 
+                                                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                            }
+                                        `}
+                                    >
+                                        {item.title}
+                                    </div>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </nav>
+
+                {/* Right Actions */}
+                <div className="flex items-center gap-3">
+                    {/* Search */}
+                    <div className="hidden lg:block relative group">
+                        <Input
+                            placeholder="搜索文章/题目..."
+                            prefix={<Search size={16} className="text-gray-400 group-hover:text-primary-500 transition-colors" />}
+                            className="w-[180px] focus:w-[240px] transition-all duration-300 rounded-full bg-gray-100 dark:bg-gray-800 border-transparent hover:bg-gray-50 dark:hover:bg-gray-700 focus:bg-white dark:focus:bg-gray-900"
+                            variant="borderless"
+                            onPressEnter={(e) => console.log("Search:", e.currentTarget.value)}
+                        />
+                    </div>
+
+                    {/* Quick Actions */}
+                    <div className="flex items-center gap-1 border-l border-gray-200 dark:border-gray-700 pl-3 ml-2">
+                        <Tooltip title="切换主题">
+                            <Button 
+                                type="text" 
+                                shape="circle" 
+                                icon={currentTheme === 'dark' ? <Moon size={18} /> : <Sun size={18} />} 
+                                onClick={toggleTheme}
+                                className="text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                            />
+                        </Tooltip>
+
+                        <Tooltip title="发布文章">
+                            <Button 
+                                type="text" 
+                                shape="circle" 
+                                icon={<PenLine size={18} />} 
+                                onClick={() => navigate("/publishArticle")}
+                                className="text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                            />
+                        </Tooltip>
+
+                        <Tooltip title="消息通知">
+                            <Badge count={5} size="small" offset={[-5, 5]}>
+                                <Button 
+                                    type="text" 
+                                    shape="circle" 
+                                    icon={<Bell size={18} />} 
+                                    onClick={() => navigate("/front/message")}
+                                    className="text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                />
+                            </Badge>
+                        </Tooltip>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-2 ml-2">
+                        <Button 
+                            className="flex items-center gap-1 rounded-full border-primary-500 text-primary-500 hover:text-primary-600 hover:border-primary-600"
+                            icon={<Terminal size={16} />}
+                            onClick={() => navigate("/question/nav")}
                         >
-                            {item.title}
-                            {location.pathname.includes(item.path) && (
-                                <span
-                                    className="absolute bottom-[2px] left-[50%] translate-x-[-50%] rounded-2xl opacity-85 bg-primary-500 dark:bg-green-500 inline-block w-[85%] h-[8px]"/>
-                            )}
-                        </li>
-                    );
-                })}
-            </ul>
-            <div className="flex gap-2 justify-end items-center ml-auto">
-                <Switch
-                    onClick={toggleTheme}
-                    checkedChildren={<ICONS.SUN size={16} className="text-white"/>}
-                    unCheckedChildren={<ICONS.MOON size={16} className="text-white"/>}
-                    checked={currentTheme !== "dark"}
-                />
-                <Divider orientation="vertical"/>
-                <span
-                    className="cursor-pointer"
-                    onClick={() => navigate("/publishArticle")}
-                >
-          发布
-        </span>
-                <Input.Search
-                    placeholder="搜索"
-                    className="w-[80px]"
-                    allowClear
-                    style={{width: "180px"}}
-                    onSearch={(value) => {
-                        if (value.trim()) {
-                            // 这里可以添加搜索逻辑
-                            console.log("搜索:", value);
-                        }
-                    }}
-                />
-                <Badge
-                    size="small"
-                    count={100}
-                    onClick={() => navigate("/front/message")}
-                >
-                    <Bell
-                        size={20}
-                        className="w-4 h-4 text-primary-500 dark:text-white cursor-pointer"
-                    />
-                </Badge>
-                <Button onClick={() => navigate("/question/nav")}>刷题</Button>
-                <Button onClick={() => navigate('/codeEdit')}>leetcode</Button>
-                <span className="cursor-pointer" onClick={goLogin}>
-          登录/注册
-        </span>
+                            刷题
+                        </Button>
+                        <Button 
+                            className="flex items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-none hover:bg-gray-200 dark:hover:bg-gray-700"
+                            icon={<Code2 size={16} />}
+                            onClick={() => navigate('/codeEdit')}
+                        >
+                            LeetCode
+                        </Button>
+                        <Button 
+                            type="primary" 
+                            className="rounded-full px-6 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 border-none shadow-md shadow-primary-500/20"
+                            icon={<UserCircle2 size={16} />}
+                            onClick={goLogin}
+                        >
+                            登录
+                        </Button>
+                    </div>
+                </div>
             </div>
-        </div>
+        </header>
     );
 };
 
