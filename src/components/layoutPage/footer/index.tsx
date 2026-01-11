@@ -1,5 +1,6 @@
 import { Github, Twitter, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
 import { Divider } from 'antd';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();
@@ -57,9 +58,9 @@ const Footer = () => {
                         <ul className="space-y-4">
                             {footerLinks.product.map((link, i) => (
                                 <li key={i}>
-                                    <a href={link.href} className="text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors">
+                                    <Link to={link.href} className="text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors">
                                         {link.title}
-                                    </a>
+                                    </Link>
                                 </li>
                             ))}
                         </ul>
@@ -70,9 +71,15 @@ const Footer = () => {
                         <ul className="space-y-4">
                             {footerLinks.resources.map((link, i) => (
                                 <li key={i}>
-                                    <a href={link.href} className="text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors">
-                                        {link.title}
-                                    </a>
+                                    {link.href.startsWith('/') ? (
+                                        <Link to={link.href} className="text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors">
+                                            {link.title}
+                                        </Link>
+                                    ) : (
+                                        <a href={link.href} className="text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors">
+                                            {link.title}
+                                        </a>
+                                    )}
                                 </li>
                             ))}
                         </ul>

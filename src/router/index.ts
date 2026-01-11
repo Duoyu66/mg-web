@@ -11,6 +11,7 @@ import Nav from "@/pages/front-end/nav";
 import Index from "@/pages/front-end/index";
 import TestBox from "@/pages/front-end/test";
 import Login from "@/pages/front-end/login";
+import Register from "@/pages/front-end/register";
 import Question from "@/pages/front-end/question";
 import QuestionNav from "@/pages/front-end/question/questionNav";
 import QuestionHome from "@/pages/front-end/question/questionHome";
@@ -27,6 +28,7 @@ import RoadmapPage from "@/pages/front-end/route";
 import RoadmapDetailPage from "@/pages/front-end/route/detail";
 import PointDetailPage from "@/pages/front-end/route/pointDetail";
 import DocumentPage from "@/pages/front-end/document";
+import UserCenter from "@/pages/front-end/center";
 
 const routes = [
     {
@@ -65,6 +67,15 @@ const routes = [
         title: '登录',
         path: "/login",
         component: Login,
+        meta: {
+            age: 1,
+            name: "张三"
+        }
+    },
+    {
+        title: '注册',
+        path: "/register",
+        component: Register,
         meta: {
             age: 1,
             name: "张三"
@@ -242,6 +253,15 @@ const routes = [
                     age: 1,
                     name: "张三",
                     showFooter: false
+                }
+            },
+            {
+                title: '个人中心',
+                path: "center",
+                component: UserCenter,
+                meta: {
+                    age: 1,
+                    name: "张三"
                 }
             },
 

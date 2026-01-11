@@ -1,109 +1,164 @@
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, Checkbox, Divider } from "antd";
 import { useNavigate } from "react-router-dom";
-// 建议把登录插画图放到本地，比如 src/assets/login-illustration.png
-// 然后把下面的 import 路径改成你自己的
-// import loginIllustration from '@/assets/login-illustration.png';
+import { User, Lock, ArrowRight, Github, Mail, Globe } from "lucide-react";
+import { motion } from "framer-motion";
 
 const Login = () => {
   const navigate = useNavigate();
+  const [form] = Form.useForm();
+
   const onFinish = (values: { username: string; password: string }) => {
-    // 这里先简单打印，后面你接后端接口即可
     console.log("Login submit:", values);
+    // 模拟登录成功后的跳转
+    setTimeout(() => {
+      goIndex();
+    }, 1000);
   };
+
   const goIndex = () => {
     navigate("/");
   };
+
+  const goRegister = () => {
+    navigate("/register");
+  };
+
   return (
-    <div className="w-[100vw] h-[100vh] flex items-center justify-center bg-cover bg-center">
-      {/* 半透明遮罩，略微压暗背景 */}
-      <div className="absolute inset-0 bg-black/25 pointer-events-none" />
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#f0f2f5] relative overflow-hidden">
+      {/* 背景装饰 */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] rounded-full bg-blue-400/20 blur-[120px]" />
+        <div className="absolute top-[40%] -right-[10%] w-[60%] h-[60%] rounded-full bg-indigo-400/20 blur-[100px]" />
+      </div>
 
-      {/* 中间容器 */}
-      <div className="relative z-10 flex rounded-[24px] overflow-hidden shadow-[0_18px_40px_rgba(0,0,0,0.18)] bg-white min-h-[420px]">
-        {/* 左侧插画区域（整块图片，不要纯蓝色） */}
-        <div className="w-[460px] min-h-[420px] overflow-hidden">
-          <img
-            // 如果你有本地图，把这一行改成 src={loginIllustration}
-            src="https://img.zcool.cn/community/01b5d356ddf3dd0000018c1be9f90f.jpg@1280w_1l_2o_100sh.jpg"
-            alt="login-illustration"
-            className="w-full h-full object-cover"
-          />
-        </div>
-
-        {/* 右侧登录表单 */}
-        <div className="w-[420px] min-h-[420px] bg-white/96 px-14 py-10 flex flex-col">
-          {/* 顶部 Logo + 标题，可按你项目替换 */}
-          <div className="mb-8">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xl font-semibold tracking-wide text-[#1890ff]">
-                木瓜编程
-              </span>
-              <span className="text-sm text-gray-400">灵感 学习</span>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="z-10 w-full max-w-[1000px] h-[600px] bg-white rounded-[24px] shadow-2xl flex overflow-hidden m-4"
+      >
+        {/* 左侧展示区 */}
+        <div className="hidden lg:flex w-[45%] bg-[#1677ff] relative overflow-hidden flex-col justify-between p-12 text-white">
+          <div className="z-10">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                <Globe className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-2xl font-bold tracking-tight">木瓜编程</span>
             </div>
-            <div className="text-2xl font-semibold text-gray-800">登录</div>
-            <div className="mt-1 text-[13px] text-gray-400">
-              没有账号？
-              <span className="text-[#1890ff] cursor-pointer hover:underline">
-                立即注册
-              </span>
-            </div>
+            <h2 className="text-4xl font-bold leading-tight mb-4">
+              探索编程的
+              <br />
+              无限可能
+            </h2>
+            <p className="text-blue-100 text-lg opacity-90">
+              加入我们，开启你的技术成长之旅。在这里，灵感与知识碰撞。
+            </p>
           </div>
 
-          {/* 表单 */}
-          <Form
-            layout="vertical"
-            onFinish={onFinish}
-            className="flex-1 flex flex-col justify-between"
-          >
-            <div>
+          {/* 装饰圆圈 */}
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-400/20 rounded-full blur-2xl translate-y-1/3 -translate-x-1/3" />
+
+          <div className="z-10 flex gap-4 text-sm text-blue-200">
+            <span>© 2024 MG Code</span>
+            <span>隐私政策</span>
+            <span>服务条款</span>
+          </div>
+        </div>
+
+        {/* 右侧表单区 */}
+        <div className="flex-1 flex flex-col justify-center p-8 md:p-12 lg:p-16 bg-white relative">
+          <div className="max-w-[400px] mx-auto w-full">
+            <div className="mb-10">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">欢迎回来</h1>
+              <p className="text-gray-500">
+                请输入您的账号密码进行登录
+              </p>
+            </div>
+
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={onFinish}
+              size="large"
+              className="space-y-4"
+            >
               <Form.Item
-                label="用户名/邮箱"
                 name="username"
-                rules={[{ required: true, message: "请输入用户名或邮箱" }]}
+                rules={[{ required: true, message: "请输入用户名/邮箱" }]}
               >
                 <Input
-                  size="large"
-                  placeholder="请输入用户名或邮箱"
-                  className="!border !border-solid !border-gray-300 !rounded-lg !bg-white hover:!border-[#1890ff] focus:!border-[#1890ff] !shadow-none"
+                  prefix={<User className="w-5 h-5 text-gray-400 mr-2" />}
+                  placeholder="用户名 / 邮箱"
+                  className="!h-12 !rounded-xl !bg-gray-50 !border-gray-200 hover:!bg-white focus:!bg-white transition-all duration-300"
                 />
               </Form.Item>
 
               <Form.Item
-                label="登录密码"
                 name="password"
                 rules={[{ required: true, message: "请输入密码" }]}
               >
                 <Input.Password
-                  size="large"
-                  placeholder="请输入密码"
-                  className="!border !border-solid !border-gray-300 !rounded-lg !bg-white hover:!border-[#1890ff] focus:!border-[#1890ff] !shadow-none"
+                  prefix={<Lock className="w-5 h-5 text-gray-400 mr-2" />}
+                  placeholder="密码"
+                  className="!h-12 !rounded-xl !bg-gray-50 !border-gray-200 hover:!bg-white focus:!bg-white transition-all duration-300"
                 />
               </Form.Item>
 
-              <div className="flex justify-between items-center text-xs text-gray-400 mb-4">
-                <span className="cursor-pointer hover:text-[#1890ff]">
-                  修改密码
-                </span>
-                <span className="cursor-pointer hover:text-[#1890ff]">
-                  免密登录
-                </span>
+              <div className="flex items-center justify-between mb-6">
+                <Form.Item name="remember" valuePropName="checked" noStyle>
+                  <Checkbox className="text-gray-500">记住我</Checkbox>
+                </Form.Item>
+                <a className="text-[#1677ff] hover:text-[#165dff] font-medium text-sm cursor-pointer">
+                  忘记密码？
+                </a>
+              </div>
+
+              <Form.Item>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  className="w-full !h-12 !rounded-xl !text-lg !font-medium !bg-[#1677ff] hover:!bg-[#165dff] shadow-lg shadow-blue-500/30 transition-all duration-300 transform hover:-translate-y-0.5"
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    登录
+                    <ArrowRight className="w-4 h-4" />
+                  </span>
+                </Button>
+              </Form.Item>
+            </Form>
+
+            <div className="relative my-8">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-100"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white text-gray-400">其他方式登录</span>
               </div>
             </div>
 
-            <Form.Item className="mb-0">
-              <Button
-                type="primary"
-                htmlType="submit"
-                size="large"
-                className="w-full rounded-full !bg-[#1677ff] !border-[#1677ff] hover:!bg-[#165dff] hover:!border-[#165dff]"
-                onClick={goIndex}
+            <div className="flex gap-4 justify-center">
+              <button className="w-12 h-12 rounded-full border border-gray-100 flex items-center justify-center hover:bg-gray-50 hover:border-gray-200 transition-all text-gray-600">
+                <Github className="w-5 h-5" />
+              </button>
+              <button className="w-12 h-12 rounded-full border border-gray-100 flex items-center justify-center hover:bg-gray-50 hover:border-gray-200 transition-all text-gray-600">
+                <Mail className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="mt-8 text-center text-sm text-gray-500">
+              还没有账号？
+              <span 
+                onClick={goRegister}
+                className="text-[#1677ff] font-medium cursor-pointer hover:underline ml-1"
               >
-                登录
-              </Button>
-            </Form.Item>
-          </Form>
+                立即注册
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

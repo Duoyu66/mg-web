@@ -47,8 +47,10 @@ const Header = () => {
                 { id: "9", title: "学习排行榜", path: "/front/rank" },
                 { id: "10", title: "学习路线", path: "/front/route" },
                 { id: "11", title: "文档管理", path: "/front/document" },
+                { id: "12", title: "个人中心", path: "/front/center" },
             ]
         },
+    
     ];
 
     const goIndex = () => navigate("/");
