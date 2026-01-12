@@ -48,13 +48,27 @@ interface CommentSystemProps {
   repliesPageSize?: number;
 }
 
+const flattenReplies = (list: CommentData[] = []): CommentData[] => {
+  const out: CommentData[] = [];
+  const stack: CommentData[] = [...list];
+  while (stack.length) {
+    const cur = stack.shift()!;
+    out.push(cur);
+    if (cur.replies && cur.replies.length) {
+      stack.push(...cur.replies);
+    }
+  }
+  return out;
+};
+
 const CommentItem: React.FC<{
   item: CommentData;
   onReply: (item: CommentData) => void;
   onLike: (id: string) => void;
   depth?: number;
   repliesPageSize: number;
-}> = ({ item, onReply, onLike, depth = 0, repliesPageSize }) => {
+  disableNestedExpansions?: boolean;
+}> = ({ item, onReply, onLike, depth = 0, repliesPageSize, disableNestedExpansions = false }) => {
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [replyContent, setReplyContent] = useState('');
   const [visibleReplies, setVisibleReplies] = useState(0);
@@ -72,7 +86,9 @@ const CommentItem: React.FC<{
 
   const isChild = depth > 0;
   const indentClass = depth === 0 ? 'py-4 border-b border-gray-100' : 'mt-4';
-  const replyCount = item.replies?.length ? item.replies.length : 0;
+  const directReplies = item.replies || [];
+  const flatReplies = useMemo(() => (depth === 0 ? flattenReplies(directReplies) : directReplies), [directReplies, depth]);
+  const replyCount = flatReplies.length;
   const remaining = Math.max(replyCount - visibleReplies, 0);
 
   return (
@@ -158,26 +174,27 @@ const CommentItem: React.FC<{
         </div>
       )}
       <AnimatePresence>
-        {replyCount > 0 && visibleReplies > 0 && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className={`mt-3 overflow-hidden ${depth === 0 ? 'pl-12' : ''}`}
-          >
-            {item.replies?.slice(0, visibleReplies).map((reply) => (
-              <CommentItem
-                key={reply.id}
-                item={reply}
-                onReply={onReply}
-                onLike={onLike}
-                depth={depth + 1}
-                repliesPageSize={repliesPageSize}
-              />
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+            {replyCount > 0 && visibleReplies > 0 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className={`mt-3 overflow-hidden ${depth === 0 ? 'pl-12' : ''}`}
+              >
+                {flatReplies.slice(0, visibleReplies).map((reply) => (
+                  <CommentItem
+                    key={reply.id}
+                    item={reply}
+                    onReply={onReply}
+                    onLike={onLike}
+                    depth={depth + 1}
+                    repliesPageSize={repliesPageSize}
+                    disableNestedExpansions={true}
+                  />
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
     </div>
   );
 };
