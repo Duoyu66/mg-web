@@ -5,11 +5,12 @@ import { CATEGORIES } from './data';
 
 const QuestionBankLayout = () => {
     const location = useLocation();
-    
+
     // 解析路径参数
+
     // 假设基础路径是 /front/questionBank
     const basePath = '/front/questionBank';
-    
+
     // 尝试匹配二级路径: /front/questionBank/:categoryId
     const categoryMatch = matchPath(`${basePath}/:categoryId`, location.pathname);
     // 尝试匹配三级路径: /front/questionBank/:categoryId/:subCategoryId
@@ -23,8 +24,8 @@ const QuestionBankLayout = () => {
 
     // 查找当前分类和子分类信息
     const currentCategory = categoryId ? CATEGORIES.find(c => c.id === categoryId) : null;
-    const currentSubCategory = subCategoryId && currentCategory 
-        ? currentCategory.subCategories.find(s => s.id === subCategoryId) 
+    const currentSubCategory = subCategoryId && currentCategory
+        ? currentCategory.subCategories.find(s => s.id === subCategoryId)
         : null;
 
     // 生成面包屑项
@@ -68,8 +69,8 @@ const QuestionBankLayout = () => {
     const showBackButton = !!categoryId;
     const backPath = questionId
         ? `${basePath}/${categoryId}/${subCategoryId}`
-        : subCategoryId 
-            ? `${basePath}/${categoryId}` 
+        : subCategoryId
+            ? `${basePath}/${categoryId}`
             : basePath;
 
     return (
