@@ -55,6 +55,8 @@ const Header = () => {
                 { id: "15", title: "代办", path: "/front/todo" },
                 { id: "16", title: "留言板", path: "/front/board" },
                 { id: "17", title: "充值", path: "/front/recharge" },
+                { id: "18", title: "真实简历", path: "/front/realResume" },
+                { id: "19", title: "名企面经", path: "/front/companyInterview" },
             ]
         },
         { id: "13", title: "管理后台", path: "/front/admin" },
