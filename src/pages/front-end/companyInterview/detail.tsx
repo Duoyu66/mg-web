@@ -147,7 +147,7 @@ const mockComments: CommentData[] = [
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
     likes: 256
   },
-  // —— 场景：用户A回复用户B、用户D回复用户B（B为顶级评论）——
+  // —— 场景：用户A回复用户B、用户D回复用户B（B为顶级评论）— —
   {
     id: '6',
     userInfo: {
