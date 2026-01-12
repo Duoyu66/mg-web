@@ -33,6 +33,7 @@ import NotePage from "@/pages/front-end/note";
 import TodoPage from "@/pages/front-end/todo";
 import BoardPage from "@/pages/front-end/board";
 import MemberPage from "@/pages/front-end/member";
+import RechargePage from "@/pages/front-end/recharge";
 import AdminLayout from '@/pages/admin/layout';
 import AdminDashboard from '@/pages/admin/home';
 import AdminCompanyList from '@/pages/admin/company';
@@ -336,6 +337,14 @@ const routes = [
                 meta: {
                     age: 1,
                     name: "张三"
+                }
+            },
+            {
+                title: '充值中心',
+                path: "recharge",
+                component: RechargePage,
+                meta: {
+                    showFooter: false
                 }
             },
 
