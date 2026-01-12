@@ -34,6 +34,10 @@ import TodoPage from "@/pages/front-end/todo";
 import BoardPage from "@/pages/front-end/board";
 import MemberPage from "@/pages/front-end/member";
 import RechargePage from "@/pages/front-end/recharge";
+import ResumeListPage from "@/pages/front-end/realResume";
+import ResumeDetailPage from "@/pages/front-end/realResume/detail";
+import CompanyInterviewPage from "@/pages/front-end/companyInterview";
+import CompanyInterviewDetail from "@/pages/front-end/companyInterview/detail";
 import AdminLayout from '@/pages/admin/layout';
 import AdminDashboard from '@/pages/admin/home';
 import AdminCompanyList from '@/pages/admin/company';
@@ -343,6 +347,38 @@ const routes = [
                 title: '充值中心',
                 path: "recharge",
                 component: RechargePage,
+                meta: {
+                    showFooter: false
+                }
+            },
+            {
+                title: '真实简历列表',
+                path: "realResume",
+                component: ResumeListPage,
+                meta: {
+                    showFooter: false
+                }
+            },
+            {
+                title: '真实简历详情',
+                path: "realResume/:id",
+                component: ResumeDetailPage,
+                meta: {
+                    showFooter: false
+                }
+            },
+            {
+                title: '名企面经',
+                path: "companyInterview",
+                component: CompanyInterviewPage,
+                meta: {
+                    showFooter: false
+                }
+            },
+            {
+                title: '名企面经详情',
+                path: "companyInterview/:id",
+                component: CompanyInterviewDetail,
                 meta: {
                     showFooter: false
                 }
