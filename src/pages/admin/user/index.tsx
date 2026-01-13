@@ -1,26 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, Tag, Space, Button, Card, Input, Modal, Form, Select, message } from 'antd';
 import { SearchOutlined, PlusOutlined, EditOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
-
-interface User {
-  id: string;
-  username: string;
-  name: string;
-  role: 'admin' | 'user' | 'editor';
-  status: 'active' | 'disabled';
-  lastLogin: string;
-}
-
-const mockUsers: User[] = [
-  { id: '1', username: 'admin', name: '管理员', role: 'admin', status: 'active', lastLogin: '2023-10-27 10:00:00' },
-  { id: '2', username: 'zhangsan', name: '张三', role: 'user', status: 'active', lastLogin: '2023-10-26 15:30:00' },
-  { id: '3', username: 'lisi', name: '李四', role: 'user', status: 'disabled', lastLogin: '2023-10-20 09:15:00' },
-];
+import { AdminUser as AdminUserType, getAdminRoleById, getAdminRoles, getAdminUsers, saveAdminUsers, setCurrentAdminUserId } from '@/utils/adminRbac';
 
 const AdminUser: React.FC = () => {
-  const [users, setUsers] = useState<User[]>(mockUsers);
+  const [users, setUsers] = useState<AdminUserType[]>(() => getAdminUsers());
+  const [roles, setRoles] = useState(() => getAdminRoles());
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUsers(getAdminUsers());
+    setRoles(getAdminRoles());
+  }, []);
 
   const columns = [
     {
@@ -36,14 +29,16 @@ const AdminUser: React.FC = () => {
     },
     {
       title: '角色',
-      dataIndex: 'role',
-      key: 'role',
-      render: (role: string) => {
-        let color = role === 'admin' ? 'geekblue' : 'green';
-        if (role === 'editor') color = 'volcano';
+      dataIndex: 'roleId',
+      key: 'roleId',
+      render: (roleId: string) => {
+        const role = getAdminRoleById(roleId);
+        if (!role) {
+          return <Tag color="default">未分配</Tag>;
+        }
         return (
-          <Tag color={color} key={role}>
-            {role.toUpperCase()}
+          <Tag color="geekblue">
+            {role.name}
           </Tag>
         );
       },
@@ -66,16 +61,18 @@ const AdminUser: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      render: (_: any, record: User) => (
+      render: (_: any, record: AdminUserType) => (
         <Space size="middle">
           <Button type="text" icon={<EditOutlined />} onClick={() => handleEdit(record)}>编辑</Button>
+          <Button type="text" onClick={() => handleSetCurrent(record.id)}>设为当前登录</Button>
           <Button type="text" danger icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)}>删除</Button>
         </Space>
       ),
     },
   ];
 
-  const handleEdit = (record: User) => {
+  const handleEdit = (record: AdminUserType) => {
+    setEditingId(record.id);
     form.setFieldsValue(record);
     setIsModalVisible(true);
   };
@@ -85,23 +82,47 @@ const AdminUser: React.FC = () => {
       title: '确认删除',
       content: '确定要删除这个用户吗？',
       onOk: () => {
-        setUsers(users.filter(user => user.id !== id));
+        const next = users.filter(user => user.id !== id);
+        setUsers(next);
+        saveAdminUsers(next);
         message.success('删除成功');
       },
     });
   };
 
   const handleAdd = () => {
+    setEditingId(null);
     form.resetFields();
     setIsModalVisible(true);
   };
 
   const handleOk = () => {
     form.validateFields().then(values => {
-      // Mock save
+      if (editingId) {
+        const next = users.map(user => (user.id === editingId ? { ...user, ...values } : user));
+        setUsers(next);
+        saveAdminUsers(next);
+      } else {
+        const next: AdminUserType = {
+          id: `user_${Date.now()}`,
+          username: values.username,
+          name: values.name,
+          roleId: values.roleId,
+          status: values.status,
+          lastLogin: new Date().toISOString(),
+        };
+        const all = [...users, next];
+        setUsers(all);
+        saveAdminUsers(all);
+      }
       message.success('保存成功');
       setIsModalVisible(false);
     });
+  };
+
+  const handleSetCurrent = (id: string) => {
+    setCurrentAdminUserId(id);
+    message.success('已切换当前登录用户');
   };
 
   return (
@@ -135,11 +156,13 @@ const AdminUser: React.FC = () => {
           <Form.Item name="name" label="姓名" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
-          <Form.Item name="role" label="角色" rules={[{ required: true }]}>
+          <Form.Item name="roleId" label="角色" rules={[{ required: true }]}>
             <Select>
-              <Select.Option value="admin">管理员</Select.Option>
-              <Select.Option value="user">普通用户</Select.Option>
-              <Select.Option value="editor">编辑</Select.Option>
+              {roles.map(role => (
+                <Select.Option key={role.id} value={role.id}>
+                  {role.name}
+                </Select.Option>
+              ))}
             </Select>
           </Form.Item>
           <Form.Item name="status" label="状态" rules={[{ required: true }]}>

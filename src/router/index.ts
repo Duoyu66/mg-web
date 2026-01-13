@@ -33,12 +33,15 @@ import NotePage from "@/pages/front-end/note";
 import TodoPage from "@/pages/front-end/todo";
 import BoardPage from "@/pages/front-end/board";
 import MemberPage from "@/pages/front-end/member";
+import PricePage from "@/pages/front-end/price";
 import AdminLayout from '@/pages/admin/layout';
 import AdminDashboard from '@/pages/admin/home';
 import AdminCompanyList from '@/pages/admin/company';
 import AdminQuestion from '@/pages/admin/question';
 import AdminArticle from '@/pages/admin/article';
 import AdminUser from '@/pages/admin/user';
+import AdminRolesPage from '@/pages/admin/system/roles';
+import AdminUserRolesPage from '@/pages/admin/system/userRoles';
 
 const routes = [
     {
@@ -129,6 +132,16 @@ const routes = [
                 path: "user",
                 component: AdminUser,
                 title: "用户管理"
+            },
+            {
+                path: "system/roles",
+                component: AdminRolesPage,
+                title: "角色管理"
+            },
+            {
+                path: "system/user-roles",
+                component: AdminUserRolesPage,
+                title: "用户角色分配"
             }
         ]
     },
@@ -325,6 +338,14 @@ const routes = [
                 title: '会员积分机制',
                 path: "member",
                 component: MemberPage,
+                meta: {
+                    showFooter: false
+                }
+            },
+            {
+                title: '会员价格',
+                path: "price",
+                component: PricePage,
                 meta: {
                     showFooter: false
                 }

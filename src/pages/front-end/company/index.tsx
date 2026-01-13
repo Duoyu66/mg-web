@@ -204,7 +204,7 @@ const CompanyList = () => {
 
                   <div className="flex flex-wrap gap-1 justify-center min-h-[20px]">
                     {company.tags?.slice(0, 2).map((tag, idx) => (
-                      <Tag key={idx} variant="borderless" className="text-[10px] px-1 py-0 bg-gray-50 dark:bg-gray-700 mr-0 scale-90">
+                      <Tag key={idx} className="text-[10px] px-1 py-0 bg-gray-50 dark:bg-gray-700 mr-0 scale-90">
                         {tag}
                       </Tag>
                     ))}

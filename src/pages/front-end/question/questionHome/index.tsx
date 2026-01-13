@@ -219,12 +219,12 @@ const QuestionHome = () => {
   useEffect(() => {
     if (typeRes && (typeRes as any).status) {
       const res: any = typeRes;
-      let typesTemp: any = [];
-      let typesValue: any = [];
+      const typesTemp: any = [];
+      const typesValue: any = [];
       setUserQuestionInfoObj(res.data.userQuestionInfoDataDto);
       setTypeList(res.data.questionTypeList);
       for (let i = 0; i < res.data.questionTypeList.length; i++) {
-        let itemObj = {
+        const itemObj = {
           label: "",
           value: "",
         };
@@ -613,6 +613,7 @@ const QuestionHome = () => {
   const openNotification = (exp: number) => {
     console.log("直观性了");
     api.open({
+      title: "签到提醒",
       showProgress: true,
       duration: 3,
       closeIcon: false,

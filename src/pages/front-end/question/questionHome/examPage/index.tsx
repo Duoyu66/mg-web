@@ -72,9 +72,9 @@ const ExamPage = () => {
     img: "",
     type: "",
   });
-  let array: any = [];
+  const array: any = [];
   for (let i = 0; i < questionList.length; i++) {
-    let item = {
+    const item = {
       questionId: questionList[i].id,
       answer: "",
       difficulty: questionList[i].difficulty,
@@ -98,7 +98,7 @@ const ExamPage = () => {
   const [percent, setPercent] = useState<number>(0);
   const [showStar, setShowStar] = useState(firstQuestion.collection == "1");
   useEffect(() => {
-    let type = questionTypeList.find((item: any) => {
+    const type = questionTypeList.find((item: any) => {
       return item.value == question.type;
     });
     setQuestionType({
@@ -137,7 +137,7 @@ const ExamPage = () => {
     // }).then(res=>{
     //     console.log('收藏---',res)
     // })
-    let count = answer.doneList.filter(
+    const count = answer.doneList.filter(
       (element: any) => element.answer == ""
     ).length;
     setEmptyAnswersCount(count);
@@ -151,7 +151,7 @@ const ExamPage = () => {
   };
 
   const addCollection = () => {
-    let data = {
+    const data = {
       userId: userId,
       type: "1", //1是收藏
       questionId: questionList[questionIndex].id,
@@ -171,7 +171,7 @@ const ExamPage = () => {
     });
   };
   const deleteCollection = () => {
-    let data = {
+    const data = {
       userId: userId,
       type: "-1", //-1取消收藏
       questionId: questionList[questionIndex].id,

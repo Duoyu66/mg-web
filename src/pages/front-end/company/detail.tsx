@@ -50,6 +50,7 @@ const CompanyDetail = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingRecord, setEditingRecord] = useState<InterviewRecord | null>(null);
   const [form] = Form.useForm();
+  const [saveAndAddMode, setSaveAndAddMode] = useState(false);
 
   const fetchData = async () => {
     if (!id) return;
@@ -140,15 +141,9 @@ const CompanyDetail = () => {
           await CompanyService.updateCompany(company.id, { status: newStatus });
       }
 
-      if (saveAndAddMode) {
-          form.resetFields();
-          setEditingRecord(null);
-          message.success('已保存，请继续添加');
-      } else {
-          setIsModalVisible(false);
-          form.resetFields();
-          setEditingRecord(null);
-      }
+      setIsModalVisible(false);
+      form.resetFields();
+      setEditingRecord(null);
       
       fetchData(); // Refresh data
     } catch (error) {

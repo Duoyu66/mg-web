@@ -43,7 +43,7 @@ export const stopKeyF12=()=>{
             event = window.event;
         }
         try {
-            let the = event.srcElement;
+            const the = event.srcElement;
             if (!((the.tagName == "INPUT" && the.type.toLowerCase() == "text") || the.tagName == "TEXTAREA")) {
                 return false;
             }

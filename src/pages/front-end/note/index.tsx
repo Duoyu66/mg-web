@@ -30,6 +30,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Editor from '@monaco-editor/react';
 import dayjs from 'dayjs';
+import { useTheme } from '@/components/context/useTheme';
 
 const { Sider, Content } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -64,6 +65,7 @@ const initialNotes: Note[] = [
 ];
 
 const NotePage: React.FC = () => {
+  const { theme } = useTheme();
   const [notes, setNotes] = useState<Note[]>(initialNotes);
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(initialNotes[0].id);
   const [searchText, setSearchText] = useState('');

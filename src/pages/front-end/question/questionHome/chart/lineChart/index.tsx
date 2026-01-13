@@ -9,8 +9,8 @@ const LineChart = (props: any) => {
     initArticleBarChart();
   }, []);
   const initArticleBarChart = () => {
-    let chartDom = document.getElementById("articleBar")!;
-    let myChart = echarts.init(chartDom);
+    const chartDom = document.getElementById("articleBar")!;
+    const myChart = echarts.init(chartDom);
     let option: EChartsOption;
 
     option = {
