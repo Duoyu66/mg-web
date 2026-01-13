@@ -284,11 +284,19 @@ export default function TopicPage() {
   const query = useQuery();
   const track = query.get('track') || 'frontend';
   const topicId = query.get('topic');
+  const queryMember = query.get('member');
   const trackData = tracksMap[track] || tracksMap.frontend;
   const topics = trackData.topics;
   const active = topics.find(t => t.id === topicId) || topics[0];
 
   const makeHref = (t: string, id: string) => `?track=${encodeURIComponent(t)}&topic=${encodeURIComponent(id)}`;
+  const isMember =
+    (queryMember === '1' || queryMember === 'true') ||
+    (typeof window !== 'undefined' &&
+      ['isMember', 'mg_is_member', 'member'].some(k => {
+        const v = window.localStorage.getItem(k);
+        return v === '1' || v === 'true';
+      }));
 
   return (
     <Layout title={trackData.title}>
@@ -307,6 +315,8 @@ export default function TopicPage() {
                       <a
                         className={`menu__link ${isActive ? 'menu__link--active' : ''}`}
                         href={makeHref(track, t.id)}
+                        onClick={isMember ? e => e.preventDefault() : undefined}
+                        style={{ pointerEvents: isMember ? 'none' : undefined }}
                       >
                         {t.title}
                       </a>

@@ -203,7 +203,8 @@ const RoadmapPage = () => {
                       }
                     `}
                     onClick={() => {
-                      const target = `${docsBaseUrl}/topic?track=${activeTab}&topic=${encodeURIComponent(node.id)}`;
+                      const prefix = activeTab === 'frontend' ? '/docs/frontend' : '/docs/backend';
+                      const target = `${docsBaseUrl}${prefix}/${encodeURIComponent(node.id)}`;
                       window.open(target, '_blank');
                     }}
                   >
