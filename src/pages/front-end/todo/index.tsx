@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Card, 
   Button, 
@@ -86,6 +87,18 @@ const statusMap = {
   done: '已完成'
 };
 
+const pageVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      duration: 0.5,
+      staggerChildren: 0.1
+    }
+  }
+};
+
 const TodoPage: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -152,54 +165,67 @@ const TodoPage: React.FC = () => {
   };
 
   const TaskCard = ({ task }: { task: Task }) => (
-    <Card 
-      className="mb-4 shadow-sm hover:shadow-md transition-all duration-300 border-t-4 bg-white dark:bg-gray-800 dark:border-gray-700"
-      style={{ borderTopColor: priorityColors[task.priority] }}
-      size="small"
-      actions={[
-        task.status !== 'todo' && (
-          <Tooltip title="后退">
-            <ArrowLeftOutlined key="back" onClick={() => moveTask(task, 'backward')} />
-          </Tooltip>
-        ),
-        <Tooltip title="编辑">
-          <EditOutlined key="edit" onClick={() => openEditModal(task)} />
-        </Tooltip>,
-        <Tooltip title="删除">
-          <DeleteOutlined key="delete" className="text-red-500" onClick={() => handleDelete(task.id)} />
-        </Tooltip>,
-        task.status !== 'done' && (
-          <Tooltip title="前进">
-            <ArrowRightOutlined key="forward" onClick={() => moveTask(task, 'forward')} />
-          </Tooltip>
-        ),
-      ].filter(Boolean)}
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      transition={{ duration: 0.2 }}
     >
-      <div className="flex justify-between items-start mb-2">
-        <h4 className="font-bold text-gray-800 dark:text-gray-100 m-0 truncate flex-1" title={task.title}>{task.title}</h4>
-        <Tag color={priorityColors[task.priority]} className="mr-0 ml-2 text-xs">
-          {task.priority.toUpperCase()}
-        </Tag>
-      </div>
-      <p className="text-gray-500 dark:text-gray-400 text-sm mb-3 line-clamp-2 min-h-[40px]">{task.description}</p>
-      
-      <div className="flex justify-between items-center text-xs text-gray-400 dark:text-gray-500">
-        <div className="flex items-center gap-1">
-          <ClockCircleOutlined />
-          <span>{dayjs(task.dueDate).format('MM-DD')}</span>
+      <Card 
+        className="mb-4 shadow-sm hover:shadow-md transition-all duration-300 border-t-4 bg-white dark:bg-gray-800 dark:border-gray-700"
+        style={{ borderTopColor: priorityColors[task.priority] }}
+        size="small"
+        actions={[
+          task.status !== 'todo' && (
+            <Tooltip title="后退">
+              <ArrowLeftOutlined key="back" onClick={() => moveTask(task, 'backward')} />
+            </Tooltip>
+          ),
+          <Tooltip title="编辑">
+            <EditOutlined key="edit" onClick={() => openEditModal(task)} />
+          </Tooltip>,
+          <Tooltip title="删除">
+            <DeleteOutlined key="delete" className="text-red-500" onClick={() => handleDelete(task.id)} />
+          </Tooltip>,
+          task.status !== 'done' && (
+            <Tooltip title="前进">
+              <ArrowRightOutlined key="forward" onClick={() => moveTask(task, 'forward')} />
+            </Tooltip>
+          ),
+        ].filter(Boolean)}
+      >
+        <div className="flex justify-between items-start mb-2">
+          <h4 className="font-bold text-gray-800 dark:text-gray-100 m-0 truncate flex-1" title={task.title}>{task.title}</h4>
+          <Tag color={priorityColors[task.priority]} className="mr-0 ml-2 text-xs">
+            {task.priority.toUpperCase()}
+          </Tag>
         </div>
-        {task.assignee && (
-           <Avatar style={{ backgroundColor: '#f56a00', verticalAlign: 'middle' }} size="small">
-             {task.assignee[0]}
-           </Avatar>
-        )}
-      </div>
-    </Card>
+        <p className="text-gray-500 dark:text-gray-400 text-sm mb-3 line-clamp-2 min-h-[40px]">{task.description}</p>
+        
+        <div className="flex justify-between items-center text-xs text-gray-400 dark:text-gray-500">
+          <div className="flex items-center gap-1">
+            <ClockCircleOutlined />
+            <span>{dayjs(task.dueDate).format('MM-DD')}</span>
+          </div>
+          {task.assignee && (
+             <Avatar style={{ backgroundColor: '#f56a00', verticalAlign: 'middle' }} size="small">
+               {task.assignee[0]}
+             </Avatar>
+          )}
+        </div>
+      </Card>
+    </motion.div>
   );
 
   return (
-    <div className="p-6 h-[calc(100vh-64px)] overflow-hidden bg-gray-50 dark:bg-gray-900 flex flex-col transition-colors duration-300">
-      <div className="flex justify-between items-center mb-6">
+    <motion.div 
+      className="p-6 h-[calc(100vh-64px)] overflow-hidden bg-gray-50 dark:bg-gray-900 flex flex-col transition-colors duration-300"
+      variants={pageVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.div className="flex justify-between items-center mb-6" variants={pageVariants}>
         <div>
           <h2 className="text-2xl font-bold m-0 flex items-center gap-2 text-gray-900 dark:text-gray-100">
             <CheckCircleOutlined className="text-primary-500" />
@@ -214,48 +240,63 @@ const TodoPage: React.FC = () => {
         }}>
           新建任务
         </Button>
-      </div>
+      </motion.div>
 
-      <div className="flex-1 flex gap-6 overflow-x-auto pb-4">
+      <motion.div className="flex-1 flex gap-6 overflow-x-auto pb-4" variants={pageVariants}>
         {/* Todo Column */}
-        <div className="flex-1 min-w-[300px] bg-gray-100/50 dark:bg-gray-800/60 rounded-xl p-4 flex flex-col h-full transition-colors duration-300">
+        <motion.div 
+          className="flex-1 min-w-[300px] bg-gray-100/50 dark:bg-gray-800/60 rounded-xl p-4 flex flex-col h-full transition-colors duration-300"
+          variants={pageVariants}
+        >
           <div className="flex justify-between items-center mb-4 px-2">
             <h3 className="font-bold text-gray-700 dark:text-gray-200 m-0">待办 (Todo)</h3>
             <Tag color="default">{tasks.filter(t => t.status === 'todo').length}</Tag>
           </div>
           <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-            {tasks.filter(t => t.status === 'todo').map(task => (
-              <TaskCard key={task.id} task={task} />
-            ))}
+            <AnimatePresence mode="popLayout">
+              {tasks.filter(t => t.status === 'todo').map(task => (
+                <TaskCard key={task.id} task={task} />
+              ))}
+            </AnimatePresence>
           </div>
-        </div>
+        </motion.div>
 
         {/* In Progress Column */}
-        <div className="flex-1 min-w-[300px] bg-blue-50/50 dark:bg-sky-900/40 rounded-xl p-4 flex flex-col h-full transition-colors duration-300">
+        <motion.div 
+          className="flex-1 min-w-[300px] bg-blue-50/50 dark:bg-sky-900/40 rounded-xl p-4 flex flex-col h-full transition-colors duration-300"
+          variants={pageVariants}
+        >
           <div className="flex justify-between items-center mb-4 px-2">
             <h3 className="font-bold text-blue-700 dark:text-blue-200 m-0">进行中 (In Progress)</h3>
             <Tag color="blue">{tasks.filter(t => t.status === 'in_progress').length}</Tag>
           </div>
           <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-            {tasks.filter(t => t.status === 'in_progress').map(task => (
-              <TaskCard key={task.id} task={task} />
-            ))}
+            <AnimatePresence mode="popLayout">
+              {tasks.filter(t => t.status === 'in_progress').map(task => (
+                <TaskCard key={task.id} task={task} />
+              ))}
+            </AnimatePresence>
           </div>
-        </div>
+        </motion.div>
 
         {/* Done Column */}
-        <div className="flex-1 min-w-[300px] bg-green-50/50 dark:bg-emerald-900/40 rounded-xl p-4 flex flex-col h-full transition-colors duration-300">
+        <motion.div 
+          className="flex-1 min-w-[300px] bg-green-50/50 dark:bg-emerald-900/40 rounded-xl p-4 flex flex-col h-full transition-colors duration-300"
+          variants={pageVariants}
+        >
           <div className="flex justify-between items-center mb-4 px-2">
             <h3 className="font-bold text-green-700 dark:text-green-200 m-0">已完成 (Done)</h3>
             <Tag color="green">{tasks.filter(t => t.status === 'done').length}</Tag>
           </div>
           <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-            {tasks.filter(t => t.status === 'done').map(task => (
-              <TaskCard key={task.id} task={task} />
-            ))}
+            <AnimatePresence mode="popLayout">
+              {tasks.filter(t => t.status === 'done').map(task => (
+                <TaskCard key={task.id} task={task} />
+              ))}
+            </AnimatePresence>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       <Modal
         title={editingTask ? "编辑任务" : "新建任务"}
@@ -296,7 +337,7 @@ const TodoPage: React.FC = () => {
           </div>
         </Form>
       </Modal>
-    </div>
+    </motion.div>
   );
 };
 

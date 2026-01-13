@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Badge, Button, Input, Tooltip, Dropdown } from "antd";
+import { Badge, Button, Input, Tooltip, Dropdown, Avatar } from "antd";
 import type { MenuProps } from "antd";
 import { useTheme } from "@/components/context/useTheme";
 import type { MenuItemType } from "@/components/layoutPage/type";
@@ -12,7 +12,10 @@ import {
   Code2, 
   Terminal,
   UserCircle2,
-  ChevronDown
+  ChevronDown,
+  LogOut,
+  Wallet,
+  Coins,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -52,6 +55,9 @@ const Header = () => {
                 { id: "15", title: "代办", path: "/front/todo" },
                 { id: "16", title: "留言板", path: "/front/board" },
                 { id: "17", title: "会员价格", path: "/front/price" },
+                { id: "17", title: "充值", path: "/front/recharge" },
+                { id: "18", title: "真实简历", path: "/front/realResume" },
+                { id: "19", title: "名企面经", path: "/front/companyInterview" },
             ]
         },
         { id: "13", title: "管理后台", path: "/front/admin" },
@@ -60,6 +66,60 @@ const Header = () => {
 
     const goIndex = () => navigate("/");
     const goLogin = () => navigate("/login");
+
+    // Mock User Info
+    const userInfo = {
+        nickname: "木瓜一块八",
+        id: "888888",
+        balance: 12580.00,
+        coins: 2450,
+        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
+    };
+
+    const userMenuItems: MenuProps['items'] = [
+        {
+            key: 'info',
+            label: (
+                <div className="flex flex-col px-1 py-1 cursor-default min-w-[120px]">
+                    <span className="font-bold text-base text-gray-800 dark:text-gray-100">{userInfo.nickname}</span>
+                    <span className="text-xs text-gray-400 mt-1">ID: {userInfo.id}</span>
+                </div>
+            ),
+        },
+        { type: 'divider' },
+        {
+            key: 'balance',
+            icon: <Wallet size={16} className="text-blue-500" />,
+            label: (
+                <div className="flex justify-between items-center w-full gap-4">
+                    <span>余额</span>
+                    <span className="font-mono font-bold">¥{userInfo.balance.toLocaleString()}</span>
+                </div>
+            ),
+            onClick: () => navigate('/front/recharge')
+        },
+        {
+            key: 'coins',
+            icon: <Coins size={16} className="text-amber-500" />,
+            label: (
+                <div className="flex justify-between items-center w-full gap-4">
+                    <span>木瓜币</span>
+                    <span className="font-mono font-bold">{userInfo.coins}</span>
+                </div>
+            ),
+        },
+        { type: 'divider' },
+        {
+            key: 'logout',
+            danger: true,
+            icon: <LogOut size={16} />,
+            label: '退出登录',
+            onClick: () => {
+                // handle logout
+                navigate('/login');
+            }
+        },
+    ];
 
     return (
         <header 
@@ -201,14 +261,30 @@ const Header = () => {
                         >
                             LeetCode
                         </Button>
-                        <Button 
+                        {/* Login Button (Shown when not logged in - Logic can be added) */}
+                        {/* <Button 
                             type="primary" 
                             className="rounded-full px-6 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 border-none shadow-md shadow-primary-500/20"
                             icon={<UserCircle2 size={16} />}
                             onClick={goLogin}
                         >
                             登录
-                        </Button>
+                        </Button> */}
+
+                        {/* User Profile Dropdown */}
+                        <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" arrow trigger={['click']}>
+                            <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 pl-2 pr-3 py-1.5 rounded-full transition-all border border-transparent hover:border-gray-200 dark:hover:border-gray-700 group">
+                                <Avatar 
+                                    src={userInfo.avatar} 
+                                    size="default" 
+                                    className="border-2 border-white dark:border-gray-700 shadow-sm group-hover:scale-105 transition-transform"
+                                />
+                                <span className="text-sm font-medium text-gray-700 dark:text-gray-200 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                                    {userInfo.nickname}
+                                </span>
+                                <ChevronDown size={14} className="text-gray-400 group-hover:text-primary-500 transition-colors" />
+                            </div>
+                        </Dropdown>
                     </div>
                 </div>
             </div>
