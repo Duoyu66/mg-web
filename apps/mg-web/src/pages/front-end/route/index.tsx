@@ -204,7 +204,9 @@ const RoadmapPage = () => {
                     `}
                     onClick={() => {
                       const prefix = activeTab === 'frontend' ? '/docs/frontend' : '/docs/backend';
-                      const target = `${docsBaseUrl}${prefix}/${encodeURIComponent(node.id)}`;
+                      const token = localStorage.getItem('doc_token');
+                      const query = token ? `?token=${encodeURIComponent(token)}` : '';
+                      const target = `${docsBaseUrl}${prefix}/${encodeURIComponent(node.id)}${query}`;
                       window.open(target, '_blank');
                     }}
                   >
