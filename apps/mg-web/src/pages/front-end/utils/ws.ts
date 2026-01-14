@@ -1,7 +1,7 @@
 import {message} from "antd";
 
 
-export let socket :any=null;
+export let socket: WebSocket | null = null;
 export  const initWebsocket = () => {
     const newSocket = new WebSocket('ws://localhost:8082/your-websocket-endpoint');
 

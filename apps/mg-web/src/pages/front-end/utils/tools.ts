@@ -46,7 +46,7 @@ export const timeAgo = (dateString: string) => {
 //分割url
 export const  splitURL=(url:string)=> {
     // 使用正则表达式来分割URL
-    const regex = /^(https?:\/\/[^\/]+\/)(.*\/)?([^\/]+)$/;
+    const regex = /^(https?:\/\/[^/]+\/)(.*\/)?([^/]+)$/;
     const matches = url.match(regex);
 
     if (matches) {

@@ -11,11 +11,11 @@ export const getTime = () => {
         return "夜深了，今晚有个甜美的梦境，明天醒来元气满满。";
     }
 };
-export const getDays = (inputDate:any) => {
+export const getDays = (inputDate: string) => {
     // 创建一个日期对象表示输入日期
-    const input:any = new Date(inputDate);
+    const input: Date = new Date(inputDate);
     // 创建一个日期对象表示今天
-    const today:any = new Date();
+    const today: Date = new Date();
 
     // 计算两个日期的时间差（以毫秒为单位）
     const timeDiff = today - input;

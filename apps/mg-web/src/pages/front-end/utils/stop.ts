@@ -1,9 +1,9 @@
 export const stopF12 = () => {
     console.log("stopf12执行了")
-    let callbacks: any[] = [];
+    let callbacks: Function[] = [];
     const timeLimit = 50;
     let open = false;
-    const currentUrl = window.location.href;
+    // const currentUrl = window.location.href;
     // if (currentUrl.includes("www.pawpaw18.cn")) {
 
         setInterval(loop, 1000);
@@ -11,20 +11,20 @@ export const stopF12 = () => {
 
 
     return {
-        addListener: function (fn: any) {
+        addListener: function (fn: Function) {
             callbacks.push(fn);
         },
-        cancelListener: function (fn: any) {
-            callbacks = callbacks.filter((v: any) => v !== fn);
+        cancelListener: function (fn: Function) {
+            callbacks = callbacks.filter((v: Function) => v !== fn);
         }
     };
 
     function loop() {
         const startTime :number= new Date().getTime();
         console.log("loop启动了,debugger了")
-        debugger;   if (new Date().getTime() - startTime > timeLimit) {
+        if (new Date().getTime() - startTime > timeLimit) {
             if (!open) {
-                callbacks.forEach((fn: any) => {
+                callbacks.forEach((fn: Function) => {
                     fn.call(null);
                 });
             }
@@ -38,17 +38,17 @@ export const stopF12 = () => {
     }
 };
 export const stopKeyF12=()=>{
-    document.oncontextmenu = function(event:any) {
+    document.oncontextmenu = function(event:MouseEvent) {
         if (window.event) {
-            event = window.event;
+            event = window.event as MouseEvent;
         }
         try {
-            const the = event.srcElement;
-            if (!((the.tagName == "INPUT" && the.type.toLowerCase() == "text") || the.tagName == "TEXTAREA")) {
+            const the = event.target as HTMLElement;
+            if (!((the.tagName == "INPUT" && (the as HTMLInputElement).type.toLowerCase() == "text") || the.tagName == "TEXTAREA")) {
                 return false;
             }
             return true;
-        } catch (e) {
+        } catch (_) {
             return false;
         }
     }
