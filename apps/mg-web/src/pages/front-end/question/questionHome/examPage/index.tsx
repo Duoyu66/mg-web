@@ -1,4 +1,4 @@
-import styles from "./index.module.css";
+
 import { useLocation, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import type { DrawerProps } from "antd";
@@ -97,6 +97,8 @@ const ExamPage = () => {
   const [submitLoading, setSubmitLoading] = useState(false);
   const [percent, setPercent] = useState<number>(0);
   const [showStar, setShowStar] = useState(firstQuestion.collection == "1");
+  const [isPaused, setIsPaused] = useState(false);
+  const [pauseTime, setPauseTime] = useState(0);
   useEffect(() => {
     const type = questionTypeList.find((item: any) => {
       return item.value == question.type;
@@ -315,17 +317,49 @@ const ExamPage = () => {
   const goQuestionHome = () => {
     nav("/question/questionHome");
   };
+
+  const togglePause = () => {
+    if (isPaused) {
+      const pausedDuration = Date.now() - pauseTime;
+      setDeadline(deadline + pausedDuration);
+      setIsPaused(false);
+    } else {
+      setPauseTime(Date.now());
+      setIsPaused(true);
+    }
+  };
+
   return (
-    <div className={styles["main_box"]}>
-      <div className={styles["question_box"]}>
-        <div className={styles["question_title"]}>
-          <div className={styles["titleDiv"]}>
+    <div className="w-full h-screen flex flex-col items-center justify-start bg-[#F7F9FE] pb-[60px]">
+      <div className="w-full bg-white shadow-md h-16 flex items-center justify-between px-6 fixed top-0 left-0 z-10">
+        <Button onClick={goQuestionHome} type="link">
+          <LeftOutlined />
+          返回答题
+        </Button>
+        <div className="text-lg font-bold">2025年秋招-技术岗-第一批笔试</div>
+        <div className="flex items-center gap-4">
+          <Button onClick={submitAnwser} type="primary" danger>
+            交卷
+          </Button>
+          <div onClick={togglePause} className="cursor-pointer">
+            <Countdown
+              format="mm:ss"
+              onChange={getPassedTime}
+              value={isPaused ? pauseTime : deadline}
+              onFinish={onFinish}
+            />
+          </div>
+        </div>
+      </div>
+      <div className="w-4/5 h-auto bg-white rounded-lg mt-20 pb-5">
+        <div className="w-full h-[60px] border-b border-[#F0F2F5] flex items-center justify-between px-5 relative">
+          <div className="text-base font-semibold text-[#333] flex items-center">
             <Tag icon={<PaperClipOutlined />} bordered={false} color="blue">
               {question.questionType == "1" ? "单选题" : "不定项选择"}
             </Tag>
             {questionIndex + 1}、 {question.title}
           </div>
-          <div className={styles["tags"]}>
+          <div className="flex items-center">
             <Tag
               style={{ marginRight: 20 }}
               icon={<img src={questionType.img} alt="" />}
@@ -335,47 +369,30 @@ const ExamPage = () => {
             </Tag>
             <Tag color={tagColor}>{question.difficulty}</Tag>
           </div>
-          <div className={styles["waveStyle"]} style={{ width: "100%" }}>
-            <div className={styles["waveStyle"]} />
+          <div className="absolute bottom-[-1px] left-0 w-full h-[10px]" style={{ backgroundImage: 'url(./img/wave.svg)' }}>
+            <div className="absolute bottom-[-1px] left-0 w-full h-[10px]" style={{ backgroundImage: 'url(./img/wave.svg)' }} />
           </div>
         </div>
-        <div className={styles["progressStyle"]}>
-          <Flex vertical gap="small">
-            <Flex vertical gap="small">
-              <Progress
-                percent={percent}
-                format={formatProgress}
-                type="circle"
-              />
-            </Flex>
-          </Flex>
-          <Countdown
-            format="mm:ss"
-            onChange={getPassedTime}
-            className={styles["countDownDiv"]}
-            value={deadline}
-            onFinish={onFinish}
-          />
-        </div>
+
         <div style={{ backgroundColor: "#f7f9fe" }}>
-          <div className={styles["myStyleOnly"]}>
+          <div className="p-5 bg-[#f7f9fe]">
             <div
-              className={`${styles["my-line-numbers"]} line-numbers pre-mac`}
+              className="bg-[#2D2D2D] rounded-lg p-4 text-[#ccc] text-sm leading-6 whitespace-pre-wrap break-words line-numbers pre-mac"
               dangerouslySetInnerHTML={content}
             ></div>
           </div>
         </div>
-        <div className={styles["optionsStyle"]}>
+        <div className="p-5">
           {question.questionType == "1" ? (
             <Radio.Group
-              className={styles["radioStyle"]}
+              className="w-full flex flex-col"
               onChange={radioChange}
               value={answer.doneList[questionIndex]?.answer}
               options={options}
             />
           ) : (
             <Checkbox.Group
-              className={styles["radioStyle"]}
+              className="w-full flex flex-col"
               options={options}
               value={answer.doneList[questionIndex]?.answer}
               onChange={checkboxChange}
@@ -384,16 +401,16 @@ const ExamPage = () => {
         </div>
       </div>
       <Modal open={incompleteVisible} onOk={handleOk} onCancel={handleCancel}>
-        <div className={styles["modalDiv"]}>
+        <div className="w-full flex items-center justify-center my-2.5">
           <img src={fightingSvg} alt="" />
         </div>
-        <div className={styles["modalDiv"]}>
+        <div className="w-full flex items-center justify-center my-2.5">
           {
             // remainingMin ?
             // <span>当前模式最短作答时间为<span className={styles['modalSpan']}>{remainingMin}分钟</span>，请稍后重新提交答案。</span> :
             <span>
               您当前还有
-              <span className={styles["modalSpan"]}>{emptyAnswersCount}道</span>
+              <span className="text-red-500 text-lg mx-1">{emptyAnswersCount}道</span>
               题目未作答，确定交卷吗？
             </span>
           }
@@ -406,50 +423,47 @@ const ExamPage = () => {
         onClose={onClose}
         open={open}
         key={placement}
-        className={styles["drawerStyle"]}
+        className="rounded-t-2xl"
       >
-        <div className={styles["answerSheet"]}>
+        <div className="w-full flex flex-wrap">
           {questionList.map((item: any, index: number) => (
             <div
               key={item.id}
               onClick={() => appointQuestion(index)}
-              className={`${styles["sheetDiv"]} 
-                             ${styles[questionIndex == index ? "picked" : ""]} 
-                             ${
-                               styles[
-                                 answer.doneList.find(
-                                   (ele: any) => item.id == ele.questionId
-                                 ).answer
-                                   ? "finished"
-                                   : ""
-                               ]
-                             }`}
+              className={`w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center m-2.5 cursor-pointer ${
+                questionIndex === index ? 'border-blue-700 text-blue-700' : ''
+              } ${
+                answer.doneList.find((ele: any) => item.id === ele.questionId)
+                  .answer
+                  ? 'bg-blue-100 border-blue-700'
+                  : ''
+              }`}
             >
               <span>{index + 1}</span>
             </div>
           ))}
         </div>
       </Drawer>
-      <div className={styles["bottomDiv"]}>
-        <div className={styles["inBox"]}>
-          <div onClick={showDrawer} className={styles["qCard"]}>
+      <div className="w-full h-[60px] bg-white fixed bottom-0 left-0 shadow-[0_-2px_10px_0_rgba(0,0,0,0.1)]">
+        <div className="w-4/5 h-full mx-auto flex items-center justify-between">
+          <div onClick={showDrawer} className="flex items-center cursor-pointer">
             <img src={QICon} style={{ marginRight: 5 }} alt="q" />
             答题卡
           </div>
-          <div className={styles["btnGroup"]}>
-            <div className={styles["collectDiv"]}>
+          <div className="flex items-center">
+            <div className="mr-5">
               {showStar ? (
                 <img
                   src={SyesICon}
                   onClick={deleteCollection}
-                  className={styles["collectStyle"]}
+                  className="w-6 h-6 cursor-pointer"
                   alt="yes"
                 />
               ) : (
                 <img
                   src={SnoICon}
                   onClick={addCollection}
-                  className={styles["collectStyle"]}
+                  className="w-6 h-6 cursor-pointer"
                   alt="no"
                 />
               )}
@@ -457,7 +471,7 @@ const ExamPage = () => {
             <Button
               onClick={goQuestionHome}
               type="default"
-              className={styles["btnItem"]}
+              className="mx-2.5"
             >
               返回刷题主页
             </Button>
@@ -465,25 +479,24 @@ const ExamPage = () => {
               disabled={questionIndex == 0}
               onClick={prevQuestion}
               type="primary"
-              className={styles["btnItem"]}
+              className="mx-2.5"
             >
               <LeftOutlined />
-              <span className={styles["contentSpan"]}>上一题</span>
+              <span className="mx-1">上一题</span>
             </Button>
             <Button
               disabled={questionIndex == questionList.length - 1}
               onClick={nextQuestion}
               type="primary"
-              className={styles["btnItem"]}
+              className="mx-2.5"
             >
-              <span className={styles["contentSpan"]}>下一题</span>
+              <span className="mx-1">下一题</span>
               <RightOutlined />
             </Button>
           </div>
           <Button
-            className={styles["diyBtn"]}
+            className="justify-self-end mr-4"
             loading={submitLoading}
-            style={{ justifySelf: "flex-end", marginRight: 15 }}
             onClick={submitAnwser}
             type="primary"
             danger={true}
@@ -492,6 +505,21 @@ const ExamPage = () => {
           </Button>
         </div>
       </div>
+      <Modal
+        open={isPaused}
+        closable={false}
+        footer={null}
+        centered
+        maskClosable={false}
+      >
+        <div className="flex flex-col items-center justify-center p-8">
+          <img src={fightingSvg} alt="暂停" className="w-24 h-24 mb-4" />
+          <div className="text-2xl font-bold mb-4">暂停中</div>
+          <Button type="primary" onClick={togglePause}>
+            继续答题
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 };

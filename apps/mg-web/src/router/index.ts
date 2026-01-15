@@ -42,6 +42,7 @@ import CompanyInterviewDetail from "@/pages/front-end/companyInterview/detail";
 import FeaturePage from "@/pages/front-end/feature";
 import TutorialPage from "@/pages/front-end/tutorial";
 import RoadmapDocPage from "@/pages/roadmapDoc";
+import ExercisePage from "@/pages/front-end/exercise";
 import AdminLayout from '@/pages/admin/layout';
 import AdminDashboard from '@/pages/admin/home';
 import AdminCompanyList from '@/pages/admin/company';
@@ -432,6 +433,14 @@ const routes = [
         title: '路线文档',
         path: "/roadmapDoc/:track/:id",
         component: RoadmapDocPage,
+        meta: {
+            showFooter: false
+        }
+    },
+    {
+        title: '习题',
+        path: "/exercise/:id",
+        component: ExercisePage,
         meta: {
             showFooter: false
         }
