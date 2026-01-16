@@ -1,19 +1,73 @@
 import { useState } from 'react';
-import { useParams ,useNavigate} from 'react-router-dom';
-import { Input, Button, Tag, Empty } from 'antd';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Input, Button, Tag, Empty, message } from 'antd';
 import { Search } from 'lucide-react';
 import { CATEGORIES, MOCK_QUESTIONS } from './data';
+import { useGetExamList } from '@/pages/front-end/question/hooks/useGetExamList';
+import { useGetQuestionType } from '@/pages/front-end/question/hooks/useGetQuestionType';
 
 const QuestionList = () => {
     const { categoryId, subCategoryId } = useParams<{ categoryId: string; subCategoryId: string }>();
     const [searchText, setSearchText] = useState('');
     const navigate = useNavigate();
+    const userId = localStorage.getItem('userId') || '4500fbd3-5e3c-407b-b158-51e1ed19ee3a';
+    const getExamListMutation = useGetExamList();
+    const { data: typeRes } = useGetQuestionType({ id: userId });
 
     const selectedCategory = CATEGORIES.find(c => c.id === categoryId);
     const selectedSubCategory = selectedCategory?.subCategories.find(s => s.id === subCategoryId);
 
     const handleQuestionClick = (questionId: string) => {
         navigate(questionId);
+    };
+
+    const handleGoToExam = () => {
+        if (!selectedSubCategory) {
+            navigate('/question/questionHome');
+            return;
+        }
+        const questionTypeList = (typeRes as any)?.status ? (typeRes as any).data.questionTypeList : [];
+        if (!questionTypeList || questionTypeList.length === 0) {
+            navigate('/question/questionHome');
+            return;
+        }
+        const matchedType = questionTypeList.find((item: any) => {
+            return item.name === selectedSubCategory.name || item.value === selectedSubCategory.id;
+        });
+        if (!matchedType) {
+            message.warning('当前分类暂不支持考试模式，已为你跳转到刷题首页');
+            navigate('/question/questionHome');
+            return;
+        }
+        const num = selectedSubCategory.count && selectedSubCategory.count > 0
+            ? Math.min(selectedSubCategory.count, 15)
+            : 15;
+        const payload = {
+            userId,
+            types: [matchedType.value],
+            num,
+            difficulty: 'easy',
+        };
+        getExamListMutation.mutate(payload, {
+            onSuccess: (res: any) => {
+                if (res.status) {
+                    navigate('/question/examPage', {
+                        state: {
+                            questionList: res.data,
+                            firstQuestion: res.data[0],
+                            questionTypeList,
+                            difficulty: payload.difficulty,
+                            num: payload.num,
+                        },
+                    });
+                } else {
+                    message.error(res.msg || '获取试题失败，请稍后重试');
+                }
+            },
+            onError: () => {
+                message.error('获取试题失败，请稍后重试');
+            },
+        });
     };
 
     return (
@@ -24,18 +78,28 @@ const QuestionList = () => {
                         {selectedSubCategory?.name || '未知分类'} 题目列表
                     </h2>
                     <p className="text-sm text-gray-500">
-                        共 {selectedSubCategory?.count || 0} 道题目
+                        共 {selectedSubCategory?.count || 0} 道题目，当前为练习模式，支持进入考试模式。
                     </p>
                 </div>
-                <div className="w-full md:w-64">
-                    <Input 
-                        prefix={<Search size={16} className="text-gray-400" />}
-                        placeholder="搜索题目..." 
-                        allowClear
-                        value={searchText}
-                        onChange={(e) => setSearchText(e.target.value)}
+                <div className="w-full md:w-auto flex flex-col md:flex-row gap-3 md:items-center">
+                    <Button 
+                        type="primary" 
+                        loading={getExamListMutation.isPending}
+                        onClick={handleGoToExam}
                         className="rounded-full"
-                    />
+                    >
+                        模拟考试
+                    </Button>
+                    <div className="w-full md:w-64">
+                        <Input 
+                            prefix={<Search size={16} className="text-gray-400" />}
+                            placeholder="搜索题目..." 
+                            allowClear
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            className="rounded-full"
+                        />
+                    </div>
                 </div>
             </div>
 

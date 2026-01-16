@@ -206,7 +206,7 @@ const DocumentPage = () => {
         />
       </div>
 
-      <div className="flex flex-1 max-w-[1920px] mx-auto w-full">
+      <div className="flex flex-1  mx-auto w-full">
         {/* Sidebar - Desktop */}
         <aside className="hidden lg:flex flex-col w-72 h-[calc(100vh-64px)] sticky top-[64px] border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-y-auto">
           <div className="p-4 sticky top-0 bg-white dark:bg-gray-900 z-10">

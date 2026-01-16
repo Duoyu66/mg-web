@@ -40,28 +40,29 @@ const Header = () => {
         { id: "3", title: "题库", path: "/front/questionBank" },
         { id: "5", title: "快捷导航", path: "/front/nav" },
         { id: "6", title: "测试", path: "/front/test" },
-        // { 
-        //     id: "more", 
-        //     title: "更多", 
-        //     path: "",
-        //     children: [
-        //         { id: "7", title: "面试公司", path: "/front/company" },
-        //         { id: "8", title: "简历制作模板", path: "/front/resume" },
-        //         { id: "9", title: "学习排行榜", path: "/front/rank" },
-        //         { id: "10", title: "学习路线", path: "/front/route" },
-        //         { id: "11", title: "文档管理", path: "/front/document" },
-        //         { id: "12", title: "个人中心", path: "/front/center" },
-        //         { id: "14", title: "笔记", path: "/front/note" },
-        //         { id: "15", title: "代办", path: "/front/todo" },
-        //         { id: "16", title: "留言板", path: "/front/board" },
-        //         { id: "17", title: "会员价格", path: "/front/price" },
-        //         { id: "17", title: "充值", path: "/front/recharge" },
-        //         { id: "18", title: "真实简历", path: "/front/realResume" },
-        //         { id: "19", title: "名企面经", path: "/front/companyInterview" },
-        //     ]
-        // },
+        { 
+            id: "more", 
+            title: "功能大全", 
+            path: "",
+            children: [
+                { id: "7", title: "面试公司", path: "/front/company" },
+                { id: "8", title: "简历制作模板", path: "/front/resume" },
+                { id: "9", title: "学习排行榜", path: "/front/rank" },
+                { id: "10", title: "学习路线", path: "/front/route" },
+                { id: "11", title: "文档管理", path: "/front/document" },
+                { id: "12", title: "个人中心", path: "/front/center" },
+                { id: "14", title: "笔记", path: "/front/note" },
+                { id: "15", title: "代办", path: "/front/todo" },
+                { id: "16", title: "留言板", path: "/front/board" },
+                { id: "17", title: "会员价格", path: "/front/price" },
+                { id: "1111", title: "充值", path: "/front/recharge" },
+                { id: "18", title: "真实简历", path: "/front/realResume" },
+                { id: "19", title: "名企面经", path: "/front/companyInterview" },
+                { id: "20", title: "刷题", path: "/question/nav" },
+                { id: "21", title: "LeetCode", path: "/codeEdit" },
+            ]
+        },
         { id: "13", title: "管理后台", path: "/front/admin" },
-        { id: "14", title: "功能大全", path: "/front/feature" },
         
     
     ];
@@ -131,7 +132,7 @@ const Header = () => {
                     : "h-[64px] bg-white dark:bg-gray-900 border-transparent"
             }`}
         >
-            <div className="max-w-[1920px] mx-auto px-6 h-full flex items-center justify-between">
+            <div className=" mx-auto px-6 h-full flex items-center justify-between">
                 {/* Logo Section */}
                 <div 
                     className="flex items-center gap-3 cursor-pointer group" 
@@ -249,20 +250,7 @@ const Header = () => {
 
                     {/* Action Buttons */}
                     <div className="flex items-center gap-2 ml-2">
-                        <Button 
-                            className="flex items-center gap-1 rounded-full border-primary-500 text-primary-500 hover:text-primary-600 hover:border-primary-600"
-                            icon={<Terminal size={16} />}
-                            onClick={() => navigate("/question/nav")}
-                        >
-                            刷题
-                        </Button>
-                        <Button 
-                            className="flex items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-none hover:bg-gray-200 dark:hover:bg-gray-700"
-                            icon={<Code2 size={16} />}
-                            onClick={() => navigate('/codeEdit')}
-                        >
-                            LeetCode
-                        </Button>
+
                         {/* Login Button (Shown when not logged in - Logic can be added) */}
                         {/* <Button 
                             type="primary" 

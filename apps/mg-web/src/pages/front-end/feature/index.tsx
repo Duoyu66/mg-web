@@ -24,7 +24,7 @@ const FeaturePage: React.FC = () => {
     { id: '15', title: '代办', path: '/front/todo' },
     { id: '16', title: '留言板', path: '/front/board' },
     { id: '17', title: '会员价格', path: '/front/price' },
-    { id: '17-2', title: '充值', path: '/front/recharge' },
+    { id: '1111', title: '充值', path: '/front/recharge' },
     { id: '18', title: '真实简历', path: '/front/realResume' },
     { id: '19', title: '名企面经', path: '/front/companyInterview' },
     { id: '20', title: '教程', path: '/front/tutorial' },
