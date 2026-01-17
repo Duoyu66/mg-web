@@ -69,36 +69,48 @@ const Header = () => {
     }, [location.pathname]);
 
     const menuData: MenuItemType[] = [
-        { id: "1", title: "首页", path: "/front/home" },
-        { id: "2", title: "算法", path: "/front/algorithm" },
-        { id: "3", title: "题库", path: "/front/questionBank" },
+        { id: "1", title: "社区", path: "/front/home" },
+        { 
+            id: "learning", 
+            title: "学习", 
+            path: "/front/learning",
+            children: [
+                { id: "2", title: "算法", path: "/front/algorithm" },
+                { id: "3", title: "题库", path: "/front/questionBank" },
+                { id: "10", title: "学习路线", path: "/front/route" },
+                { id: "11", title: "文档管理", path: "/front/document" },
+                { id: "14", title: "笔记", path: "/front/note" },
+                { id: "15", title: "代办", path: "/front/todo" },
+                { id: "20", title: "刷题", path: "/question/nav" },
+                             { id: "9", title: "学习排行榜", path: "/front/rank" },
+            ]
+        },
+        { 
+            id: "career", 
+            title: "求职", 
+            path: "/front/career",
+            children: [
+                { id: "18", title: "真实简历", path: "/front/realResume" },
+                { id: "19", title: "名企面经", path: "/front/companyInterview" },
+                { id: "7", title: "面试公司", path: "/front/company" },
+                { id: "8", title: "简历制作模板", path: "/front/resume" },
+            ]
+        },
         { id: "5", title: "快捷导航", path: "/front/nav" },
         { id: "6", title: "网站地图", path: "/sitemap" },
         { 
             id: "more", 
-            title: "功能大全", 
+            title: "更多", 
             path: "",
             children: [
-                { id: "7", title: "面试公司", path: "/front/company" },
-                { id: "8", title: "简历制作模板", path: "/front/resume" },
-                { id: "9", title: "学习排行榜", path: "/front/rank" },
-                { id: "10", title: "学习路线", path: "/front/route" },
-                { id: "11", title: "文档管理", path: "/front/document" },
+   
                 { id: "12", title: "个人中心", path: "/front/center" },
-                { id: "14", title: "笔记", path: "/front/note" },
-                { id: "15", title: "代办", path: "/front/todo" },
                 { id: "16", title: "留言板", path: "/front/board" },
                 { id: "17", title: "会员价格", path: "/front/price" },
                 { id: "1111", title: "充值", path: "/front/recharge" },
-                { id: "18", title: "真实简历", path: "/front/realResume" },
-                { id: "19", title: "名企面经", path: "/front/companyInterview" },
-                { id: "20", title: "刷题", path: "/question/nav" },
                 { id: "21", title: "LeetCode", path: "/codeEdit" },
             ]
         },
-        { id: "13", title: "管理后台", path: "/front/admin" },
-        
-    
     ];
 
     const goIndex = () => navigate("/");
@@ -162,6 +174,12 @@ const Header = () => {
                     <span className="font-mono font-bold">{displayUser.coins}</span>
                 </div>
             ),
+        },
+        {
+            key: 'center',
+            icon: <UserCircle2 size={16} className="text-purple-500" />,
+            label: '个人中心',
+            onClick: () => navigate('/front/center')
         },
         { type: 'divider' },
         {
@@ -274,6 +292,8 @@ const Header = () => {
                             onPressEnter={(e) => console.log("Search:", e.currentTarget.value)}
                         />
                     </div>
+                    
+                  
 
                     {/* Quick Actions */}
                     <div className="flex items-center gap-1 border-l border-gray-200 dark:border-gray-700 pl-3 ml-2">
@@ -309,7 +329,14 @@ const Header = () => {
                             </Badge>
                         </Tooltip>
                     </div>
-
+  {/* Console Button */}
+                    <Button 
+                        type="text" 
+                        onClick={() => navigate("/front/admin")}
+                        className="hidden md:flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full px-3"
+                    >
+                        控制台
+                    </Button>       
                     {/* Action Buttons */}
                     <div className="flex items-center gap-2 ml-2">
                         {!isLoggedIn && (

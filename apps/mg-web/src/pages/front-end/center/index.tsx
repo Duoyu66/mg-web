@@ -204,11 +204,11 @@ const ProfileHeader = () => {
           <div
             className={`
               relative rounded-2xl p-[3px]
-              ${selectedFrame === 'neon' ? 'bg-gradient-to-tr from-cyan-400 via-blue-500 to-purple-500 shadow-[0_0_20px_rgba(59,130,246,0.6)] animate-pulse' : ''}
+              ${selectedFrame === 'neon' ? 'bg-gradient-to-tr from-cyan-400 via-blue-500 to-purple-500 shadow-[0_0_20px_rgba(59,130,246,0.6)] ' : ''}
               ${selectedFrame === 'gold' ? 'bg-gradient-to-tr from-yellow-300 via-amber-400 to-orange-500 shadow-[0_0_18px_rgba(251,191,36,0.7)]' : ''}
               ${selectedFrame === 'gradient' ? 'bg-gradient-to-tr from-pink-400 via-purple-500 to-indigo-500 shadow-[0_0_18px_rgba(244,114,182,0.5)]' : ''}
-              ${selectedFrame === 'pulse' ? 'bg-gradient-to-tr from-emerald-400 via-teal-400 to-sky-400 shadow-[0_0_18px_rgba(34,197,94,0.6)] animate-pulse' : ''}
-              ${selectedFrame === 'cyber' ? 'bg-[conic-gradient(at_top,_#22c55e,_#0ea5e9,_#6366f1,_#22c55e)] animate-spin' : ''}
+              ${selectedFrame === 'pulse' ? 'bg-gradient-to-tr from-emerald-400 via-teal-400 to-sky-400 shadow-[0_0_18px_rgba(34,197,94,0.6)] ' : ''}
+              ${selectedFrame === 'cyber' ? 'bg-[conic-gradient(at_top,_#22c55e,_#0ea5e9,_#6366f1,_#22c55e)] ' : ''}
               ${selectedFrame === 'ocean' ? 'bg-gradient-to-tr from-sky-500 via-indigo-500 to-slate-900 shadow-[0_0_18px_rgba(59,130,246,0.7)]' : ''}
             `}
           >

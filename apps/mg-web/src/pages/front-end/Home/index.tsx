@@ -293,7 +293,7 @@ const Home = () => {
             </div>
 
             {/* 帖子列表 */}
-            <div className="space-y-4">
+            <div className="">
               {records.map((item, index) => {
                 const frameIndex = index % 4;
                 const frameClass =' dark:border-gray-700'
@@ -308,7 +308,7 @@ const Home = () => {
                 return (
                 <div
                   key={item.id}
-                  className="bg-white dark:bg-gray-800 rounded-lg p-5 transition-shadow cursor-pointer"
+                  className="bg-white dark:bg-gray-800  p-5 transition-shadow cursor-pointer"
                   onClick={() =>
                     navigate(`/front/articleDetail/${item.id}`, {
                       state: { article: item },

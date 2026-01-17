@@ -28,9 +28,8 @@ const Footer = () => {
 
     return (
         <footer className="w-full bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 transition-colors duration-300">
-            <div className=" mx-auto px-6 pt-16 pb-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
-                    {/* Brand Section */}
+            <div className=" mx-auto px-6  py-6">
+                {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
                     <div className="lg:col-span-2">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="w-10 h-10 flex items-center justify-center bg-gradient-to-br from-amber-300 to-orange-500 rounded-xl shadow-lg">
@@ -52,7 +51,6 @@ const Footer = () => {
                         </div>
                     </div>
 
-                    {/* Links Sections */}
                     <div>
                         <h4 className="font-bold text-gray-900 dark:text-white mb-6">产品服务</h4>
                         <ul className="space-y-4">
@@ -102,11 +100,11 @@ const Footer = () => {
                             </li>
                         </ul>
                     </div>
-                </div>
+                </div> */}
 
-                <Divider className="dark:border-gray-800" />
+                {/* <Divider className="dark:border-gray-800" /> */}
 
-                <div className="flex flex-col md:flex-row justify-between items-center pt-8 text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex flex-col md:flex-row justify-between items-center  text-sm text-gray-500 dark:text-gray-400">
                     <div className="mb-4 md:mb-0">
                         © {currentYear} MG Code. All rights reserved.
                     </div>

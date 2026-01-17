@@ -41,6 +41,8 @@ import CompanyInterviewPage from "@/pages/front-end/companyInterview";
 import CompanyInterviewDetail from "@/pages/front-end/companyInterview/detail";
 import FeaturePage from "@/pages/front-end/feature";
 import TutorialPage from "@/pages/front-end/tutorial";
+import LearningHub from "@/pages/front-end/learning";
+import CareerHub from "@/pages/front-end/career";
 import RoadmapDocPage from "@/pages/roadmapDoc";
 import ExercisePage from "@/pages/front-end/exercise";
 import AdminLayout from '@/pages/admin/layout';
@@ -179,6 +181,22 @@ const routes = [
                 meta: {
                     age: 1,
                     name: "张三"
+                }
+            },
+            {
+                title: '学习中心',
+                path: "learning",
+                component: LearningHub,
+                meta: {
+                    name: "学习中心"
+                }
+            },
+            {
+                title: '求职中心',
+                path: "career",
+                component: CareerHub,
+                meta: {
+                    name: "求职中心"
                 }
             },
             {
