@@ -228,20 +228,36 @@ const Home = () => {
   }, [records]);
 
 
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 py-4 pt-0">
         <div className="flex gap-6">
           {/* 主内容区 */}
-          <div className="flex-1 border bg-white min-w-0 ">
+          <div className="flex-1  bg-white min-w-0 ">
             <div
-              className="flex sticky z-40 bg-white dark:bg-gray-900 items-center justify-between mb-4"
+              className="sticky z-40 bg-gray-50 dark:bg-gray-900 pt-3"
               style={{ 
                 top: "var(--app-header-height, 64px)",
                 transition: "top 300ms"
               }}
             >
-              <div className="inline-flex items-center bg-gray-100 dark:bg-gray-800 rounded-full p-1">
+              <div 
+                className={`flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-800 rounded-tl-xl rounded-tr-xl transition-shadow duration-300 ${
+                  scrolled ? "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.05)]" : ""
+                }`}
+              >
+                <div className="inline-flex items-center bg-gray-100 dark:bg-gray-700 rounded-full p-1">
                 <button
                   type="button"
                   onClick={() => setActiveTab("recommend")}
@@ -273,6 +289,7 @@ const Home = () => {
                 <RefreshCcw className="w-4 h-4" />
                 <span>刷新</span>
               </button>
+              </div>
             </div>
 
             {/* 帖子列表 */}
@@ -689,7 +706,9 @@ const Home = () => {
             </div>
           </div>
 
-          <Aside isLoading={isLoading} records={records} />
+ <div className="pt-4">
+           <Aside  isLoading={isLoading} records={records} />
+ </div>
 
 
         </div>

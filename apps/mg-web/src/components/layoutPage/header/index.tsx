@@ -188,10 +188,10 @@ const Header = () => {
                 transitionProperty: 'height, background-color, border-color, box-shadow',
                 transitionDuration: '300ms',
             }}
-            className={`fixed top-0 left-0 right-0 z-50 border-b ${
+            className={`fixed top-0 left-0 right-0 z-50 border-b bg-white  ${
                 scrolled 
-                    ? "bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-gray-200/50 dark:border-gray-700/50 shadow-sm" 
-                    : "bg-white dark:bg-gray-900 border-transparent"
+                    ? "dark:bg-gray-900/80 backdrop-blur-md border-gray-200/50 dark:border-gray-700/50 shadow-sm" 
+                    : " dark:bg-gray-900 border-transparent"
             }`}
         >
             <div className=" mx-auto px-6 h-full flex items-center justify-between">
