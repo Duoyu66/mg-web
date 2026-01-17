@@ -32,38 +32,54 @@ const LayoutPage = () => {
     return () => cancelAnimationFrame(timer);
   }, [location.pathname]);
 
-  // 在需要 Affix 的页面（如 /front/nav）禁用路由过渡动画的 transform，避免影响 Affix 的定位
-  const isNavPage = location.pathname.startsWith("/front/nav");
-  const contentClassName = isNavPage
+  // 在需要 Sticky/Affix 的页面（如 /front/nav, /front/home）禁用路由过渡动画的 transform，避免影响定位
+  const isTransformSensitivePage =
+    location.pathname.startsWith("/front/nav") ||
+    location.pathname === "/front/home";
+    
+  const contentClassName = isTransformSensitivePage
     ? ""
     : isAnimating
-    ? "animate-route-enter"
-    : "opacity-0 scale-[0.98]";
-  const contentStyle = isNavPage
+      ? "animate-route-enter"
+      : "opacity-0 scale-[0.98]";
+  const contentStyle = isTransformSensitivePage
     ? undefined
     : ({
-        willChange: "opacity, transform",
-        transformOrigin: "top center",
-      } as const);
+      willChange: "opacity, transform",
+      transformOrigin: "top center",
+    } as const);
 
   return (
-    <div className="w-full min-h-[100vh] dark:bg-gray-900 transition-colors duration-300 flex flex-col justify-start items-center overflow-x-hidden">
+    <div className="w-full min-h-[100vh] dark:bg-gray-900 transition-colors duration-300 flex flex-col justify-start items-center">
       <Header />
       <div
-        className={`border w-[100%] max-w-[1200px] min-h-[calc(100vh - 150px)] relative mt-[70px]`}
-        ref={containerRef}
+        className="w-full flex flex-col items-center"
+        style={{ 
+          paddingTop: "var(--app-header-height, 64px)",
+          transition: "padding-top 300ms"
+        }}
       >
-        <div
-          key={location.pathname}
-          className={contentClassName}
-          style={contentStyle}
-        >
-          <Outlet />
+        <div className="w-full max-w-[1200px] flex-1 px-4">
+          {/* 这里是 sticky 元素的参考容器 */}
+          <div className="relative">
+            <div
+              className={`min-h-[calc(100vh-150px)]`}
+              ref={containerRef}
+            >
+              <div
+                key={location.pathname}
+                className={contentClassName}
+                style={contentStyle}
+              >
+                <Outlet />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       {/* 友情链接 */}
       <div className="fixed top-1/2 left-0 -translate-y-1/2 px-6   bg-white dark:bg-gray-800 p-2 rounded-r-2xl flex items-center justify-center">
-        <FriendshipLinks />
+        {/* <FriendshipLinks /> */}
       </div>
       {/* footer */}
       {(() => {

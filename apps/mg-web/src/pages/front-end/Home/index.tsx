@@ -32,6 +32,8 @@ type MentionOption = {
   realValue?: string;
 };
 
+import Aside from "./aside";
+
 const Home = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -231,8 +233,14 @@ const Home = () => {
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex gap-6">
           {/* 主内容区 */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between mb-4">
+          <div className="flex-1 border bg-white min-w-0 ">
+            <div
+              className="flex sticky z-40 bg-white dark:bg-gray-900 items-center justify-between mb-4"
+              style={{ 
+                top: "var(--app-header-height, 64px)",
+                transition: "top 300ms"
+              }}
+            >
               <div className="inline-flex items-center bg-gray-100 dark:bg-gray-800 rounded-full p-1">
                 <button
                   type="button"
@@ -283,7 +291,7 @@ const Home = () => {
                 return (
                 <div
                   key={item.id}
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow cursor-pointer"
+                  className="bg-white dark:bg-gray-800 rounded-lg p-5 transition-shadow cursor-pointer"
                   onClick={() =>
                     navigate(`/front/articleDetail/${item.id}`, {
                       state: { article: item },
@@ -487,7 +495,7 @@ const Home = () => {
 
                   {/* 操作栏 */}
                   <div
-                    className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700"
+                    className="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-700"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-center gap-6">
@@ -681,119 +689,9 @@ const Home = () => {
             </div>
           </div>
 
-          {/* 侧边栏 */}
-          <div className="w-80 flex-shrink-0 space-y-4">
-            {/* 热门话题 */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                热门话题
-              </h3>
-              <div className="space-y-2">
-                {[
-                  "学习打卡",
-                  "训练营打卡",
-                  "Java后端",
-                  "算法刷题",
-                  "求职面试",
-                ].map((topic, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
-                  >
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                      #{topic}
-                    </span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {Math.floor(Math.random() * 1000)}+
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+          <Aside isLoading={isLoading} records={records} />
 
-            {/* 推荐用户 */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                推荐关注
-              </h3>
-              <div className="space-y-3">
-                {records.slice(0, 3).map((item, index) => {
-                  const frameIndex = index % 4;
-                  const frameClass =
-                    frameIndex === 0
-                      ? 'bg-gradient-to-tr from-cyan-400 via-blue-500 to-purple-500 shadow-[0_0_12px_rgba(59,130,246,0.6)] animate-pulse'
-                      : frameIndex === 1
-                      ? 'bg-gradient-to-tr from-yellow-300 via-amber-400 to-orange-500 shadow-[0_0_10px_rgba(251,191,36,0.7)]'
-                      : frameIndex === 2
-                      ? 'bg-gradient-to-tr from-pink-400 via-purple-500 to-indigo-500 shadow-[0_0_10px_rgba(244,114,182,0.5)]'
-                      : 'bg-[conic-gradient(at_top,_#22c55e,_#0ea5e9,_#6366f1,_#22c55e)] animate-spin';
 
-                  return (
-                    <div key={item.userId} className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-full p-[2px] ${frameClass}`}>
-                        <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center">
-                          <img
-                            className="w-8 h-8 rounded-full object-cover"
-                            src={item.avatar}
-                            alt={item.nickname}
-                          />
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">
-                          {item.nickname}
-                        </div>
-                        {item.signature && (
-                          <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                            {item.signature}
-                          </div>
-                        )}
-                             {item.ipAddress && (
-                          <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                            {item.ipAddress}
-                          </div>
-                        )}
-                      </div>
-                      <Button
-                        size="small"
-                        type="primary"
-                        className="!rounded-full"
-                      >
-                        关注
-                      </Button>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 统计信息 */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                社区数据
-              </h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                  <span>今日发帖</span>
-                  <span className="font-semibold text-gray-900 dark:text-gray-100">
-                    1,234
-                  </span>
-                </div>
-                <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                  <span>在线用户</span>
-                  <span className="font-semibold text-gray-900 dark:text-gray-100">
-                    5,678
-                  </span>
-                </div>
-                <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                  <span>总用户数</span>
-                  <span className="font-semibold text-gray-900 dark:text-gray-100">
-                    12,345
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 

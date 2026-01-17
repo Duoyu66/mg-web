@@ -17,7 +17,7 @@ import {
   Wallet,
   Coins,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 const Header = () => {
     const location = useLocation();
@@ -26,13 +26,27 @@ const Header = () => {
     const [scrolled, setScrolled] = useState(false);
     const [currentUser, setCurrentUser] = useState<any | null>(null);
     const [token, setToken] = useState<string | null>(null);
+    const headerRef = useRef<HTMLElement | null>(null);
 
     useEffect(() => {
         const handleScroll = () => {
-            setScrolled(window.scrollY > 10);
+            const isScrolled = window.scrollY > 10;
+            setScrolled(isScrolled);
+            
+            // 切换 body class，触发 CSS 变量变化
+            if (isScrolled) {
+                document.body.classList.add('is-scrolled');
+            } else {
+                document.body.classList.remove('is-scrolled');
+            }
         };
         window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
+        // 初始化一次
+        handleScroll();
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+            document.body.classList.remove('is-scrolled');
+        };
     }, []);
 
     useEffect(() => {
@@ -167,11 +181,17 @@ const Header = () => {
     ];
 
     return (
-        <header 
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${
+        <header
+            ref={headerRef}
+            style={{
+                height: 'var(--app-header-height)',
+                transitionProperty: 'height, background-color, border-color, box-shadow',
+                transitionDuration: '300ms',
+            }}
+            className={`fixed top-0 left-0 right-0 z-50 border-b ${
                 scrolled 
-                    ? "h-[60px] bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-gray-200/50 dark:border-gray-700/50 shadow-sm" 
-                    : "h-[64px] bg-white dark:bg-gray-900 border-transparent"
+                    ? "bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-gray-200/50 dark:border-gray-700/50 shadow-sm" 
+                    : "bg-white dark:bg-gray-900 border-transparent"
             }`}
         >
             <div className=" mx-auto px-6 h-full flex items-center justify-between">

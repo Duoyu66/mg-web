@@ -95,6 +95,13 @@
 
 /* 将字体设置移到 @layer base 中，这样 Tailwind 的实用类可以覆盖它 */
 @layer base {
+    :root {
+        --app-header-height: 64px;
+    }
+    body.is-scrolled {
+        --app-header-height: 60px;
+    }
+
     * {
         font-family: 'newFont', sans-serif;
     }
