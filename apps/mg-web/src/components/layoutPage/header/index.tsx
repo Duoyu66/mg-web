@@ -69,7 +69,7 @@ const Header = () => {
     }, [location.pathname]);
 
     const menuData: MenuItemType[] = [
-        { id: "1", title: "社区", path: "/front/home" },
+        { id: "1", title: "首页", path: "/front/home" },
         { 
             id: "learning", 
             title: "学习", 
