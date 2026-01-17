@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Card, Button, Radio, Space, Tag, message, Typography, Empty, Segmented, Progress } from 'antd';
+import { Button, Tag, message, Typography, Empty, Segmented, Progress } from 'antd';
 import { LeftOutlined, RightOutlined, UnorderedListOutlined, FileTextOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import Prism from 'prismjs';
 import 'prismjs/themes/prism-okaidia.css';
@@ -20,13 +20,36 @@ const RoadmapExamPage = () => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [viewMode, setViewMode] = useState<'single' | 'list'>('single');
+  const [viewMode, setViewMode] = useState<'single' | 'list'>('list');
+  const pageSize = 50;
+  
+  const fullQuestionList = React.useMemo(() => {
+    if (!questionList || questionList.length === 0) return [];
+    const targetCount = 150;
+    const result: any[] = [];
+    for (let i = 0; i < targetCount; i++) {
+      const base = questionList[i % questionList.length];
+      result.push({
+        ...base,
+        id: `${base.id ?? i}-${i}`,
+      });
+    }
+    return result;
+  }, [questionList]);
+  
+  const [cardPage, setCardPage] = useState(1);
+  const totalCount = fullQuestionList.length;
+  const totalCardPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const currentCardPage = Math.min(cardPage, totalCardPages);
+  const cardStartIndex = (currentCardPage - 1) * pageSize;
+  const cardEndIndex = cardStartIndex + pageSize;
+  const cardQuestions = fullQuestionList.slice(cardStartIndex, cardEndIndex);
   
   useEffect(() => {
     Prism.highlightAll();
-  }, [currentIndex, viewMode, questionList]);
+  }, [currentIndex, viewMode, fullQuestionList]);
 
-  if (!questionList || questionList.length === 0) {
+  if (!fullQuestionList || fullQuestionList.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <Empty description="暂无题目数据" >
@@ -40,16 +63,28 @@ const RoadmapExamPage = () => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
   };
 
-  const currentQuestion = questionList[currentIndex];
+  const currentQuestion = fullQuestionList[currentIndex];
   const answeredCount = Object.keys(answers).length;
-  const totalCount = questionList.length;
   const progress = Math.round((answeredCount / totalCount) * 100);
 
-  const QuestionCard = ({ question, index, showNumber = true }: { question: any, index: number, showNumber?: boolean }) => {
+  const QuestionCard = ({
+    question,
+    index,
+    showNumber = true,
+    showDivider = true,
+  }: {
+    question: any;
+    index: number;
+    showNumber?: boolean;
+    showDivider?: boolean;
+  }) => {
     return (
-      <Card
-        className="mb-4 shadow-sm border border-gray-200/80 dark:border-gray-800 bg-white dark:bg-gray-900 rounded-2xl overflow-hidden"
-        title={
+      <div
+        className={`bg-white dark:bg-gray-900 ${
+          showDivider ? 'border-b border-gray-200/80 dark:border-gray-800' : ''
+        }`}
+      >
+        <div className="p-4 sm:p-5 space-y-4">
           <div className="flex flex-col gap-2 whitespace-normal">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
@@ -81,33 +116,40 @@ const RoadmapExamPage = () => {
               </div>
             </div>
           </div>
-        }
-      >
-        <div className="space-y-4 pt-1">
-          <Radio.Group 
-            className="w-full" 
-            value={answers[question.id]} 
-            onChange={(e) => handleAnswer(question.id, e.target.value)}
-          >
-            <Space direction="vertical" className="w-full">
-              {question.items?.map((item: any) => (
-                <Radio 
-                    key={item.optionName} 
-                    value={item.optionName}
-                    className="w-full px-3 py-2 sm:py-3 border border-gray-200/80 dark:border-gray-800 rounded-xl hover:bg-blue-50/40 dark:hover:bg-blue-900/10 transition-colors flex items-start gap-2"
+          <div className="space-y-3 pt-1">
+            {question.items?.map((item: any) => {
+              const selected = answers[question.id] === item.optionName;
+
+              return (
+                <div
+                  key={item.optionName}
+                  className={`w-full px-3 py-2 sm:py-3 rounded-xl flex items-start gap-2 cursor-pointer transition-colors border ${
+                    selected
+                      ? 'border-blue-500 bg-blue-50/60 text-blue-700 dark:border-blue-400 dark:bg-blue-900/20'
+                      : 'border-gray-200/80 dark:border-gray-800 hover:bg-blue-50/40 dark:hover:bg-blue-900/10'
+                  }`}
+                  onClick={() => handleAnswer(question.id, item.optionName)}
                 >
-                  <span className="font-semibold mr-1 mt-0.5 text-gray-700 dark:text-gray-200">
+                  <span
+                    className={`font-semibold mr-1 mt-0.5 ${
+                      selected ? 'text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-200'
+                    }`}
+                  >
                     {item.optionName}.
                   </span>
-                  <span className="text-gray-700 dark:text-gray-200 leading-relaxed">
+                  <span
+                    className={`leading-relaxed ${
+                      selected ? 'text-blue-700 dark:text-blue-200' : 'text-gray-700 dark:text-gray-200'
+                    }`}
+                  >
                     {item.optionValue}
                   </span>
-                </Radio>
-              ))}
-            </Space>
-          </Radio.Group>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </Card>
+      </div>
     );
   };
 
@@ -116,18 +158,13 @@ const RoadmapExamPage = () => {
       <div className=" mx-auto   ">
         <div className="sticky top-0 z-30 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 py-2 bg-gray-50/95 dark:bg-gray-950/95 backdrop-blur h-14">
           <div className="flex items-center gap-3">
-            <Button
-              type="text"
-              icon={<LeftOutlined />}
-              onClick={() => navigate(-1)}
-              className="px-0 text-gray-600 dark:text-gray-200"
-            >
-              返回
-            </Button>
-            <div className="flex flex-col">
-              <Title level={4} className="m-0 !text-gray-900 dark:!text-gray-100">
-                {title}
-              </Title>
+  
+     <div onClick={() => navigate(-1)} className='cursor-pointer'>
+               <span className="iconfont text-base leading-none">&#xe66c;</span>
+              <span>返回</span>
+     </div>
+            <div className="flex justify-center items-center">
+              {title}
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -136,8 +173,9 @@ const RoadmapExamPage = () => {
               value={viewMode}
               onChange={(val) => setViewMode(val as 'single' | 'list')}
               options={[
-                { label: '单题', value: 'single', icon: <FileTextOutlined /> },
                 { label: '列表', value: 'list', icon: <UnorderedListOutlined /> },
+
+                { label: '单题', value: 'single', icon: <FileTextOutlined /> },
               ]}
             />
           </div>
@@ -170,35 +208,67 @@ const RoadmapExamPage = () => {
                 未答
               </div>
             </div>
-            <div className="grid grid-cols-5 gap-2">
-              {questionList.map((q: any, idx: number) => {
+            <ul className="grid grid-cols-5 gap-2 place-items-center">
+              {cardQuestions.map((q: any, idx: number) => {
+                const realIndex = cardStartIndex + idx;
                 const isAnswered = !!answers[q.id];
-                const isCurrent = currentIndex === idx;
+                const isCurrent = currentIndex === realIndex;
+
+                const baseClasses =
+                  'h-[30px] w-[30px] border border-gray-300 flex items-center justify-center text-xs rounded-full cursor-pointer transition-colors select-none';
+
+                const stateClasses = isCurrent
+                  ? 'bg-blue-600 text-white'
+                  : isAnswered
+                  ? 'border border-green-500 text-green-600 bg-green-50'
+                  : 'border text-gray-500 hover:border-gray-300 hover:bg-gray-50';
 
                 return (
-                  <Button
+                  <li
                     key={q.id}
-                    type={isCurrent ? 'primary' : isAnswered ? 'default' : 'text'}
-                    size="small"
-                    className={`!rounded-full ${
-                      isAnswered && !isCurrent ? 'border border-green-500 text-green-600 bg-green-50' : ''
-                    } ${
-                      !isAnswered && !isCurrent
-                        ? 'text-gray-500 hover:border-gray-300'
-                        : ''
-                    }`}
+                    className={`${baseClasses} ${stateClasses}`}
                     onClick={() => {
-                      setCurrentIndex(idx);
+                      setCurrentIndex(realIndex);
                       if (viewMode === 'list') {
-                        document.getElementById(`q-${idx}`)?.scrollIntoView({ behavior: 'smooth' });
+                        document
+                          .getElementById(`q-${realIndex}`)
+                          ?.scrollIntoView({ behavior: 'smooth' });
                       }
                     }}
                   >
-                    {idx + 1}
-                  </Button>
+                    {realIndex + 1}
+                  </li>
                 );
               })}
-            </div>
+            </ul>
+
+            {totalCardPages > 1 && (
+              <div className="mt-3 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                <span>
+                  第 {currentCardPage} / {totalCardPages} 页
+                </span>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="small"
+                    type="text"
+                    disabled={currentCardPage === 1}
+                    onClick={() => setCardPage((prev) => Math.max(1, prev - 1))}
+                  >
+                    上一页
+                  </Button>
+                  <Button
+                    size="small"
+                    type="text"
+                    disabled={currentCardPage === totalCardPages}
+                    onClick={() =>
+                      setCardPage((prev) => Math.min(totalCardPages, prev + 1))
+                    }
+                  >
+                    下一页
+                  </Button>
+                </div>
+              </div>
+            )}
 
             <div className="mt-5">
               <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
@@ -229,13 +299,19 @@ const RoadmapExamPage = () => {
           <div className="space-y-6">
             {viewMode === 'single' ? (
               <div className="space-y-6">
-                <QuestionCard question={currentQuestion} index={currentIndex} />
+                <QuestionCard question={currentQuestion} index={currentIndex} showDivider={false} />
                 <div className="flex justify-between">
                   <Button
                     size="large"
                     icon={<LeftOutlined />}
                     disabled={currentIndex === 0}
-                    onClick={() => setCurrentIndex((prev) => prev - 1)}
+                    onClick={() =>
+                      setCurrentIndex(prev => {
+                        const next = Math.max(0, prev - 1);
+                        setCardPage(Math.floor(next / pageSize) + 1);
+                        return next;
+                      })
+                    }
                   >
                     上一题
                   </Button>
@@ -243,8 +319,14 @@ const RoadmapExamPage = () => {
                     size="large"
                     type="primary"
                     icon={<RightOutlined />}
-                    disabled={currentIndex === questionList.length - 1}
-                    onClick={() => setCurrentIndex((prev) => prev + 1)}
+                    disabled={currentIndex === fullQuestionList.length - 1}
+                    onClick={() =>
+                      setCurrentIndex(prev => {
+                        const next = Math.min(fullQuestionList.length - 1, prev + 1);
+                        setCardPage(Math.floor(next / pageSize) + 1);
+                        return next;
+                      })
+                    }
                     iconPosition="end"
                   >
                     下一题
@@ -252,13 +334,16 @@ const RoadmapExamPage = () => {
                 </div>
               </div>
             ) : (
-              <Card className="shadow-sm border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+              <div className="shadow-sm border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900  p-4 sm:p-6">
                 <div className="space-y-5">
-                  {questionList.map((q: any, idx: number) => (
-                    <div key={q.id} id={`q-${idx}`}>
-                      <QuestionCard question={q} index={idx} />
-                    </div>
-                  ))}
+                  {fullQuestionList.map((q: any, idx: number) => {
+                    const isLast = idx === fullQuestionList.length - 1;
+                    return (
+                      <div key={q.id} id={`q-${idx}`}>
+                        <QuestionCard question={q} index={idx} showDivider={!isLast} />
+                      </div>
+                    );
+                  })}
                   <div className="flex justify-center mt-4">
                     <Button
                       type="default"
@@ -269,7 +354,7 @@ const RoadmapExamPage = () => {
                     </Button>
                   </div>
                 </div>
-              </Card>
+              </div>
             )}
           </div>
         </div>
