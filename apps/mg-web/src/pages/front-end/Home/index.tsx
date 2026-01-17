@@ -1,4 +1,5 @@
 import { useMemo, useEffect, useState, useCallback, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useQueryClient, InfiniteData } from '@tanstack/react-query';
 import {
   MessageCircle,
@@ -6,6 +7,7 @@ import {
   Eye,
   ThumbsUp,
   Bookmark,
+  RefreshCcw,
 } from "lucide-react";
 import { Button, Skeleton, Popover } from "antd";
 import { useNavigate } from "react-router-dom";
@@ -33,13 +35,30 @@ type MentionOption = {
 const Home = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const [activeTab, setActiveTab] = useState<"recommend" | "follow">("recommend");
+
+  const queryParams = useMemo(
+    () =>
+      activeTab === "recommend"
+        ? { type: "recommend" }
+        : { type: "follow" },
+    [activeTab]
+  );
+
+  const queryKey = useMemo(
+    () => ["/api/post/getAll", queryParams] as const,
+    [queryParams]
+  );
+
   const { 
     data, 
     fetchNextPage, 
     hasNextPage, 
     isFetchingNextPage, 
-    isLoading 
-  } = useGetPostList();
+    isLoading,
+    refetch,
+  } = useGetPostList(queryParams);
   
   // 跟踪哪个帖子的评论区域是展开的
   const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
@@ -79,9 +98,18 @@ const Home = () => {
     return `${date.getMonth() + 1}-${date.getDate()}`;
   };
 
+  const handleRefresh = () => {
+    refetch();
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+  };
+
   // 处理点赞
   const handleThumb = (id: string) => {
-    queryClient.setQueryData<InfiniteData<PostListResponse>>(['/api/post/getAll', undefined], (oldData) => {
+    queryClient.setQueryData<InfiniteData<PostListResponse>>(queryKey, (oldData) => {
       if (!oldData) return oldData;
       return {
         ...oldData,
@@ -104,7 +132,7 @@ const Home = () => {
 
   // 处理收藏
   const handleFavour = (id: string) => {
-     queryClient.setQueryData<InfiniteData<PostListResponse>>(['/api/post/getAll', undefined], (oldData) => {
+     queryClient.setQueryData<InfiniteData<PostListResponse>>(queryKey, (oldData) => {
       if (!oldData) return oldData;
       return {
         ...oldData,
@@ -204,34 +232,53 @@ const Home = () => {
         <div className="flex gap-6">
           {/* 主内容区 */}
           <div className="flex-1 min-w-0">
-            {/* 发布区域 */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-white font-bold">
-                  我
-                </div>
-                <Button
-                  type="primary"
-                  className="flex-1 !h-10 !rounded-full"
-                  onClick={() => console.log("发布")}
+            <div className="flex items-center justify-between mb-4">
+              <div className="inline-flex items-center bg-gray-100 dark:bg-gray-800 rounded-full p-1">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("recommend")}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                    activeTab === "recommend"
+                      ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm"
+                      : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                  }`}
                 >
-                  分享你的学习心得...
-                </Button>
+                  推荐
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("follow")}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                    activeTab === "follow"
+                      ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm"
+                      : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                  }`}
+                >
+                  关注
+                </button>
               </div>
+              <button
+                type="button"
+                onClick={handleRefresh}
+                className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+              >
+                <RefreshCcw className="w-4 h-4" />
+                <span>刷新</span>
+              </button>
             </div>
 
             {/* 帖子列表 */}
             <div className="space-y-4">
               {records.map((item, index) => {
                 const frameIndex = index % 4;
-                const frameClass =
-                  frameIndex === 0
-                    ? 'bg-gradient-to-tr from-cyan-400 via-blue-500 to-purple-500 shadow-[0_0_16px_rgba(59,130,246,0.6)] animate-pulse'
-                    : frameIndex === 1
-                    ? 'bg-gradient-to-tr from-yellow-300 via-amber-400 to-orange-500 shadow-[0_0_14px_rgba(251,191,36,0.7)]'
-                    : frameIndex === 2
-                    ? 'bg-gradient-to-tr from-pink-400 via-purple-500 to-indigo-500 shadow-[0_0_14px_rgba(244,114,182,0.5)]'
-                    : 'bg-[conic-gradient(at_top,_#22c55e,_#0ea5e9,_#6366f1,_#22c55e)]';
+                const frameClass =' dark:border-gray-700'
+                  // frameIndex === 0
+                  //   ? 'bg-gradient-to-tr from-cyan-400 via-blue-500 to-purple-500 shadow-[0_0_16px_rgba(59,130,246,0.6)] animate-pulse'
+                  //   : frameIndex === 1
+                  //   ? 'bg-gradient-to-tr from-yellow-300 via-amber-400 to-orange-500 shadow-[0_0_14px_rgba(251,191,36,0.7)]'
+                  //   : frameIndex === 2
+                  //   ? 'bg-gradient-to-tr from-pink-400 via-purple-500 to-indigo-500 shadow-[0_0_14px_rgba(244,114,182,0.5)]'
+                  //   : 'bg-[conic-gradient(at_top,_#22c55e,_#0ea5e9,_#6366f1,_#22c55e)]';
 
                 return (
                 <div
@@ -253,88 +300,80 @@ const Home = () => {
                       overlayInnerStyle={{ padding: 0 }}
                       overlayClassName="user-hover-card"
                       content={
-                        <div className="w-72 rounded-xl bg-white dark:bg-gray-900 shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
-                          <div className="h-16 bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500" />
-                          <div className="px-4 pb-4 -mt-8">
-                            <div className="flex items-center gap-3">
-                              <div className="w-14 h-14 rounded-full border-2 border-white dark:border-gray-800 overflow-hidden shadow-md bg-white dark:bg-gray-900">
-                                <img
-                                  className="w-full h-full object-cover"
-                                  src={item.avatar}
-                                  alt={item.nickname}
-                                />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <span className="font-semibold text-gray-900 dark:text-gray-100 truncate">
-                                    {item.nickname}
-                                  </span>
-                                  <span className="px-1.5 py-0.5 text-[10px] rounded-full bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-300">
-                                    LV.1
-                                  </span>
-                                </div>
-                                {item.school && (
-                                  <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 truncate">
-                                    {item.school}
-                                  </div>
-                                )}
+                        <div className="w-80 bg-white dark:bg-gray-900 shadow-xl rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+                          <div className="relative h-20 bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500">
+                            <div className="absolute left-4 bottom-[-28px] w-16 h-16 rounded-full border-[3px] border-white dark:border-gray-900 overflow-hidden bg-white dark:bg-gray-900 shadow-lg">
+                              <img
+                                className="w-full h-full object-cover"
+                                src={item.avatar}
+                                alt={item.nickname}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="pt-8 px-4 pb-3">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span className="font-semibold text-gray-900 dark:text-gray-100 truncate">
+                                  {item.nickname}
+                                </span>
+                                <span className="px-2 py-0.5 text-[10px] rounded-full bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-300">
+                                  LV.1
+                                </span>
                               </div>
                             </div>
 
-                            <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-                              <div className="py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800">
-                                <div className="text-[11px] text-gray-500 dark:text-gray-400">
-                                  浏览
-                                </div>
-                                <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                  {item.view ?? 0}
-                                </div>
+                            <div className="mt-3 grid grid-cols-3 text-center text-xs text-gray-500 dark:text-gray-400">
+                              <div className="flex flex-col gap-1">
+                                <span>粉丝</span>
+                                <span className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                                  0
+                                </span>
                               </div>
-                              <div className="py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800">
-                                <div className="text-[11px] text-gray-500 dark:text-gray-400">
-                                  点赞
-                                </div>
-                                <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                              <div className="flex flex-col gap-1 border-l border-r border-gray-100 dark:border-gray-700">
+                                <span>帖子</span>
+                                <span className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                                  0
+                                </span>
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                <span>获赞</span>
+                                <span className="text-base font-semibold text-gray-900 dark:text-gray-100">
                                   {item.likeCount ?? 0}
-                                </div>
-                              </div>
-                              <div className="py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800">
-                                <div className="text-[11px] text-gray-500 dark:text-gray-400">
-                                  评论
-                                </div>
-                                <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                  {item.commentCount ?? 0}
-                                </div>
+                                </span>
                               </div>
                             </div>
 
-                            {(item.signature || item.ipAddress) && (
-                              <div className="mt-3 space-y-1.5 text-xs">
-                                {item.signature && (
-                                  <div className="text-gray-600 dark:text-gray-300 line-clamp-2">
-                                    {item.signature}
-                                  </div>
-                                )}
-                                {item.ipAddress && (
-                                  <div className="text-gray-400 dark:text-gray-500">
-                                    IP属地：{item.ipAddress}
-                                  </div>
-                                )}
-                              </div>
-                            )}
-
-                            <div className="mt-3 flex items-center justify-between gap-2">
-                              <Button size="small" className="flex-1">
-                                私信
-                              </Button>
-                              <Button
-                                size="small"
-                                type="primary"
-                                className="flex-1 !rounded-full"
-                              >
-                                关注
-                              </Button>
+                            <div className="mt-3 flex flex-wrap gap-2 text-xs text-gray-600 dark:text-gray-300">
+                              {item.school && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-50 dark:bg-gray-800">
+                                  <span className="mr-1">📚</span>
+                                  {item.school}
+                                </span>
+                              )}
+                              {item.signature && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-50 dark:bg-gray-800 max-w-[9rem] truncate">
+                                  <span className="mr-1">💼</span>
+                                  {item.signature}
+                                </span>
+                              )}
                             </div>
+                          </div>
+
+                          <div className="border-t border-gray-100 dark:border-gray-800 px-4 py-3 flex items-center gap-3 bg-white dark:bg-gray-900">
+                            <Button
+                              size="small"
+                              className="flex-1 border-gray-300 dark:border-gray-700"
+                            >
+                              私信
+                            </Button>
+                            <Button
+                              size="small"
+                              type="primary"
+                              className="flex-1 !rounded-full bg-emerald-500 hover:bg-emerald-600 border-none"
+                            >
+                              关注
+                            </Button>
                           </div>
                         </div>
                       }
@@ -757,6 +796,21 @@ const Home = () => {
           </div>
         </div>
       </div>
+
+      {typeof document !== "undefined" &&
+        createPortal(
+          <div className="fixed bottom-6 right-6 z-40">
+            <Button
+              type="primary"
+              className="!h-10 !rounded-full shadow-lg"
+              icon={<MessageCircleMore className="w-4 h-4" />}
+              onClick={() => navigate("/publishArticle")}
+            >
+              分享你的学习心得
+            </Button>
+          </div>,
+          document.body
+        )}
     </div>
   );
 };
