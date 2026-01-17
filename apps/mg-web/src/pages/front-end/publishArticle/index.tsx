@@ -226,7 +226,7 @@ const PublishArticle = () => {
         <div className={`flex-1 flex flex-col h-full transition-all duration-300 ${
             viewMode === 'preview' ? 'hidden' : 'block'
         }`}>
-          <div className="h-full flex flex-col max-w-5xl mx-auto w-full p-4 md:p-6 overflow-hidden">
+          <div className="h-full flex flex-col max-w-5xl mx-auto w-full px-4 pt-2 overflow-hidden">
             {/* 标题输入 */}
             <Input 
                size="large" 
@@ -239,7 +239,7 @@ const PublishArticle = () => {
             />
             
             {/* 编辑器容器 */}
-            <div className="flex-1 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col relative">
+            <div className="flex-1 mt-1 border-t border-red bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col relative">
                 <div ref={divRef} style={{ height: '100%' }} className="ai-editor-container" /> 
             </div>
           </div>
