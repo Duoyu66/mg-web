@@ -28,6 +28,7 @@ const Login = () => {
     let loginCredentials: any = {
       email: values.email,
       password: values.password,
+      rememberMe:true
     };
     login(loginCredentials);
   };
