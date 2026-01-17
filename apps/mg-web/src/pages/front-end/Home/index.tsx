@@ -7,7 +7,7 @@ import {
   ThumbsUp,
   Bookmark,
 } from "lucide-react";
-import { Button, Skeleton } from "antd";
+import { Button, Skeleton, Popover } from "antd";
 import { useNavigate } from "react-router-dom";
 import CommentInput from "@/components/mgInput";
 import Prism from "prismjs";
@@ -233,7 +233,7 @@ const Home = () => {
                     ? 'bg-gradient-to-tr from-pink-400 via-purple-500 to-indigo-500 shadow-[0_0_14px_rgba(244,114,182,0.5)]'
                     : 'bg-[conic-gradient(at_top,_#22c55e,_#0ea5e9,_#6366f1,_#22c55e)]';
 
-              return (
+                return (
                 <div
                   key={item.id}
                   className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow cursor-pointer"
@@ -245,15 +245,113 @@ const Home = () => {
                 >
                   {/* 用户信息 */}
                   <div className="flex items-start gap-3 mb-4">
-                    <div className={`w-12 h-12 rounded-full p-[2px] flex-shrink-0 ${frameClass}`}>
-                      <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center">
-                        <img
-                          className="w-10 h-10 rounded-full object-cover"
-                          src={item.avatar}
-                          alt={item.nickname}
-                        />
+                    <Popover
+                      placement="rightTop"
+                      mouseEnterDelay={0.25}
+                      mouseLeaveDelay={0.2}
+                      arrow={false}
+                      overlayInnerStyle={{ padding: 0 }}
+                      overlayClassName="user-hover-card"
+                      content={
+                        <div className="w-72 rounded-xl bg-white dark:bg-gray-900 shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+                          <div className="h-16 bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500" />
+                          <div className="px-4 pb-4 -mt-8">
+                            <div className="flex items-center gap-3">
+                              <div className="w-14 h-14 rounded-full border-2 border-white dark:border-gray-800 overflow-hidden shadow-md bg-white dark:bg-gray-900">
+                                <img
+                                  className="w-full h-full object-cover"
+                                  src={item.avatar}
+                                  alt={item.nickname}
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold text-gray-900 dark:text-gray-100 truncate">
+                                    {item.nickname}
+                                  </span>
+                                  <span className="px-1.5 py-0.5 text-[10px] rounded-full bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-300">
+                                    LV.1
+                                  </span>
+                                </div>
+                                {item.school && (
+                                  <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 truncate">
+                                    {item.school}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                              <div className="py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800">
+                                <div className="text-[11px] text-gray-500 dark:text-gray-400">
+                                  浏览
+                                </div>
+                                <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                  {item.view ?? 0}
+                                </div>
+                              </div>
+                              <div className="py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800">
+                                <div className="text-[11px] text-gray-500 dark:text-gray-400">
+                                  点赞
+                                </div>
+                                <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                  {item.likeCount ?? 0}
+                                </div>
+                              </div>
+                              <div className="py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800">
+                                <div className="text-[11px] text-gray-500 dark:text-gray-400">
+                                  评论
+                                </div>
+                                <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                  {item.commentCount ?? 0}
+                                </div>
+                              </div>
+                            </div>
+
+                            {(item.signature || item.ipAddress) && (
+                              <div className="mt-3 space-y-1.5 text-xs">
+                                {item.signature && (
+                                  <div className="text-gray-600 dark:text-gray-300 line-clamp-2">
+                                    {item.signature}
+                                  </div>
+                                )}
+                                {item.ipAddress && (
+                                  <div className="text-gray-400 dark:text-gray-500">
+                                    IP属地：{item.ipAddress}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            <div className="mt-3 flex items-center justify-between gap-2">
+                              <Button size="small" className="flex-1">
+                                私信
+                              </Button>
+                              <Button
+                                size="small"
+                                type="primary"
+                                className="flex-1 !rounded-full"
+                              >
+                                关注
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    >
+                      <div
+                        className={`w-12 h-12 rounded-full p-[2px] flex-shrink-0 ${frameClass}`}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center">
+                          <img
+                            className="w-10 h-10 rounded-full object-cover"
+                            src={item.avatar}
+                            alt={item.nickname}
+                          />
+                        </div>
                       </div>
-                    </div>
+                    </Popover>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-semibold text-gray-900 dark:text-gray-100">

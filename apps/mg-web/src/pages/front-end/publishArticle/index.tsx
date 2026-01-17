@@ -5,7 +5,77 @@ import { AiEditor } from "aieditor";
 import "aieditor/dist/style.css";
 import { useSendPost } from "./hooks/useSendPost";
 
+type MentionUser = {
+  id: string;
+  label: string;
+};
+
 const initialContent = "写点什么~";
+
+const mentionUsers: MentionUser[] = [
+  { id: "user1", label: "用户1" },
+  { id: "user2", label: "用户2" },
+  { id: "user3", label: "用户3" },
+];
+
+const highlightMentionsInHtml = (html: string) => {
+  if (!html || !html.includes("@")) return html;
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  const mentionRegex = /@([\w\u4e00-\u9fa5]+)/g;
+
+  const walk = (node: Node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const text = node.textContent || "";
+      if (!text.includes("@")) return;
+
+      let match;
+      let lastIndex = 0;
+      const frag = doc.createDocumentFragment();
+
+      while ((match = mentionRegex.exec(text)) !== null) {
+        if (match.index > lastIndex) {
+          frag.appendChild(
+            doc.createTextNode(text.slice(lastIndex, match.index))
+          );
+        }
+
+        const matchedText = match[1];
+        const span = doc.createElement("span");
+        span.textContent = `@${matchedText}`;
+        span.className =
+          "mg-mention text-primary-600 dark:text-primary-400 font-medium hover:underline cursor-pointer";
+        frag.appendChild(span);
+
+        lastIndex = match.index + 1 + matchedText.length;
+      }
+
+      if (lastIndex === 0) return;
+
+      if (lastIndex < text.length) {
+        frag.appendChild(doc.createTextNode(text.slice(lastIndex)));
+      }
+
+      if (node.parentNode) {
+        node.parentNode.replaceChild(frag, node);
+      }
+
+      return;
+    }
+
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const el = node as Element;
+      const tag = el.tagName.toLowerCase();
+      if (tag === "script" || tag === "style") return;
+      const children = Array.from(el.childNodes);
+      children.forEach(walk);
+    }
+  };
+
+  walk(doc.body);
+  return doc.body.innerHTML;
+};
 
 const PublishArticle = () => {
   //定义 ref
@@ -30,8 +100,19 @@ const PublishArticle = () => {
           "printer",
           "attachment",
         ],
+        onMentionQuery: (query: string) => {
+          const text = query.toLowerCase();
+          return mentionUsers
+            .filter((user) => user.label.toLowerCase().includes(text))
+            .slice(0, 5)
+            .map((user) => ({
+              id: user.id,
+              label: user.label,
+            }));
+        },
         onChange: (editor) => {
-          const html = editor.getHtml();
+          const rawHtml = editor.getHtml();
+          const html = highlightMentionsInHtml(rawHtml);
           setContent(html);
         },
       });

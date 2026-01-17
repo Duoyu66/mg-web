@@ -164,6 +164,7 @@ export default function ArticleDetail() {
   const [toc, setToc] = useState<Array<{ id: string; text: string; level: number }>>([]);
   const [activeTocId, setActiveTocId] = useState<string>("");
   const commentsRef = useRef<HTMLDivElement>(null);
+  const articleContentRef = useRef<HTMLDivElement>(null);
 
   // 模拟可@的用户列表（实际应该从API获取）
   useEffect(() => {
@@ -564,6 +565,68 @@ session.sendMessage(new TextMessage(json));
     }
   }, [parsedContent?.toc]);
 
+  useEffect(() => {
+    const container = articleContentRef.current;
+    if (!container) return;
+    if (parsedContent?.type !== "html") return;
+    if (container.getAttribute("data-mentions-processed") === "true") return;
+
+    const mentionRegex = /@([\w\u4e00-\u9fa5]+)/g;
+
+    const walk = (node: Node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent || "";
+        if (!text.includes("@")) return;
+
+        let match;
+        let lastIndex = 0;
+        const frag = document.createDocumentFragment();
+
+        while ((match = mentionRegex.exec(text)) !== null) {
+          if (match.index > lastIndex) {
+            frag.appendChild(
+              document.createTextNode(text.slice(lastIndex, match.index))
+            );
+          }
+
+          const matchedText = match[1];
+          const span = document.createElement("span");
+          span.textContent = `@${matchedText}`;
+          span.className =
+            "mg-mention text-primary-600 dark:text-primary-400 font-medium hover:underline cursor-pointer";
+          frag.appendChild(span);
+
+          lastIndex = match.index + 1 + matchedText.length;
+        }
+
+        if (lastIndex === 0) return;
+
+        if (lastIndex < text.length) {
+          frag.appendChild(
+            document.createTextNode(text.slice(lastIndex))
+          );
+        }
+
+        if (node.parentNode) {
+          node.parentNode.replaceChild(frag, node);
+        }
+
+        return;
+      }
+
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const el = node as Element;
+        const tag = el.tagName.toLowerCase();
+        if (tag === "script" || tag === "style") return;
+        const children = Array.from(el.childNodes);
+        children.forEach(walk);
+      }
+    };
+
+    walk(container);
+    container.setAttribute("data-mentions-processed", "true");
+  }, [parsedContent?.type, parsedContent?.html]);
+
   const handleThumb = () => {
     if (article) {
       setArticle({
@@ -632,7 +695,6 @@ session.sendMessage(new TextMessage(json));
     let keyIndex = 0;
 
     while ((match = mentionRegex.exec(content)) !== null) {
-      // 添加 @ 之前的文本
       if (match.index > lastIndex) {
         parts.push(content.slice(lastIndex, match.index));
       }
@@ -641,9 +703,6 @@ session.sendMessage(new TextMessage(json));
       let foundUsername = "";
       let usernameEndIndex = match.index + 1 + matchedText.length;
 
-      // 尝试找到最长的有效用户名匹配
-      // 例如：如果内容是 "@竹叶你好"，而用户列表中有 "竹叶"
-      // 我们应该只匹配 "竹叶" 而不是 "竹叶你好"
       for (let i = matchedText.length; i > 0; i--) {
         const candidate = matchedText.slice(0, i);
         const isValidMention =
@@ -661,16 +720,14 @@ session.sendMessage(new TextMessage(json));
       }
 
       if (foundUsername) {
-        // 找到有效的 @ 提及，高亮显示
         parts.push(
           <span
             key={`mention-${keyIndex++}-${match.index}`}
-            className="text-primary-600 dark:text-primary-400 font-medium hover:underline cursor-pointer"
+            className="mg-mention text-primary-600 dark:text-primary-400 font-medium hover:underline cursor-pointer"
           >
             @{foundUsername}
           </span>
         );
-        // 如果匹配的文本比找到的用户名长，说明后面还有字符，需要作为普通文本添加
         if (matchedText.length > foundUsername.length) {
           const remainingText = matchedText.slice(foundUsername.length);
           parts.push(remainingText);
@@ -679,7 +736,6 @@ session.sendMessage(new TextMessage(json));
           lastIndex = usernameEndIndex;
         }
       } else {
-        // 无效的 @ 提及当作普通文本显示
         parts.push(`@${matchedText}`);
         lastIndex = mentionRegex.lastIndex;
       }
@@ -893,6 +949,7 @@ session.sendMessage(new TextMessage(json));
               <div className="text-gray-800 dark:text-gray-200 mb-6 prose prose-gray dark:prose-invert max-w-none">
                 {parsedContent.type === "html" ? (
                   <div
+                    ref={articleContentRef}
                     dangerouslySetInnerHTML={{ __html: parsedContent.html || "" }}
                     className="article-content"
                   />
@@ -916,7 +973,7 @@ session.sendMessage(new TextMessage(json));
                                 key={i}
                                 className="text-gray-600 dark:text-gray-400"
                               >
-                                {line}
+                                  {renderCommentContent(line)}
                               </div>
                             ))}
                           </div>
@@ -934,7 +991,7 @@ session.sendMessage(new TextMessage(json));
                                 key={i}
                                 className="text-gray-600 dark:text-gray-400"
                               >
-                                {line}
+                                  {renderCommentContent(line)}
                               </div>
                             ))}
                           </div>
@@ -952,7 +1009,7 @@ session.sendMessage(new TextMessage(json));
                                 key={i}
                                 className="text-gray-600 dark:text-gray-400"
                               >
-                                {line}
+                                {renderCommentContent(line)}
                               </div>
                             ))}
                           </div>
