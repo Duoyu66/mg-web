@@ -1,22 +1,35 @@
-import { Button, Form, Input, Checkbox, Divider } from "antd";
+import { Button, Form, Input, Checkbox, Divider, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { User, Lock, ArrowRight, Github, Mail, Globe } from "lucide-react";
 import { motion } from "framer-motion";
+import { useLogin } from "./hooks/useLogin";
 
 const Login = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
 
-  const onFinish = (values: { username: string; password: string }) => {
-    console.log("Login submit:", values);
-    // 模拟登录成功后的跳转
-    setTimeout(() => {
-      goIndex();
-    }, 1000);
-  };
-
   const goIndex = () => {
     navigate("/");
+  };
+
+  const { mutate: login, isPending } = useLogin({
+    onSuccess: () => {
+      message.success("登录成功");
+      goIndex();
+    },
+    onError: (error) => {
+      message.error(error.message || "登录失败");
+    },
+  });
+
+  const onFinish = (values: { username: string; password: string,email:string }) => {
+    console.log("Login submit:", values);
+    values.email = values.username;
+    let loginCredentials: any = {
+      email: values.email,
+      password: values.password,
+    };
+    login(loginCredentials);
   };
 
   const goRegister = () => {
@@ -119,6 +132,7 @@ const Login = () => {
                 <Button
                   type="primary"
                   htmlType="submit"
+                  loading={isPending}
                   className="w-full !h-12 !rounded-xl !text-lg !font-medium !bg-[#1677ff] hover:!bg-[#165dff] shadow-lg shadow-blue-500/30 transition-all duration-300 transform hover:-translate-y-0.5"
                 >
                   <span className="flex items-center justify-center gap-2">

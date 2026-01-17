@@ -9,10 +9,10 @@ const requestClient = axios.create({
 //配置请求拦截器
 requestClient.interceptors.request.use(config => {
     // 从本地存储获取 token
-    const token = 'KZxl0vLTyJq9o5ywvW24UOb0a7azGL59PA3eNoK2yiubwDdwYGyeM9OGdo0fop91vbbNbwyOCq1gQFnIutVXId2YZFQL0TK+VA4HiF8UhxjaqvSWrzNvOV7rDCdQ4HR03GWGUcu3Y1JYF7KccMMgeN7ySM5TzpNJ8eqkDlOMRQ/5/1tH6ZjOxVHmi+OUUngrrxiW2CR1yTx5cqrlOKSPyWhzGfrm6iOYjm6A7fADOO0l14pMhbYzU3tcbyObelA7'
-    sessionStorage.setItem('token', token);
-    // config.headers['third-admin-token'] = token
-    // config.headers['Authorization'] = 'Bearer'
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+    }
 
     return config
 }, error => {
