@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import type { ReactNode } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import {
   ThumbsUp,
   MessageCircle,
@@ -137,6 +137,9 @@ const parseContent = (content: string) => {
 
 export default function ArticleDetail() {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  const locationState = location.state as any;
+  const stateArticle = locationState?.article;
   const [article, setArticle] = useState<Record | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentText, setCommentText] = useState("");
@@ -277,10 +280,40 @@ export default function ArticleDetail() {
     };
   };
 
-  // 模拟获取文章数据
+  // 获取文章数据：优先使用路由 state 传递的真实数据，否则使用示例数据
   useEffect(() => {
-    // 这里应该根据 id 调用 API 获取文章详情
-    // 暂时使用模拟数据
+    if (stateArticle) {
+      const mapped: Record = {
+        id: stateArticle.id || id || "",
+        content: stateArticle.content || "",
+        category: stateArticle.category || "",
+        tags: stateArticle.tags || [],
+        thumbNum: stateArticle.likeCount ?? stateArticle.thumbNum ?? 0,
+        favourNum: stateArticle.favourNum ?? 0,
+        commentNum: stateArticle.commentCount ?? stateArticle.commentNum ?? 0,
+        viewNum: stateArticle.view ?? stateArticle.viewNum ?? 0,
+        hasThumb: !!stateArticle.hasThumb,
+        hasFavour: !!stateArticle.hasFavour,
+        user: {
+          id: stateArticle.userId || stateArticle.user?.id || "",
+          userName: stateArticle.nickname || stateArticle.user?.userName || "",
+          userAvatar: stateArticle.avatar || stateArticle.user?.userAvatar,
+          userProfile: stateArticle.user?.userProfile,
+          school: stateArticle.school || stateArticle.user?.school,
+          direction: stateArticle.user?.direction,
+          userRole: stateArticle.user?.userRole,
+          score: stateArticle.user?.score,
+          scoreLevel: stateArticle.user?.scoreLevel,
+        },
+        createTime: stateArticle.createTime
+          ? new Date(stateArticle.createTime).getTime()
+          : Date.now(),
+      };
+      setArticle(mapped);
+      setComments([]);
+      return;
+    }
+
     const mockArticle: Record = {
       id: id || "",
       content: `<h3>一、Websocket基础</h3>

@@ -10,6 +10,16 @@ import {
 import { Button, Skeleton } from "antd";
 import { useNavigate } from "react-router-dom";
 import CommentInput from "@/components/mgInput";
+import Prism from "prismjs";
+import "prismjs/themes/prism-okaidia.css";
+import "prismjs/components/prism-clike";
+import "prismjs/components/prism-java";
+import "prismjs/components/prism-bash";
+import "prismjs/components/prism-javascript";
+import "prismjs/components/prism-typescript";
+import "prismjs/components/prism-css";
+import "prismjs/components/prism-jsx";
+import "prismjs/components/prism-tsx";
 
 import { useGetPostList, Post, PostListResponse } from "./hooks/useGetPostList";
 
@@ -124,6 +134,25 @@ const Home = () => {
   );
   const contentRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const MAX_CONTENT_HEIGHT = 300; // 最大显示高度
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "auto",
+    });
+  }, []);
+  useEffect(() => {
+    const blocks = document.querySelectorAll<HTMLPreElement>(
+      ".rich-text pre code"
+    );
+    blocks.forEach((block) => {
+      const className = block.className || "";
+      if (!/\blanguage-/.test(className)) {
+        block.classList.add("language-java");
+      }
+      Prism.highlightElement(block);
+    });
+  }, [records]);
 
   const loadMore = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -208,7 +237,11 @@ const Home = () => {
                 <div
                   key={item.id}
                   className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => navigate(`/front/articleDetail/${item.id}`)}
+                  onClick={() =>
+                    navigate(`/front/articleDetail/${item.id}`, {
+                      state: { article: item },
+                    })
+                  }
                 >
                   {/* 用户信息 */}
                   <div className="flex items-start gap-3 mb-4">

@@ -24,8 +24,9 @@ const Header = () => {
     const navigate = useNavigate();
     const { toggleTheme, theme: currentTheme } = useTheme();
     const [scrolled, setScrolled] = useState(false);
+    const [currentUser, setCurrentUser] = useState<any | null>(null);
+    const [token, setToken] = useState<string | null>(null);
 
-    // 监听滚动以改变头部样式
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 10);
@@ -33,6 +34,25 @@ const Header = () => {
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    useEffect(() => {
+        const nextToken = localStorage.getItem("token");
+        setToken(nextToken);
+
+        const storedUser =
+            localStorage.getItem("user") || localStorage.getItem("userInfo");
+
+        if (storedUser) {
+            try {
+                const parsed = JSON.parse(storedUser);
+                setCurrentUser(parsed);
+            } catch {
+                setCurrentUser(null);
+            }
+        } else {
+            setCurrentUser(null);
+        }
+    }, [location.pathname]);
 
     const menuData: MenuItemType[] = [
         { id: "1", title: "首页", path: "/front/home" },
@@ -70,13 +90,31 @@ const Header = () => {
     const goIndex = () => navigate("/");
     const goLogin = () => navigate("/login");
 
-    // Mock User Info
-    const userInfo = {
-        nickname: "木瓜一块八",
-        id: "888888",
-        balance: 12580.00,
-        coins: 2450,
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
+    const isLoggedIn = !!token;
+
+    const rawAvatar =
+        currentUser?.avatar ||
+        currentUser?.userAvatar ||
+        currentUser?.avatarUrl ||
+        "";
+
+    const normalizedAvatar =
+        typeof rawAvatar === "string"
+            ? rawAvatar.trim().replace(/^`+|`+$/g, "").replace(/^"+|"+$/g, "")
+            : "";
+
+    const displayUser = {
+        nickname:
+            currentUser?.nickname ||
+            currentUser?.userName ||
+            currentUser?.nickName ||
+            currentUser?.username ||
+            currentUser?.email ||
+            "用户",
+        id: currentUser?.id || currentUser?.userId || "",
+        balance: currentUser?.balance ?? 0,
+        coins: currentUser?.coins ?? 0,
+        avatar: normalizedAvatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
     };
 
     const userMenuItems: MenuProps['items'] = [
@@ -84,8 +122,8 @@ const Header = () => {
             key: 'info',
             label: (
                 <div className="flex flex-col px-1 py-1 cursor-default min-w-[120px]">
-                    <span className="font-bold text-base text-gray-800 dark:text-gray-100">{userInfo.nickname}</span>
-                    <span className="text-xs text-gray-400 mt-1">ID: {userInfo.id}</span>
+                    <span className="font-bold text-base text-gray-800 dark:text-gray-100">{displayUser.nickname}</span>
+                    <span className="text-xs text-gray-400 mt-1">ID: {displayUser.id}</span>
                 </div>
             ),
         },
@@ -96,7 +134,7 @@ const Header = () => {
             label: (
                 <div className="flex justify-between items-center w-full gap-4">
                     <span>余额</span>
-                    <span className="font-mono font-bold">¥{userInfo.balance.toLocaleString()}</span>
+                    <span className="font-mono font-bold">¥{displayUser.balance.toLocaleString()}</span>
                 </div>
             ),
             onClick: () => navigate('/front/recharge')
@@ -107,7 +145,7 @@ const Header = () => {
             label: (
                 <div className="flex justify-between items-center w-full gap-4">
                     <span>木瓜币</span>
-                    <span className="font-mono font-bold">{userInfo.coins}</span>
+                    <span className="font-mono font-bold">{displayUser.coins}</span>
                 </div>
             ),
         },
@@ -118,7 +156,11 @@ const Header = () => {
             icon: <LogOut size={16} />,
             label: '退出登录',
             onClick: () => {
-                // handle logout
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                localStorage.removeItem("userInfo");
+                setCurrentUser(null);
+                setToken(null);
                 navigate('/login');
             }
         },
@@ -250,31 +292,32 @@ const Header = () => {
 
                     {/* Action Buttons */}
                     <div className="flex items-center gap-2 ml-2">
+                        {!isLoggedIn && (
+                            <Button 
+                                type="primary" 
+                                className="rounded-full px-6 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 border-none shadow-md shadow-primary-500/20"
+                                icon={<UserCircle2 size={16} />}
+                                onClick={goLogin}
+                            >
+                                登录
+                            </Button>
+                        )}
 
-                        {/* Login Button (Shown when not logged in - Logic can be added) */}
-                        {/* <Button 
-                            type="primary" 
-                            className="rounded-full px-6 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 border-none shadow-md shadow-primary-500/20"
-                            icon={<UserCircle2 size={16} />}
-                            onClick={goLogin}
-                        >
-                            登录
-                        </Button> */}
-
-                        {/* User Profile Dropdown */}
-                        <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" arrow trigger={['click']}>
-                            <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 pl-2 pr-3 py-1.5 rounded-full transition-all border border-transparent hover:border-gray-200 dark:hover:border-gray-700 group">
-                                <Avatar 
-                                    src={userInfo.avatar} 
-                                    size="default" 
-                                    className="border-2 border-white dark:border-gray-700 shadow-sm group-hover:scale-105 transition-transform"
-                                />
-                                <span className="text-sm font-medium text-gray-700 dark:text-gray-200 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                                    {userInfo.nickname}
-                                </span>
-                                <ChevronDown size={14} className="text-gray-400 group-hover:text-primary-500 transition-colors" />
-                            </div>
-                        </Dropdown>
+                        {isLoggedIn && (
+                            <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" arrow trigger={['click']}>
+                                <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 pl-2 pr-3 py-1.5 rounded-full transition-all border border-transparent hover:border-gray-200 dark:hover:border-gray-700 group">
+                                    <Avatar 
+                                        src={displayUser.avatar} 
+                                        size="default" 
+                                        className="border-2 border-white dark:border-gray-700 shadow-sm group-hover:scale-105 transition-transform"
+                                    />
+                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                                        {displayUser.nickname}
+                                    </span>
+                                    <ChevronDown size={14} className="text-gray-400 group-hover:text-primary-500 transition-colors" />
+                                </div>
+                            </Dropdown>
+                        )}
                     </div>
                 </div>
             </div>

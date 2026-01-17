@@ -20,8 +20,10 @@ export const useLogin = (props?: UseLoginProps): UseMutationResult<LoginResponse
   return useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
+      console.log("登录的data是",data);
+      
       // 保存 token 到 localStorage
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('token', data.accessToken);
       localStorage.setItem('user', JSON.stringify(data.user));
       
       // 调用成功回调
