@@ -51,8 +51,16 @@ import AdminArticle from '@/pages/admin/article';
 import AdminUser from '@/pages/admin/user';
 import AdminRolesPage from '@/pages/admin/system/roles';
 import AdminUserRolesPage from '@/pages/admin/system/userRoles';
+import SiteMap from '@/pages/SiteMap';
+
+import RoadmapExamPage from "@/pages/front-end/route/RoadmapExamPage";
 
 const routes = [
+    {
+        path: "/sitemap",
+        title: "网站地图",
+        component: SiteMap
+    },
     {
         path: "/",
         title: "官网",
@@ -82,6 +90,11 @@ const routes = [
                 title: '结束页',
                 path: "finishPage",
                 component: FinishPage,
+            },
+            {
+                title: '路线图练习',
+                path: "roadmap-exam",
+                component: RoadmapExamPage,
             },
         ]
     },

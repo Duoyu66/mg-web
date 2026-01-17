@@ -5,12 +5,14 @@ import remarkGfm from 'remark-gfm';
 import { useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { backendRoadmap, frontendRoadmap, ROADMAP_DOCS } from './data';
+import { useGetExamList } from '../question/hooks/useGetExamList';
 
 type Track = 'frontend' | 'backend';
 
 const RoadmapDetailPage = () => {
   const navigate = useNavigate();
   const params = useParams();
+  const getExamList = useGetExamList();
 
   const track = (params.track === 'backend' ? 'backend' : 'frontend') as Track;
   const id = params.id ?? '';
@@ -36,6 +38,31 @@ const RoadmapDetailPage = () => {
   }, [node]);
 
   const finalDoc = doc ?? fallback;
+
+  const handleStartPractice = () => {
+    if (!id) return;
+    getExamList.mutate(
+      {
+        types: [id],
+        difficulty: 'simple',
+        num: 10,
+      },
+      {
+        onSuccess: (res: any) => {
+          if (res.status && res.data && res.data.length > 0) {
+            navigate('/question/roadmap-exam', {
+              state: {
+                questionList: res.data,
+                title: `${track === 'frontend' ? '前端' : '后端'} · ${finalDoc.title} 练习`,
+              },
+            });
+          } else {
+            window.setTimeout(() => {}, 0);
+          }
+        },
+      }
+    );
+  };
 
   if (!node || !finalDoc) {
     return (
@@ -94,6 +121,9 @@ const RoadmapDetailPage = () => {
                   官方/参考
                 </Button>
               )}
+              <Button type="default" onClick={handleStartPractice}>
+                题目练习
+              </Button>
             </div>
           </div>
         </div>
@@ -139,7 +169,7 @@ const RoadmapDetailPage = () => {
                       {g.points.map((p, pi) => (
                         <li key={pi}>
                           <Link 
-                            to={`/front/route/${track}/${id}/${encodeURIComponent(p)}`}
+                            to={`/route/${track}/${id}/${encodeURIComponent(p)}`}
                             className="flex gap-2 group hover:text-primary-500 transition-colors cursor-pointer"
                           >
                             <span className="mt-2 h-1.5 w-1.5 rounded-full bg-gray-400/70 dark:bg-gray-600 shrink-0 group-hover:bg-primary-500 transition-colors" />

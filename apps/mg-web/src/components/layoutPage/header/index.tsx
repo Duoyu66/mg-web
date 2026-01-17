@@ -39,7 +39,7 @@ const Header = () => {
         { id: "2", title: "算法", path: "/front/algorithm" },
         { id: "3", title: "题库", path: "/front/questionBank" },
         { id: "5", title: "快捷导航", path: "/front/nav" },
-        { id: "6", title: "测试", path: "/front/test" },
+        { id: "6", title: "网站地图", path: "/sitemap" },
         { 
             id: "more", 
             title: "功能大全", 
