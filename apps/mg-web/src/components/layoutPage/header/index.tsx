@@ -16,6 +16,8 @@ import {
   LogOut,
   Wallet,
   Coins,
+  ShoppingBag,
+  Crown,
 } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
@@ -131,11 +133,7 @@ const Header = () => {
 
     const displayUser = {
         nickname:
-            currentUser?.nickname ||
-            currentUser?.userName ||
             currentUser?.nickName ||
-            currentUser?.username ||
-            currentUser?.email ||
             "用户",
         id: currentUser?.id || currentUser?.userId || "",
         balance: currentUser?.balance ?? 0,
@@ -155,15 +153,20 @@ const Header = () => {
         },
         { type: 'divider' },
         {
-            key: 'balance',
+            key: 'mall',
             icon: <Wallet size={16} className="text-blue-500" />,
             label: (
                 <div className="flex justify-between items-center w-full gap-4">
-                    <span>余额</span>
-                    <span className="font-mono font-bold">¥{displayUser.balance.toLocaleString()}</span>
+                    <span>木瓜商城</span>
                 </div>
             ),
-            onClick: () => navigate('/front/recharge')
+            onClick: () => navigate('/front/mall')
+        },
+        {
+            key: 'purchases',
+            icon: <ShoppingBag size={16} className="text-green-500" />,
+            label: '我的购买',
+            onClick: () => navigate('/front/purchases')
         },
         {
             key: 'coins',
@@ -328,6 +331,14 @@ const Header = () => {
                                 />
                             </Badge>
                         </Tooltip>
+                    </div>
+
+                    <div 
+                        className="cursor-pointer ml-2 px-3 py-1.5 rounded-full text-white text-xs font-bold bg-gradient-to-r from-amber-400 via-orange-500 to-amber-400 bg-[length:200%_auto] hover:bg-right transition-all duration-500 shadow-md hover:shadow-orange-500/30 flex items-center gap-1"
+                        onClick={() => navigate('/front/price')}
+                    >
+                        <Crown size={14} className="fill-white" />
+                        <span>订阅会员</span>
                     </div>
   {/* Console Button */}
                     <Button 

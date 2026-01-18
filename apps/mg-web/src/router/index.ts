@@ -35,6 +35,8 @@ import BoardPage from "@/pages/front-end/board";
 import MemberPage from "@/pages/front-end/member";
 import PricePage from "@/pages/front-end/price";
 import RechargePage from "@/pages/front-end/recharge";
+import MallPage from "@/pages/front-end/mall";
+import PurchasesPage from "@/pages/front-end/purchases";
 import ResumeListPage from "@/pages/front-end/realResume";
 import ResumeDetailPage from "@/pages/front-end/realResume/detail";
 import CompanyInterviewPage from "@/pages/front-end/companyInterview";
@@ -421,6 +423,22 @@ const routes = [
                 title: '充值中心',
                 path: "recharge",
                 component: RechargePage,
+                meta: {
+                    showFooter: false
+                }
+            },
+            {
+                title: '木瓜商城',
+                path: "mall",
+                component: MallPage,
+                meta: {
+                    showFooter: false
+                }
+            },
+            {
+                title: '我的购买',
+                path: "purchases",
+                component: PurchasesPage,
                 meta: {
                     showFooter: false
                 }
