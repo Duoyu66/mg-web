@@ -157,7 +157,13 @@ const PublishArticle = () => {
       return;
     }
 
-    publish({ content: finalHtml }, {
+    const textContent = new DOMParser().parseFromString(rawHtml, 'text/html').body.textContent || "";
+    if (textContent.length > 5000) {
+      message.warning("发布内容不能超过5000个字符");
+      return;
+    }
+
+    publish({ title,content: finalHtml }, {
       onSuccess: () => {
         message.success("发布成功");
         navigate(-1);

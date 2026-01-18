@@ -2,7 +2,7 @@ import { useInfiniteQuery, UseInfiniteQueryOptions, InfiniteData } from '@tansta
 import requestClient from '@/utils/requestClient';
 
 const API_URL = '/api/post/getAll';
-
+type VipType = 'free' | 'vip' | 'svip';
 export interface Post {
   id: string;
   content: string;
@@ -10,6 +10,7 @@ export interface Post {
   nickname: string;
   avatar: string;
   school?: string;
+   title?: string;
   signature?: string;
   view: number;
   likeCount: number;
@@ -20,6 +21,7 @@ export interface Post {
   tags?: string[];
   hasThumb?: boolean;
   hasFavour?: boolean;
+  vipType?: VipType;
 }
 
 export interface PostListParams {
