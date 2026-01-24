@@ -25,9 +25,11 @@ export interface InterviewRecord {
 
 export interface Company {
   id: string;
-  name: string;
+  name: string; // Mapped from 'title' if needed, or keeping name
+  title?: string; // Adding title as per new API
   logo?: string;
   website?: string;
+  recruitmentUrl?: string; // Adding recruitmentUrl
   description?: string;
   status: CompanyStatus;
   viewCount: number;
@@ -36,4 +38,8 @@ export interface Company {
   salaryRange?: string; // e.g., "20k-30k"
   tags?: string[];
   recordCount?: number;
+  scale?: string; // Adding scale
+  level?: string; // Adding level
+  createTime?: string; // Adding createTime
+  updateTime?: string; // Adding updateTime
 }
