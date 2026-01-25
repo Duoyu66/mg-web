@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Tag, Avatar, Divider, Breadcrumb, message, Result } from 'antd';
+import { Button, Tag, Avatar, Divider, Breadcrumb, message, Result, Spin } from 'antd';
 import { 
   ArrowLeftOutlined, 
   EyeOutlined, 
@@ -11,10 +11,9 @@ import {
   HomeOutlined
 } from '@ant-design/icons';
 import { motion } from 'framer-motion';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import CommentSystem, { CommentData } from '../../../components/CommentSystem';
-import { interviewExperiences } from './data';
+import { useGetInterviewExperienceDetail } from '@/pages/front-end/company/hooks/useGetInterviewExperienceDetail';
+import dayjs from 'dayjs';
 
 // Mock Comment Data
 const mockComments: CommentData[] = [
@@ -342,9 +341,38 @@ const CompanyInterviewDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
+  const { data: apiData, isLoading } = useGetInterviewExperienceDetail(id || '');
+
   const data = useMemo(() => {
-    return interviewExperiences.find(item => item.id === id);
-  }, [id]);
+    if (!apiData) return null;
+    return {
+      id: apiData.id,
+      companyName: apiData.companyName || '未知公司',
+      logo: apiData.logo || apiData.companyName?.charAt(0) || 'C',
+      color: apiData.color || '#1890ff',
+      title: apiData.title,
+      position: apiData.job || '前端开发',
+      level: apiData.level || 'Unknown',
+      tags: apiData.tags || [],
+      date: dayjs(apiData.createTime).format('YYYY-MM-DD'),
+      views: apiData.views || 0,
+      likes: apiData.likes || 0,
+      author: apiData.author || '匿名用户',
+      avatar: apiData.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Anonymous',
+      difficulty: apiData.difficulty || '中等',
+      summary: '', 
+      content: apiData.content || '暂无内容',
+      accessType: apiData.vip === 'vip' ? 'vip' : 'normal',
+    };
+  }, [apiData]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <Spin size="large" tip="加载中..." />
+      </div>
+    );
+  }
 
   if (!data) {
     return (
@@ -361,33 +389,7 @@ const CompanyInterviewDetail: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-12 transition-colors duration-300">
-      {/* Top Navigation Bar */}
-      <div className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10 transition-colors duration-300">
-        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button 
-              type="text" 
-              icon={<ArrowLeftOutlined />} 
-              onClick={() => navigate('/front/companyInterview')}
-              className="hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              返回
-            </Button>
-            <Breadcrumb
-              items={[
-                { title: <span className="cursor-pointer" onClick={() => navigate('/front/home')}><HomeOutlined /> 首页</span> },
-                { title: <span className="cursor-pointer" onClick={() => navigate('/front/companyInterview')}>名企面经</span> },
-                { title: '面经详情' },
-              ]}
-              className="hidden sm:flex"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <Button icon={<LikeOutlined />} onClick={() => message.success('点赞成功！')}>点赞</Button>
-            <Button type="primary" icon={<ShareAltOutlined />} onClick={() => message.success('链接已复制')}>分享</Button>
-          </div>
-        </div>
-      </div>
+
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -433,11 +435,15 @@ const CompanyInterviewDetail: React.FC = () => {
                 </div>
               </div>
 
-              {/* Markdown Content */}
-              <div className="prose prose-lg dark:prose-invert max-w-none">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {data.content}
-                </ReactMarkdown>
+              {/* Content */}
+              <div 
+                className="rich-text text-gray-800 dark:text-gray-200 leading-relaxed transition-all duration-300"
+                dangerouslySetInnerHTML={{ __html: data.content }}
+              />
+              
+              <div className="mt-12 flex justify-center gap-4 border-t border-gray-100 dark:border-gray-700 pt-8">
+                <Button icon={<LikeOutlined />} size="large" onClick={() => message.success('点赞成功！')}>点赞</Button>
+                <Button type="primary" icon={<ShareAltOutlined />} size="large" onClick={() => message.success('链接已复制')}>分享</Button>
               </div>
             </div>
 
@@ -462,10 +468,14 @@ const CompanyInterviewDetail: React.FC = () => {
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 border border-gray-100 dark:border-gray-700 sticky top-24 transition-colors duration-300">
               <div className="flex items-center gap-4 mb-6">
                 <div 
-                  className="w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-md"
-                  style={{ backgroundColor: data.color }}
+                  className="w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-md overflow-hidden"
+                  style={{ backgroundColor: data.logo?.length > 1 ? 'transparent' : data.color }}
                 >
-                  {data.logo}
+                  {data.logo?.length > 1 ? (
+                    <img src={data.logo} alt={data.companyName} className="w-full h-full object-cover" />
+                  ) : (
+                    data.logo
+                  )}
                 </div>
                 <div>
                   <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100 m-0">{data.companyName}</h3>

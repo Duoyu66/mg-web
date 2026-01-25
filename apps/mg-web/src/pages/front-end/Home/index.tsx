@@ -339,7 +339,23 @@ const Home = () => {
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2 min-w-0">
                                   <span className="font-semibold  text-gray-900 dark:text-gray-100 truncate flex items-center gap-1">
-                                    {item.nickname} <VipIcon type={item.vipType || 'free'} />
+                                    <span
+                                      style={
+                                        item.vipType === 'svip'
+                                          ? {
+                                              color: 'transparent',
+                                              backgroundImage:
+                                                'linear-gradient(90deg, rgb(0, 215, 60) 0%, rgb(0, 194, 255) 33.3333%, rgb(234, 101, 148) 66.6667%, rgb(157, 59, 255) 100%)',
+                                              display: 'inline-block',
+                                              backgroundClip: 'text',
+                                              WebkitBackgroundClip: 'text',
+                                            }
+                                          : undefined
+                                      }
+                                    >
+                                      {item.nickname}
+                                    </span>
+                                    <VipIcon type={item.vipType || 'free'} />
                                     
                                   </span>
                                   <span className="px-2 py-0.5 text-[10px] rounded-full bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-300">
@@ -404,8 +420,11 @@ const Home = () => {
                         }
                       >
                         <div
-                          className={`w-12 h-12 rounded-full p-[2px] flex-shrink-0 ${frameClass}`}
-                          onClick={(e) => e.stopPropagation()}
+                          className={`w-12 h-12 rounded-full p-[2px] flex-shrink-0 ${frameClass} cursor-pointer`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/front/userProfile/${item.userId}`);
+                          }}
                         >
                           <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center">
                             <img
@@ -418,8 +437,30 @@ const Home = () => {
                       </Popover>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold flex items-center text-gray-900 dark:text-gray-100">
-                            {item.nickname} <VipIcon type={item.vipType || 'free'} />
+                          <span
+                            className="font-semibold flex items-center text-gray-900 dark:text-gray-100 cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/front/userProfile/${item.userId}`);
+                            }}
+                          >
+                            <span
+                              style={
+                                item.vipType === 'svip'
+                                  ? {
+                                      color: 'transparent',
+                                      backgroundImage:
+                                        'linear-gradient(90deg, rgb(0, 215, 60) 0%, rgb(0, 194, 255) 33.3333%, rgb(234, 101, 148) 66.6667%, rgb(157, 59, 255) 100%)',
+                                      display: 'inline-block',
+                                      backgroundClip: 'text',
+                                      WebkitBackgroundClip: 'text',
+                                    }
+                                  : undefined
+                              }
+                            >
+                              {item.nickname}
+                            </span>
+                            <VipIcon type={item.vipType || 'free'} />
                           </span>
                           {item.school && (
                             <span className="text-xs text-gray-500 dark:text-gray-400">

@@ -30,11 +30,14 @@ import {
   SyncOutlined,
   DeleteOutlined,
   LinkOutlined,
-  EditOutlined
+  EditOutlined,
+  FileTextOutlined  
 } from '@ant-design/icons';
 import { CompanyService } from './service';
 import { Company, CompanyStatus, InterviewRecord } from './types';
 import dayjs from 'dayjs';
+
+import { useGetInterviewExperienceList } from './hooks/useGetInterviewExperienceList';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -51,6 +54,11 @@ const CompanyDetail = () => {
   const [editingRecord, setEditingRecord] = useState<InterviewRecord | null>(null);
   const [form] = Form.useForm();
   const [saveAndAddMode, setSaveAndAddMode] = useState(false);
+  const [activeTab, setActiveTab] = useState('experience');
+
+  const { data: experiences, isLoading: isExperienceLoading } = useGetInterviewExperienceList({
+    companyId: id || '',
+  });
 
   const fetchData = async () => {
     if (!id) return;
@@ -220,82 +228,134 @@ const CompanyDetail = () => {
                   </div>
                 </div>
               </div>
-              
-              <Descriptions column={{ xs: 1, sm: 2, md: 3 }} size="small" bordered>
-                <Descriptions.Item label="工作地点">{company.location || '-'}</Descriptions.Item>
-                <Descriptions.Item label="薪资范围">{company.salaryRange || '-'}</Descriptions.Item>
-                <Descriptions.Item label="标签">
-                  {company.tags?.map(tag => <Tag key={tag}>{tag}</Tag>)}
-                </Descriptions.Item>
-              </Descriptions>
             </div>
           </div>
         </Card>
 
-        {/* Timeline Section */}
-        <Card title="面试时间轴" className="shadow-md rounded-xl bg-white dark:bg-gray-800 dark:border-gray-700">
-          {records.length > 0 ? (
-            <Timeline 
-              mode="alternate" 
-              className="mt-4"
-              items={records.map(record => ({
-                key: record.id,
-                label: record.date,
-                dot: getResultIcon(record.result),
-                color: getResultColor(record.result),
-                children: (
-                  <Card 
-                    size="small" 
-                    className="mb-4 hover:shadow-sm border-l-4" 
-                    style={{ borderLeftColor: getResultColor(record.result) === 'green' ? '#52c41a' : getResultColor(record.result) === 'red' ? '#ff4d4f' : '#1890ff' }}
-                    title={
-                        <div className="flex justify-between items-center">
-                            <span>{record.round} - {record.format}</span>
-                            <Space>
-                                <Button 
-                                  type="text" 
-                                  icon={<EditOutlined />} 
-                                  size="small" 
-                                  onClick={() => showEditModal(record)}
-                                />
-                                <Popconfirm title="确定删除这条记录吗？" onConfirm={() => handleDeleteRecord(record.id)}>
-                                    <Button type="text" danger icon={<DeleteOutlined />} size="small" />
-                                </Popconfirm>
-                            </Space>
-                        </div>
-                    }
-                  >
-                    {record.interviewer && <p className="text-gray-500 mb-2">面试官: {record.interviewer}</p>}
-                    
-                    {record.questions && (
-                      <div className="mb-3">
-                        <div className="font-semibold text-gray-700 dark:text-gray-300 mb-1">面试问题:</div>
-                        <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-sm whitespace-pre-wrap">
-                          {record.questions}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {record.answers && (
-                      <div className="mb-3">
-                        <div className="font-semibold text-gray-700 dark:text-gray-300 mb-1">我的回答/复盘:</div>
-                        <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm whitespace-pre-wrap text-gray-600 dark:text-gray-400">
-                          {record.answers}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {record.feedback && (
-                       <div className="mt-2 text-sm text-gray-500">
-                           <span className="font-bold">反馈/备注:</span> {record.feedback}
-                       </div>
-                    )}
-                  </Card>
-                )
-              }))}
-            />
+        {/* Timeline & Experience Section */}
+        <Card 
+            className="shadow-md rounded-xl bg-white dark:bg-gray-800 dark:border-gray-700"
+            tabList={[
+                { key: 'experience', tab: '面经记录' },
+                { key: 'timeline', tab: '我的面试' }
+            ]}
+            activeTabKey={activeTab}
+            onTabChange={key => setActiveTab(key)}
+        >
+          {activeTab === 'timeline' ? (
+              records.length > 0 ? (
+                <Timeline 
+                  mode="alternate" 
+                  className="mt-4"
+                  items={records.map(record => ({
+                    key: record.id,
+                    label: record.date,
+                    dot: getResultIcon(record.result),
+                    color: getResultColor(record.result),
+                    children: (
+                      <Card 
+                        size="small" 
+                        className="mb-4 hover:shadow-sm border-l-4" 
+                        style={{ borderLeftColor: getResultColor(record.result) === 'green' ? '#52c41a' : getResultColor(record.result) === 'red' ? '#ff4d4f' : '#1890ff' }}
+                        title={
+                            <div className="flex justify-between items-center">
+                                <span>{record.round} - {record.format}</span>
+                                <Space>
+                                    <Button 
+                                      type="text" 
+                                      icon={<EditOutlined />} 
+                                      size="small" 
+                                      onClick={() => showEditModal(record)}
+                                    />
+                                    <Popconfirm title="确定删除这条记录吗？" onConfirm={() => handleDeleteRecord(record.id)}>
+                                        <Button type="text" danger icon={<DeleteOutlined />} size="small" />
+                                    </Popconfirm>
+                                </Space>
+                            </div>
+                        }
+                      >
+                        {record.interviewer && <p className="text-gray-500 mb-2">面试官: {record.interviewer}</p>}
+                        
+                        {record.questions && (
+                          <div className="mb-3">
+                            <div className="font-semibold text-gray-700 dark:text-gray-300 mb-1">面试问题:</div>
+                            <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-sm whitespace-pre-wrap">
+                              {record.questions}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {record.answers && (
+                          <div className="mb-3">
+                            <div className="font-semibold text-gray-700 dark:text-gray-300 mb-1">我的回答/复盘:</div>
+                            <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm whitespace-pre-wrap text-gray-600 dark:text-gray-400">
+                              {record.answers}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {record.feedback && (
+                           <div className="mt-2 text-sm text-gray-500">
+                               <span className="font-bold">反馈/备注:</span> {record.feedback}
+                           </div>
+                        )}
+                      </Card>
+                    )
+                  }))}
+                />
+              ) : (
+                <Empty description="暂无面试记录，快去添加一条吧！" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+              )
           ) : (
-            <Empty description="暂无面试记录，快去添加一条吧！" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            // Experience Tab
+            <div className="space-y-6 mt-2">
+              <Spin spinning={isExperienceLoading}>
+                {experiences && experiences.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-4">
+                    {experiences.map(exp => (
+                      <Card
+                        key={exp.id}
+                        hoverable
+                        className="border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow"
+                        onClick={() => window.open(`/front/companyInterview/${exp.id}`, '_blank')}
+                      >
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-2 line-clamp-2">
+                              {exp.title}
+                            </h3>
+                            <div className="flex items-center gap-3 text-sm text-gray-500">
+                              <span>{dayjs(exp.createTime).format('YYYY-MM-DD')}</span>
+                              {exp.vip === 'vip' && (
+                                <Tag color="gold" className="m-0 border-0">VIP</Tag>
+                              )}
+                            </div>
+                          </div>
+                          <div className="ml-4">
+                             <Button 
+                               type="link" 
+                               size="small" 
+                               icon={<LinkOutlined />}
+                               onClick={(e) => {
+                                 e.stopPropagation();
+                                 window.open(`/front/companyInterview/${exp.id}`, '_blank');
+                               }}
+                             >
+                               查看详情
+                             </Button>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                   <Empty description="暂无相关面经" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                )}
+              </Spin>
+
+              {/* Personal Interview Records with Content */}
+        
+            </div>
           )}
         </Card>
 

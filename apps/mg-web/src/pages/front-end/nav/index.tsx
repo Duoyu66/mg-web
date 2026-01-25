@@ -15,6 +15,8 @@ import {
   Server,
   Box
 } from 'lucide-react';
+import { Spin } from 'antd';
+import { useVisualSearch } from './hooks/useVisualSearch';
 
 // --- Data Definition ---
 
@@ -167,6 +169,18 @@ const NavCard = ({ item }: { item: NavItem }) => {
 
 const Nav = () => {
   const [activeCategory, setActiveCategory] = useState<string>(NAV_DATA[0].id);
+  const [searchText, setSearchText] = useState('');
+  const [debouncedSearchText, setDebouncedSearchText] = useState('');
+
+  // Debounce search text
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchText(searchText);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchText]);
+
+  const { data: searchResults, isLoading: isSearching } = useVisualSearch(debouncedSearchText);
 
   // Scroll spy effect to update active category
   useEffect(() => {
@@ -213,12 +227,13 @@ const Nav = () => {
             <Globe className="text-primary-600" />
             开发者导航
           </h1>
-          {/* Placeholder for search - can be implemented later */}
           <div className="relative hidden sm:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input 
               type="text" 
               placeholder="搜索资源..." 
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
               className="pl-9 pr-4 py-1.5 bg-gray-100 dark:bg-gray-700 border-none rounded-full text-sm focus:ring-2 focus:ring-primary-500 w-64 transition-all"
             />
           </div>
@@ -226,6 +241,25 @@ const Nav = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {searchText ? (
+          <div className="min-h-[400px]">
+            <h2 className="text-xl font-bold mb-6 text-gray-800 dark:text-gray-100">搜索结果</h2>
+            {isSearching ? (
+              <div className="flex justify-center items-center py-20"><Spin size="large" /></div>
+            ) : searchResults && searchResults.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
+                {searchResults.map((item: any, index: number) => (
+                  <NavCard key={index} item={item} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-20">
+                <Search className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500">未找到相关资源</p>
+              </div>
+            )}
+          </div>
+        ) : (
         <div className="flex flex-col lg:flex-row gap-8">
           
           {/* Sidebar Navigation - Desktop */}
@@ -296,6 +330,7 @@ const Nav = () => {
             ))}
           </main>
         </div>
+        )}
       </div>
     </div>
   );

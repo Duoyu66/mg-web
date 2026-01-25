@@ -59,7 +59,7 @@ const LayoutPage = () => {
           transition: "padding-top 300ms"
         }}
       >
-        <div className="w-full max-w-[1200px] flex-1 px-4">
+        <div className="w-full max-w-[1400px] flex-1 px-4">
           {/* 这里是 sticky 元素的参考容器 */}
           <div className="relative">
             <div

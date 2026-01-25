@@ -142,12 +142,9 @@ const PublishArticle = () => {
 
   const handlePublish = () => {
     const rawHtml = editorRef.current?.getHtml() ?? content;
-    let finalHtml = rawHtml;
 
-    // 如果有标题，将标题作为 h1 标签插入到内容顶部
-    if (title.trim()) {
-      finalHtml = `<h1 style="font-size: 2em; font-weight: bold; margin-bottom: 0.8em; color: #1a1a1a;">${title}</h1>${rawHtml}`;
-    } else {
+    // 校验标题
+    if (!title.trim()) {
       message.warning("请输入文章标题");
       return;
     }
@@ -163,7 +160,7 @@ const PublishArticle = () => {
       return;
     }
 
-    publish({ title,content: finalHtml }, {
+    publish({ title, content: rawHtml }, {
       onSuccess: () => {
         message.success("发布成功");
         navigate(-1);

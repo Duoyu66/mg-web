@@ -91,9 +91,9 @@ const CompanyList = () => {
       <div className="max-w-7xl mx-auto space-y-6">
         
         {/* Header & Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <Card variant="borderless" className="shadow-sm">
-            <Statistic title="总投递公司" value={totalCompanies} prefix={<GlobalOutlined />} />
+            <Statistic title="正在投递" value={totalCompanies} prefix={<GlobalOutlined />} />
           </Card>
           {/* Placeholder stats as we don't have full data */}
           <Card variant="borderless" className="shadow-sm">
@@ -104,6 +104,9 @@ const CompanyList = () => {
           </Card>
           <Card variant="borderless" className="shadow-sm">
             <Statistic title="已结束/挂" value={'-'} styles={{ content: { color: '#cf1322' } }} />
+          </Card>
+            <Card variant="borderless" className="shadow-sm">
+            <Statistic title="我的面试" value={'-'} styles={{ content: { color: '#cf1322' } }} />
           </Card>
         </div>
 
@@ -150,7 +153,7 @@ const CompanyList = () => {
                     </span>
                     <span className="text-sm font-normal text-gray-500">级别</span>
                   </h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols- gap-4">
                     {group.companies.map((item) => {
                       const company: Company = {
                         id: item.id,
@@ -170,34 +173,32 @@ const CompanyList = () => {
                         <Card
                           key={company.id}
                           hoverable
-                          className="transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-xl rounded-xl overflow-hidden group"
-                          bodyStyle={{ padding: '12px' }}
+                          className="flex transition-all duration-300 ease-linear  hover:shadow-lg rounded-2xl overflow-hidden group border-transparent bg-white dark:bg-gray-800"
+                          bodyStyle={{ padding: '20px 16px', height: '100%' }}
                           onClick={() => navigate(`/front/company/${company.id}`)}
                         >
-                          <div className="absolute top-0 right-0 p-0">
-                            <Tag color={getStatusColor(company.status)} className="m-1 mr-2 scale-75 origin-top-right rounded-md">
+                      <div className='flex'>
+                            <div className="absolute top-3 right-3 z-10">
+                            <Tag 
+                              color={getStatusColor(company.status)} 
+                              className="m-0 border-0 rounded-full px-2.5 py-0.5 text-xs font-medium transition-all duration-300 ease-linear shadow-sm"
+                            >
                               {company.status}
                             </Tag>
                           </div>
                           
-                          <div className="flex flex-col items-center mb-2 mt-1">
-                            <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center overflow-hidden mb-2 border border-gray-100 group-hover:border-primary-200 transition-colors">
-                              {company.logo ? (
-                                <img src={company.logo} alt={company.name} className="w-full h-full object-cover" />
-                              ) : (
-                                <span className="text-lg font-bold text-gray-300">{company.name.charAt(0)}</span>
-                              )}
-                            </div>
-                            <h3 className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-0.5 truncate w-full text-center px-1">{company.name}</h3>
+                          <div className="border min-w-[50px] h-[50px] rounded-2xl bg-gray-50 dark:bg-gray-700 flex items-center justify-center overflow-hidden  border border-gray-100 dark:border-gray-600 group-hover:border-primary-200 dark:group-hover:border-primary-500 transition-colors duration-300 ease-linear shadow-sm relative">
+                            {company.logo ? (
+                              <img src={company.logo} alt={company.name} className="min-w-[50px] h-[50px] object-cover transition-transform duration-300 ease-linear group-hover:scale-110" />
+                            ) : (
+                              <span className="text-2xl font-bold text-gray-300 dark:text-gray-500">{company.name.charAt(0)}</span>
+                            )}
                           </div>
-
-                          <div className="flex flex-wrap gap-1 justify-center min-h-[20px]">
-                            {company.tags?.slice(0, 2).map((tag, idx) => (
-                              <Tag key={idx} className="text-[10px] px-1 py-0 bg-gray-50 dark:bg-gray-700 mr-0 scale-90">
-                                {tag}
-                              </Tag>
-                            ))}
-                          </div>
+                          
+                          <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 truncate w-full text-center px-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300 ease-linear">
+                            {company.name}
+                          </h3>
+                      </div>
                         </Card>
                       );
                     })}

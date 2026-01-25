@@ -96,43 +96,54 @@ const parseContent = (content: string) => {
   const sections: {
     type: "title" | "today" | "tomorrow" | "reflection" | "text";
     content: string[];
+    id?: string;
   }[] = [];
+  const tocItems: Array<{ id: string; text: string; level: number }> = [];
 
   let currentSection: {
     type: "title" | "today" | "tomorrow" | "reflection" | "text";
     content: string[];
+    id?: string;
   } | null = null;
 
-  lines.forEach((line) => {
+  lines.forEach((line, index) => {
     const trimmed = line.trim();
     if (trimmed.startsWith("Day ")) {
       if (currentSection) sections.push(currentSection);
-      currentSection = { type: "title", content: [trimmed] };
+      const id = `section-title-${index}`;
+      currentSection = { type: "title", content: [trimmed], id };
+      tocItems.push({ id, text: trimmed, level: 1 });
     } else if (
       trimmed.includes("今天做了:") ||
       trimmed.includes("今天做了：")
     ) {
       if (currentSection) sections.push(currentSection);
-      currentSection = { type: "today", content: [] };
+      const id = `section-today-${index}`;
+      currentSection = { type: "today", content: [], id };
+      tocItems.push({ id, text: "今天做了", level: 2 });
     } else if (
       trimmed.includes("明天计划:") ||
       trimmed.includes("明天计划：")
     ) {
       if (currentSection) sections.push(currentSection);
-      currentSection = { type: "tomorrow", content: [] };
+      const id = `section-tomorrow-${index}`;
+      currentSection = { type: "tomorrow", content: [], id };
+      tocItems.push({ id, text: "明天计划", level: 2 });
     } else if (
       trimmed.includes("今日感悟:") ||
       trimmed.includes("今日感悟：")
     ) {
       if (currentSection) sections.push(currentSection);
-      currentSection = { type: "reflection", content: [] };
+      const id = `section-reflection-${index}`;
+      currentSection = { type: "reflection", content: [], id };
+      tocItems.push({ id, text: "今日感悟", level: 2 });
     } else if (trimmed && currentSection) {
       currentSection.content.push(trimmed);
     }
   });
   if (currentSection) sections.push(currentSection);
 
-  return { type: "sections", sections, toc: [] };
+  return { type: "sections", sections, toc: tocItems };
 };
 
 export default function ArticleDetail() {
@@ -654,7 +665,7 @@ session.sendMessage(new TextMessage(json));
       const offsetPosition = elementPosition + window.pageYOffset - offset;
       window.scrollTo({
         top: offsetPosition,
-        behavior: "smooth",
+        behavior: "auto",
       });
       setActiveTocId(id);
     }
@@ -957,12 +968,12 @@ session.sendMessage(new TextMessage(json));
                   parsedContent.sections?.map((section, index) => (
                     <div key={index} className="mb-4">
                       {section.type === "title" && (
-                        <h1 className="text-2xl font-bold mb-4">
+                        <h1 id={section.id} className="text-2xl font-bold mb-4">
                           {section.content[0]}
                         </h1>
                       )}
                       {section.type === "today" && (
-                        <div className="mb-4">
+                        <div className="mb-4" id={section.id}>
                           <div className="flex items-center gap-2 mb-2 text-gray-700 dark:text-gray-300">
                             <CheckCircle2 className="w-5 h-5 text-green-500" />
                             <span className="font-semibold">今天做了:</span>
@@ -980,7 +991,7 @@ session.sendMessage(new TextMessage(json));
                         </div>
                       )}
                       {section.type === "tomorrow" && (
-                        <div className="mb-4">
+                        <div className="mb-4" id={section.id}>
                           <div className="flex items-center gap-2 mb-2 text-gray-700 dark:text-gray-300">
                             <Clock className="w-5 h-5 text-red-500" />
                             <span className="font-semibold">明天计划:</span>
@@ -998,7 +1009,7 @@ session.sendMessage(new TextMessage(json));
                         </div>
                       )}
                       {section.type === "reflection" && (
-                        <div className="mb-4">
+                        <div className="mb-4" id={section.id}>
                           <div className="flex items-center gap-2 mb-2 text-gray-700 dark:text-gray-300">
                             <SquareStack className="w-5 h-5 text-blue-500" />
                             <span className="font-semibold">今日感悟:</span>

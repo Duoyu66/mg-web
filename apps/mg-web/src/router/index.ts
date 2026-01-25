@@ -19,6 +19,7 @@ import ExamPage from "@/pages/front-end/question/questionHome/examPage";
 import FinishPage from "@/pages/front-end/question/questionHome/finishPage";
 import PublishArticle from "@/pages/front-end/publishArticle";
 import ArticleDetail from "@/pages/front-end/Home/articleDetail";
+import UserProfile from "@/pages/front-end/user";
 import CodeEdit from "@/pages/front-end/codeEdit";
 import CompanyList from "@/pages/front-end/company";
 import CompanyDetail from "@/pages/front-end/company/detail";
@@ -291,6 +292,15 @@ const routes = [
                 title: '文章详情',
                 path: "articleDetail/:id",
                 component: ArticleDetail,
+                meta: {
+                    age: 1,
+                    name: "张三"
+                }
+            },
+            {
+                title: '用户主页',
+                path: "userProfile/:id",
+                component: UserProfile,
                 meta: {
                     age: 1,
                     name: "张三"
