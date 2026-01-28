@@ -11,34 +11,39 @@ type NavTreeProps = {
   tree: DirectoryNode[];
   currentSegments: string[];
   userRole: UserRole;
+  moduleTitle: string | null;
 };
 
-export function NavTree({ tree, currentSegments, userRole }: NavTreeProps) {
+export function NavTree({ tree, currentSegments, userRole, moduleTitle }: NavTreeProps) {
   // 在顶层管理展开状态，确保所有层级共享
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(() => {
-    if (typeof window === "undefined") return new Set();
+  // 服务器端和客户端都初始化为空 Set，避免 hydration 错误
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // 在客户端挂载后从 sessionStorage 读取展开状态
+  useEffect(() => {
+    setIsHydrated(true);
     try {
       const saved = sessionStorage.getItem(STORAGE_KEY);
       if (saved) {
         const items = JSON.parse(saved) as string[];
-        return new Set(items);
+        setExpandedItems(new Set(items));
       }
     } catch {
       // 忽略解析错误
     }
-    return new Set();
-  });
+  }, []);
 
   // 保存展开状态到 sessionStorage
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (isHydrated && typeof window !== "undefined") {
       try {
         sessionStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(expandedItems)));
       } catch {
         // 忽略存储错误
       }
     }
-  }, [expandedItems]);
+  }, [expandedItems, isHydrated]);
 
   const toggleExpand = (key: string) => {
     setExpandedItems((prev) => {
@@ -52,8 +57,34 @@ export function NavTree({ tree, currentSegments, userRole }: NavTreeProps) {
     });
   };
 
+  // 如果只有一个模块，直接显示其内容，不显示模块名
+  if (tree.length === 1) {
+    return (
+      <nav className="space-y-8 text-sm">
+        {moduleTitle && (
+          <div className="mb-6 pb-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">{moduleTitle}</h2>
+          </div>
+        )}
+        <NavChildren 
+          nodes={tree[0].children} 
+          currentSegments={currentSegments}
+          expandedItems={expandedItems}
+          toggleExpand={toggleExpand}
+          userRole={userRole}
+        />
+      </nav>
+    );
+  }
+  
+  // 多个模块时显示模块名
   return (
     <nav className="space-y-8 text-sm">
+      {moduleTitle && (
+        <div className="mb-6 pb-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">{moduleTitle}</h2>
+        </div>
+      )}
       {tree.map((node) => (
         <div key={node.name}>
           <p className="font-semibold mb-3 text-gray-900 text-xs uppercase tracking-wider">{node.name}</p>

@@ -72,7 +72,31 @@ function readDirectory(dirPath: string, segments: string[]): Array<DirectoryNode
     const fm = parsed.data as DocFrontmatter;
     const title = fm.sidebar_label || fm.title || baseName;
     // 检查是否需要 VIP：如果 roles 中包含 "vip" 或 "admin"，则需要 VIP
-    const requiresVip = Array.isArray(fm.roles) && (fm.roles.includes("vip") || fm.roles.includes("admin"));
+    // 处理 roles 可能是数组、字符串或其他格式的情况
+    let requiresVip = false;
+    if (fm.roles) {
+      if (Array.isArray(fm.roles)) {
+        requiresVip = fm.roles.includes("vip") || fm.roles.includes("admin");
+      } else if (typeof fm.roles === "string") {
+        // 如果 roles 是字符串，尝试解析（可能是 JSON 字符串或 YAML 解析问题）
+        try {
+          const parsedRoles = JSON.parse(fm.roles);
+          if (Array.isArray(parsedRoles)) {
+            requiresVip = parsedRoles.includes("vip") || parsedRoles.includes("admin");
+          } else if (parsedRoles === "vip" || parsedRoles === "admin") {
+            requiresVip = true;
+          }
+        } catch {
+          // 如果不是 JSON，检查是否直接是 "vip" 或 "admin"
+          requiresVip = fm.roles === "vip" || fm.roles === "admin";
+        }
+      }
+    }
+    
+    // 调试日志（仅在开发环境）
+    if (process.env.NODE_ENV === "development" && baseName === "js") {
+      console.log(`[docs.ts] File: ${baseName}, roles:`, fm.roles, "type:", typeof fm.roles, "requiresVip:", requiresVip);
+    }
     result.push({
       type: "file",
       id,
@@ -100,15 +124,38 @@ export function loadDocBySegments(segments: string[]): LoadedDoc | null {
   if (typeof data.sidebar_label === "string") {
     frontmatter.sidebar_label = data.sidebar_label;
   }
-  if (Array.isArray(data.roles)) {
-    const roles: UserRole[] = [];
-    for (const value of data.roles) {
-      if (value === "guest" || value === "basic" || value === "vip" || value === "admin") {
-        roles.push(value);
+  // 处理 roles 字段，可能是数组、字符串或其他格式
+  if (data.roles) {
+    let rolesArray: UserRole[] = [];
+    
+    if (Array.isArray(data.roles)) {
+      // 如果已经是数组，直接使用
+      rolesArray = data.roles.filter(
+        (value): value is UserRole => 
+          value === "guest" || value === "basic" || value === "vip" || value === "admin"
+      );
+    } else if (typeof data.roles === "string") {
+      // 如果是字符串，尝试解析（可能是 JSON 字符串或 YAML 解析问题）
+      try {
+        const parsed = JSON.parse(data.roles);
+        if (Array.isArray(parsed)) {
+          rolesArray = parsed.filter(
+            (value): value is UserRole => 
+              value === "guest" || value === "basic" || value === "vip" || value === "admin"
+          );
+        } else if (parsed === "guest" || parsed === "basic" || parsed === "vip" || parsed === "admin") {
+          rolesArray = [parsed];
+        }
+      } catch {
+        // 如果不是 JSON，检查是否直接是有效的角色字符串
+        if (data.roles === "guest" || data.roles === "basic" || data.roles === "vip" || data.roles === "admin") {
+          rolesArray = [data.roles];
+        }
       }
     }
-    if (roles.length > 0) {
-      frontmatter.roles = roles;
+    
+    if (rolesArray.length > 0) {
+      frontmatter.roles = rolesArray;
     }
   }
   return {
@@ -156,4 +203,75 @@ export function getAdjacentDocs(
     prev: currentIndex > 0 ? allDocs[currentIndex - 1] : null,
     next: currentIndex < allDocs.length - 1 ? allDocs[currentIndex + 1] : null,
   };
+}
+
+// 读取模块目录下的 config.ts 文件并解析 title
+export function getModuleTitle(segments: string[]): string | null {
+  if (segments.length < 2) {
+    return null;
+  }
+  
+  const configPath = path.join(DOCS_ROOT, segments[0], segments[1], "config.ts");
+  if (!fs.existsSync(configPath)) {
+    return null;
+  }
+  
+  try {
+    const content = fs.readFileSync(configPath, "utf8");
+    // 使用正则表达式提取 title 属性
+    // 匹配 title: "值" 或 title: '值' 或 title: `值` 或 title: 值（中文等，直到逗号、换行或右大括号）
+    const titleMatch = content.match(/title\s*:\s*(["'`])((?:(?!\1)[^\\]|\\.)*)\1|title\s*:\s*([^\s,}\n]+)/);
+    if (titleMatch) {
+      // 如果有引号，返回引号内的值（去除引号）
+      if (titleMatch[2]) {
+        return titleMatch[2].replace(/\\(.)/g, "$1"); // 处理转义字符
+      }
+      // 如果没有引号，返回原始值（去除可能的尾随空格）
+      if (titleMatch[3]) {
+        return titleMatch[3].trim();
+      }
+    }
+  } catch {
+    // 忽略读取错误
+  }
+  
+  return null;
+}
+
+// 根据当前路径获取当前模块的目录树
+export function getCurrentModuleTree(
+  currentSegments: string[],
+  fullTree: DirectoryNode[]
+): DirectoryNode[] | null {
+  if (currentSegments.length < 2) {
+    // 如果路径少于2段，返回顶层目录
+    return fullTree;
+  }
+  
+  const topLevelDir = currentSegments[0];
+  const secondLevelDir = currentSegments[1];
+  
+  // 找到顶层目录
+  const topLevelNode = fullTree.find((node) => node.name === topLevelDir);
+  if (!topLevelNode) {
+    return null;
+  }
+  
+  // 找到第二层目录（当前模块）
+  const moduleNode = topLevelNode.children.find(
+    (child) => child.type === "directory" && child.name === secondLevelDir
+  ) as DirectoryNode | undefined;
+  
+  if (!moduleNode) {
+    return null;
+  }
+  
+  // 返回只包含当前模块的目录树
+  return [
+    {
+      type: "directory",
+      name: moduleNode.name,
+      children: moduleNode.children,
+    },
+  ];
 }

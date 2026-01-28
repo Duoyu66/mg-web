@@ -2,6 +2,7 @@
 id: js
 title: JavaScript
 slug: /frontend/js
+roles: ['vip']
 ---
 
 ## 概览
