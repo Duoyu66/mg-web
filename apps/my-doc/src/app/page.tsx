@@ -5,29 +5,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { UserRole } from "@/lib/auth";
-import type { DirectoryNode, DocNode } from "@/lib/docs";
 
-type DocsTreeResponse = {
-  tree: DirectoryNode[];
+type Book = {
+  id: string;
+  title: string;
+  description?: string;
+  cover?: string;
+  category: string;
+  documentCount: number;
 };
 
-// 获取模块下的所有文档
-function getAllDocsFromModule(module: DirectoryNode): DocNode[] {
-  const docs: DocNode[] = [];
-  
-  function traverse(nodes: Array<DirectoryNode | DocNode>) {
-    for (const node of nodes) {
-      if (node.type === "file") {
-        docs.push(node);
-      } else if (node.type === "directory") {
-        traverse(node.children);
-      }
-    }
-  }
-  
-  traverse(module.children);
-  return docs;
-}
+type BooksResponse = {
+  books: Book[];
+};
 
 // 从 cookie 获取用户角色
 function getUserRoleFromCookie(): UserRole {
@@ -47,19 +37,18 @@ function getUserRoleFromCookie(): UserRole {
 
 export default function Home() {
   const router = useRouter();
-  const [docsTree, setDocsTree] = useState<DirectoryNode[]>([]);
-  const [selectedModule, setSelectedModule] = useState<string | null>(null);
+  const [books, setBooks] = useState<Book[]>([]);
   const [userRole, setUserRole] = useState<UserRole>(() => getUserRoleFromCookie());
 
   useEffect(() => {
-    // 获取文档树
-    fetch("/api/docs-tree")
+    // 获取所有书籍
+    fetch("/api/books")
       .then((res) => res.json())
-      .then((data: DocsTreeResponse) => {
-        setDocsTree(data.tree);
+      .then((data: BooksResponse) => {
+        setBooks(data.books);
       })
       .catch((error) => {
-        console.error("Failed to fetch docs tree:", error);
+        console.error("Failed to fetch books:", error);
       });
   }, []);
 
@@ -74,8 +63,9 @@ export default function Home() {
     router.push("/docs");
   }
 
-  const selectedModuleNode = docsTree.find((node) => node.name === selectedModule);
-  const moduleDocs = selectedModuleNode ? getAllDocsFromModule(selectedModuleNode) : [];
+  function enterBook(bookId: string) {
+    router.push(`/books/${bookId}`);
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -94,73 +84,51 @@ export default function Home() {
               木瓜文档系统
             </h1>
             <p className="text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-              选择模块查看文档，或切换不同权限进行模拟。
+              选择书籍开始学习，每本书都是独立完整的学习路径。
             </p>
           </div>
 
-          {/* 模块列表 */}
+          {/* 书籍列表 */}
           <div className="mt-8">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-zinc-50">选择模块</h2>
-            <div className="flex flex-wrap gap-3">
-              {docsTree.map((module) => (
-                <button
-                  key={module.name}
-                  type="button"
-                  onClick={() => setSelectedModule(module.name)}
-                  className={`px-4 py-2 rounded-lg border transition-colors ${
-                    selectedModule === module.name
-                      ? "bg-gray-900 text-white border-gray-900"
-                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                  }`}
+            <h2 className="text-xl font-semibold mb-6 text-gray-900 dark:text-zinc-50">所有书籍</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {books.map((book) => (
+                <div
+                  key={book.id}
+                  onClick={() => enterBook(book.id)}
+                  className="group cursor-pointer bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all"
                 >
-                  {module.name}
-                </button>
+                  {book.cover ? (
+                    <div className="h-48 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                      <span className="text-white text-2xl font-bold">{book.title}</span>
+                    </div>
+                  ) : (
+                    <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                      <span className="text-gray-400 text-4xl">📚</span>
+                    </div>
+                  )}
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                      {book.title}
+                    </h3>
+                    {book.description && (
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                        {book.description}
+                      </p>
+                    )}
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        {book.category}
+                      </span>
+                      <span className="text-sm text-gray-600">
+                        {book.documentCount} 个文档
+                      </span>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
-
-          {/* 文档列表 */}
-          {selectedModule && moduleDocs.length > 0 && (
-            <div className="mt-8">
-              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-zinc-50">
-                {selectedModule} 模块文档
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {moduleDocs.map((doc) => {
-                  const href = "/docs/" + doc.pathSegments.join("/");
-                  const isVip = userRole === "vip" || userRole === "admin";
-                  const canAccess = !doc.requiresVip || isVip;
-                  
-                  return (
-                    <Link
-                      key={doc.id}
-                      href={canAccess ? href : "#"}
-                      onClick={(e) => {
-                        if (!canAccess) {
-                          e.preventDefault();
-                          alert("您还不是会员");
-                        }
-                      }}
-                      className={`block p-4 rounded-lg border transition-colors ${
-                        canAccess
-                          ? "bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400"
-                          : "bg-gray-50 text-gray-500 border-gray-200 cursor-not-allowed"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">{doc.title}</span>
-                        {doc.requiresVip && (
-                          <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-                            VIP
-                          </span>
-                        )}
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          )}
 
           {/* 权限切换 */}
           <div className="mt-8 pt-8 border-t border-gray-200">

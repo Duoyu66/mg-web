@@ -21,16 +21,16 @@ export function CodeBlock({ children, className, title }: CodeBlockProps) {
   const language = className?.replace("language-", "") || "";
 
   return (
-    <div className="relative group my-6 rounded-lg overflow-hidden border border-gray-200 bg-[#0d1117]">
+    <div className="relative group my-6 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
       {title && (
-        <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
-          <span className="text-sm text-gray-600 font-medium">{title}</span>
+        <div className="px-4 py-2 bg-gray-100 border-b border-gray-200">
+          <span className="text-sm text-gray-700 font-medium">{title}</span>
         </div>
       )}
       <div className="relative">
         <button
           onClick={copyToClipboard}
-          className="absolute top-3 right-3 z-10 p-1.5 rounded border border-gray-600 bg-[#161b22] hover:bg-[#21262d] text-gray-400 hover:text-gray-300 transition-all opacity-0 group-hover:opacity-100"
+          className="absolute top-3 right-3 z-10 p-1.5 rounded border border-gray-300 bg-white hover:bg-gray-100 text-gray-600 hover:text-gray-900 transition-all opacity-0 group-hover:opacity-100 shadow-sm"
           title="Copy code"
           aria-label="Copy code"
         >
@@ -49,7 +49,7 @@ export function CodeBlock({ children, className, title }: CodeBlockProps) {
             {language}
           </div>
         )}
-        <pre className={`${className || ""} overflow-x-auto p-4 text-sm`}>
+        <pre className={`${className || ""} overflow-x-auto p-4 text-sm bg-gray-50`}>
           <code className={className}>{children}</code>
         </pre>
       </div>

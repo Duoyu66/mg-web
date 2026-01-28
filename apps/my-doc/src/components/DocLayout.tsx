@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
@@ -13,7 +13,7 @@ import { CodeBlock } from "@/components/CodeBlock";
 import React from "react";
 import type { DirectoryNode, DocNode } from "@/lib/docs";
 import type { UserRole } from "@/lib/auth";
-import "highlight.js/styles/github-dark.css";
+import "highlight.js/styles/github.css";
 
 type DocLayoutProps = {
   initialModuleTree: DirectoryNode[];
@@ -49,43 +49,69 @@ export function DocLayout({
   const currentModuleId = getModuleId(initialSegments);
   
   // 从 sessionStorage 读取保存的模块标识和模块树
-  // 服务器端和客户端都使用 initialModuleTree，避免 hydration 错误
-  const [moduleTree, setModuleTree] = useState<DirectoryNode[]>(initialModuleTree);
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  // 在客户端挂载后从 sessionStorage 读取模块树
-  useEffect(() => {
-    setIsHydrated(true);
-    if (typeof window === "undefined") return;
+  // 使用 useMemo 稳定模块树，避免路由变化时重新计算
+  const moduleTree = useMemo(() => {
+    if (typeof window === "undefined") return initialModuleTree;
     
     const savedModuleId = sessionStorage.getItem(STORAGE_KEY);
     const savedTree = sessionStorage.getItem(TREE_STORAGE_KEY);
     
-    // 如果 sessionStorage 中已经有保存的模块树，使用保存的模块树（固定显示初始模块的菜单）
-    if (savedModuleId && savedTree) {
+    // 如果 sessionStorage 中已经有保存的模块树，且模块ID匹配，使用保存的模块树
+    if (savedModuleId === currentModuleId && savedTree) {
       try {
         const parsedTree = JSON.parse(savedTree);
-        // 验证解析的树是否有效
         if (Array.isArray(parsedTree) && parsedTree.length > 0) {
-          setModuleTree(parsedTree);
-          return;
+          return parsedTree;
         }
       } catch {
-        // 如果解析失败，继续使用当前模块树
+        // 如果解析失败，使用初始模块树
       }
     }
     
-    // 首次进入或保存的模块树无效：保存当前模块标识和模块树
-    if (currentModuleId && !savedModuleId) {
-      sessionStorage.setItem(STORAGE_KEY, currentModuleId);
-      sessionStorage.setItem(TREE_STORAGE_KEY, JSON.stringify(initialModuleTree));
-    }
+    return initialModuleTree;
   }, [currentModuleId, initialModuleTree]);
+
+  // 在客户端挂载后保存模块树到 sessionStorage
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    
+    // 保存当前模块标识和模块树
+    if (currentModuleId) {
+      sessionStorage.setItem(STORAGE_KEY, currentModuleId);
+      sessionStorage.setItem(TREE_STORAGE_KEY, JSON.stringify(moduleTree));
+    }
+  }, [currentModuleId, moduleTree]);
   
-  // 从路径中提取当前 segments
-  const currentSegments = pathname.startsWith("/docs/")
-    ? pathname.replace("/docs/", "").split("/").filter(Boolean)
-    : initialSegments;
+  // 从路径中提取当前 segments，使用 useMemo 避免不必要的重新计算
+  const currentSegments = useMemo(() => {
+    if (pathname.startsWith("/docs/")) {
+      return pathname.replace("/docs/", "").split("/").filter(Boolean);
+    } else if (pathname.startsWith("/books/")) {
+      // 处理书籍页面的路径：/books/[bookId]/[...slug]
+      const parts = pathname.replace("/books/", "").split("/").filter(Boolean);
+      return parts;
+    }
+    return initialSegments;
+  }, [pathname, initialSegments]);
+
+  // 只监听用户主动滚动，保存滚动位置（不自动恢复）
+  useEffect(() => {
+    const sidebar = document.getElementById("doc-sidebar");
+    if (!sidebar) return;
+
+    const scrollKey = `sidebar-scroll-${currentModuleId || "default"}`;
+    
+    // 只保存滚动位置，不恢复
+    const handleScroll = () => {
+      sessionStorage.setItem(scrollKey, sidebar.scrollTop.toString());
+    };
+
+    sidebar.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      sidebar.removeEventListener("scroll", handleScroll);
+    };
+  }, [currentModuleId]);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -98,8 +124,17 @@ export function DocLayout({
       
       <div className="flex mt-14">
         {/* 左侧菜单 */}
-        <aside className="w-64 border-r border-gray-200 bg-white p-4 overflow-y-auto fixed left-0 top-14 h-[calc(100vh-3.5rem)] z-10 pointer-events-auto">
-          <NavTree tree={moduleTree} currentSegments={currentSegments} userRole={userRole} moduleTitle={moduleTitle} />
+        <aside 
+          id="doc-sidebar"
+          className="w-64 border-r border-gray-200 bg-white p-4 overflow-y-auto fixed left-0 top-14 h-[calc(100vh-3.5rem)] z-10 pointer-events-auto"
+        >
+          <NavTree 
+            key={currentModuleId || "default"} 
+            tree={moduleTree} 
+            currentSegments={currentSegments} 
+            userRole={userRole} 
+            moduleTitle={moduleTitle} 
+          />
         </aside>
         
         {/* 中间内容 */}
@@ -199,7 +234,7 @@ export function DocLayout({
                       );
                     }
                     
-                    return <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto my-4">{children}</pre>;
+                    return <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto my-4 border border-gray-200">{children}</pre>;
                   },
                   a: ({ href, children }) => {
                     const isExternal = href?.startsWith("http");
@@ -311,6 +346,7 @@ type TableOfContentsProps = {
 function TableOfContents({ headings }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const isManualClickRef = useRef(false);
   
   useEffect(() => {
     if (headings.length === 0) return;
@@ -318,12 +354,22 @@ function TableOfContents({ headings }: TableOfContentsProps) {
     const observerOptions = {
       root: null,
       rootMargin: "-80px 0% -80% 0%", // 考虑顶部栏高度
-      threshold: 0,
+      threshold: [0, 0.1, 0.5, 1], // 多个阈值，更精确地检测
     };
     
     const observer = new IntersectionObserver((entries) => {
-      // 找到所有进入视口的标题，选择最接近顶部的那个
+      // 如果最近有手动点击，暂时忽略 IntersectionObserver 的更新
+      if (isManualClickRef.current) {
+        // 延迟重置标志，让手动点击的高亮保持一段时间
+        setTimeout(() => {
+          isManualClickRef.current = false;
+        }, 100);
+        return;
+      }
+      
+      // 找到所有进入视口的标题
       const intersectingEntries = entries.filter(entry => entry.isIntersecting);
+      
       if (intersectingEntries.length > 0) {
         // 按位置排序，选择最接近顶部的
         intersectingEntries.sort((a, b) => {
@@ -332,6 +378,23 @@ function TableOfContents({ headings }: TableOfContentsProps) {
           return aTop - bTop;
         });
         setActiveId(intersectingEntries[0].target.id);
+      } else {
+        // 如果没有标题在视口中，找到最接近视口顶部的标题
+        let closestHeading: { id: string; distance: number } | null = null;
+        for (let i = 0; i < headings.length; i++) {
+          const heading = headings[i];
+          const element = document.getElementById(heading.id);
+          if (element) {
+            const rect = element.getBoundingClientRect();
+            const distance = Math.abs(rect.top - 80); // 80px 是顶部栏高度
+            if (!closestHeading || distance < closestHeading.distance) {
+              closestHeading = { id: heading.id, distance };
+            }
+          }
+        }
+        if (closestHeading) {
+          setActiveId(closestHeading.id);
+        }
       }
     }, observerOptions);
     
@@ -344,11 +407,40 @@ function TableOfContents({ headings }: TableOfContentsProps) {
     });
   
     observerRef.current = observer;
+    
+    // 添加滚动监听，作为 IntersectionObserver 的补充
+    const handleScroll = () => {
+      if (isManualClickRef.current) return;
+      
+      let closestHeading: { id: string; distance: number } | null = null;
+      for (let i = 0; i < headings.length; i++) {
+        const heading = headings[i];
+        if (!heading || !heading.id) continue;
+        const element = document.getElementById(heading.id);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          // 如果标题在视口上方或接近视口顶部
+          if (rect.top <= 100 && rect.bottom >= 80) {
+            const distance = Math.abs(rect.top - 80);
+            if (!closestHeading || distance < closestHeading.distance) {
+              closestHeading = { id: heading.id, distance };
+            }
+          }
+        }
+      }
+      
+      if (closestHeading && closestHeading.id) {
+        setActiveId(closestHeading.id);
+      }
+    };
+    
+    window.addEventListener("scroll", handleScroll, { passive: true });
   
     return () => {
       if (observerRef.current) {
         observerRef.current.disconnect();
       }
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [headings]);
   
@@ -370,6 +462,8 @@ function TableOfContents({ headings }: TableOfContentsProps) {
                   href={`#${heading.id}`}
                   onClick={(e) => {
                     e.preventDefault();
+                    // 标记为手动点击
+                    isManualClickRef.current = true;
                     // 立即设置高亮
                     setActiveId(heading.id);
                     const element = document.getElementById(heading.id);
@@ -378,12 +472,25 @@ function TableOfContents({ headings }: TableOfContentsProps) {
                       const elementPosition = element.getBoundingClientRect().top;
                       const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
                       // 立即跳转，不使用平滑滚动
+                      // 使用 scrollTo 并设置 behavior 为 auto，同时临时禁用 CSS 的 scroll-behavior
+                      const htmlElement = document.documentElement;
+                      const originalScrollBehavior = htmlElement.style.scrollBehavior;
+                      htmlElement.style.scrollBehavior = "auto";
                       window.scrollTo({
                         top: offsetPosition,
                         behavior: "auto",
                       });
+                      // 恢复原来的 scroll-behavior（如果有的话）
+                      setTimeout(() => {
+                        htmlElement.style.scrollBehavior = originalScrollBehavior || "";
+                      }, 0);
                       // 更新 URL hash
                       window.history.pushState(null, "", `#${heading.id}`);
+                      
+                      // 延迟重置标志，让 IntersectionObserver 继续工作
+                      setTimeout(() => {
+                        isManualClickRef.current = false;
+                      }, 500);
                     }
                   }}
                   className={`block py-1.5 transition-colors text-sm cursor-pointer ${

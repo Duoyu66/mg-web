@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { DirectoryNode, DocNode } from "@/lib/docs";
 import type { UserRole } from "@/lib/auth";
 
@@ -15,35 +16,49 @@ type NavTreeProps = {
 };
 
 export function NavTree({ tree, currentSegments, userRole, moduleTitle }: NavTreeProps) {
+  const pathname = usePathname();
+  // 判断是否在书籍页面，使用 useMemo 稳定值
+  const isBookPage = useMemo(() => pathname.startsWith("/books/"), [pathname]);
+  
   // 在顶层管理展开状态，确保所有层级共享
   // 服务器端和客户端都初始化为空 Set，避免 hydration 错误
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  // 在客户端挂载后从 sessionStorage 读取展开状态
-  useEffect(() => {
-    setIsHydrated(true);
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(() => {
+    // 使用 lazy initialization，在客户端立即读取 sessionStorage
+    if (typeof window === "undefined") return new Set();
     try {
       const saved = sessionStorage.getItem(STORAGE_KEY);
       if (saved) {
         const items = JSON.parse(saved) as string[];
-        setExpandedItems(new Set(items));
+        return new Set(items);
       }
     } catch {
       // 忽略解析错误
     }
+    return new Set();
+  });
+  const isHydratedRef = useRef(false);
+
+  // 确保 hydration 后标记为已初始化
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      isHydratedRef.current = true;
+    }
   }, []);
 
-  // 保存展开状态到 sessionStorage
+  // 保存展开状态到 sessionStorage（使用防抖，避免频繁写入）
   useEffect(() => {
-    if (isHydrated && typeof window !== "undefined") {
+    if (!isHydratedRef.current || typeof window === "undefined") return;
+    
+    const timer = setTimeout(() => {
       try {
         sessionStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(expandedItems)));
       } catch {
         // 忽略存储错误
       }
-    }
-  }, [expandedItems, isHydrated]);
+    }, 100); // 100ms 防抖
+    
+    return () => clearTimeout(timer);
+  }, [expandedItems]);
 
   const toggleExpand = (key: string) => {
     setExpandedItems((prev) => {
@@ -72,6 +87,7 @@ export function NavTree({ tree, currentSegments, userRole, moduleTitle }: NavTre
           expandedItems={expandedItems}
           toggleExpand={toggleExpand}
           userRole={userRole}
+          isBookPage={isBookPage}
         />
       </nav>
     );
@@ -94,6 +110,7 @@ export function NavTree({ tree, currentSegments, userRole, moduleTitle }: NavTre
             expandedItems={expandedItems}
             toggleExpand={toggleExpand}
             userRole={userRole}
+            isBookPage={isBookPage}
           />
         </div>
       ))}
@@ -109,6 +126,7 @@ type NavChildrenProps = {
   expandedItems: Set<string>;
   toggleExpand: (key: string) => void;
   userRole: UserRole;
+  isBookPage: boolean;
 };
 
 function NavChildren({ 
@@ -118,7 +136,8 @@ function NavChildren({
   parentKey = "",
   expandedItems,
   toggleExpand,
-  userRole
+  userRole,
+  isBookPage
 }: NavChildrenProps) {
 
   return (
@@ -162,13 +181,17 @@ function NavChildren({
                     expandedItems={expandedItems}
                     toggleExpand={toggleExpand}
                     userRole={userRole}
+                    isBookPage={isBookPage}
                   />
                 </div>
               )}
             </li>
           );
         }
-        const href = "/docs/" + child.pathSegments.join("/");
+        // 根据当前路径判断是书籍页面还是文档页面
+        const href = isBookPage 
+          ? `/books/${child.pathSegments[0]}/${child.pathSegments.slice(1).join("/")}`
+          : "/docs/" + child.pathSegments.join("/");
         const isActive =
           currentSegments.length === child.pathSegments.length &&
           currentSegments.every((s, idx) => s === child.pathSegments[idx]);

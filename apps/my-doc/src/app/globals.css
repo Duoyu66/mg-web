@@ -26,7 +26,7 @@ body {
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 /* 锚点链接样式 */
@@ -34,15 +34,15 @@ html {
   scroll-margin-top: 80px;
 }
 
-/* 代码高亮样式优化 */
+/* 代码高亮样式优化 - 浅色主题 */
 .hljs {
-  background: #0d1117 !important;
-  color: #c9d1d9 !important;
+  background: #f6f8fa !important;
+  color: #24292f !important;
 }
 
 .hljs-comment,
 .hljs-quote {
-  color: #8b949e;
+  color: #6e7781;
   font-style: italic;
 }
 
@@ -51,42 +51,42 @@ html {
 .hljs-literal,
 .hljs-section,
 .hljs-link {
-  color: #ff7b72;
+  color: #cf222e;
 }
 
 .hljs-function,
 .hljs-title {
-  color: #d2a8ff;
+  color: #8250df;
 }
 
 .hljs-string,
 .hljs-attr {
-  color: #a5d6ff;
+  color: #0a3069;
 }
 
 .hljs-number,
 .hljs-symbol,
 .hljs-bullet {
-  color: #79c0ff;
+  color: #0550ae;
 }
 
 .hljs-variable,
 .hljs-template-variable {
-  color: #ffa657;
+  color: #953800;
 }
 
 .hljs-attribute {
-  color: #79c0ff;
+  color: #0550ae;
 }
 
 .hljs-meta,
 .hljs-meta-keyword {
-  color: #ff7b72;
+  color: #cf222e;
 }
 
 .hljs-built_in,
 .hljs-builtin-name {
-  color: #ffa657;
+  color: #953800;
 }
 
 /* 标题锚点链接样式 */

@@ -1,8 +1,9 @@
 ---
 id: react-query
 title: React Query
-slug: /frontend/react-query
+slug: /frontend/advanced/react-query
 ---
+
 # React Query 详解
 
 ## 一、什么是 React Query？

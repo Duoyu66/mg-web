@@ -109,8 +109,10 @@ const Header = () => {
                 { id: "12", title: "个人中心", path: "/front/center" },
                 { id: "16", title: "留言板", path: "/front/board" },
                 { id: "17", title: "会员价格", path: "/front/price" },
-                { id: "1111", title: "充值", path: "/front/recharge" },
+    ,            { id: "1111", title: "充值", path: "/front/recharge" },
                 { id: "21", title: "LeetCode", path: "/codeEdit" },
+                { id: "22", title: "书架", path: "/front/bookcase" }
+
             ]
         },
     ];
