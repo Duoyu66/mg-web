@@ -40,7 +40,7 @@ const config: Config = {
       'classic',
       {
         docs: {
-          sidebarPath: './sidebars.ts',
+          sidebarPath: require.resolve('./sidebars.ts'),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
@@ -74,6 +74,12 @@ const config: Config = {
     colorMode: {
       respectPrefersColorScheme: true,
     },
+    docs: {
+      sidebar: {
+        hideable: true,
+        autoCollapseCategories: true,
+      },
+    },
     navbar: {
       title: '木瓜教程',
       logo: {
@@ -83,9 +89,21 @@ const config: Config = {
       items: [
         {
           type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
+          sidebarId: 'frontend',
           position: 'left',
-          label: '目录',
+          label: '前端',
+        },
+        {
+          type: 'docSidebar',
+          sidebarId: 'backend',
+          position: 'left',
+          label: '后端',
+        },
+        {
+          type: 'docSidebar',
+          sidebarId: 'secretManual',
+          position: 'left',
+          label: '秘籍',
         },
         {to: '/blog', label: 'Blog', position: 'left'},
         {
@@ -95,13 +113,12 @@ const config: Config = {
         },
       ],
     },
-    footer: {
-      style: 'light',
-      links: [
+    // footer: {
+    //   style: 'light',
+    //   links: [
 
-      ],
-      copyright: `Copyright © ${new Date().getFullYear()} power by 木瓜编程`,
-    },
+    //   ],
+    // },
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,

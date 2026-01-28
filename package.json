@@ -11,7 +11,11 @@
     "web:lint": "pnpm -C apps/mg-web lint",
     "docs:dev": "pnpm -C apps/doc start",
     "docs:build": "pnpm -C apps/doc build",
-    "docs:serve": "pnpm -C apps/doc serve"
+    "docs:serve": "pnpm -C apps/doc serve",
+    "doc:dev": "pnpm -C apps/my-doc dev",
+    "doc:build": "pnpm -C apps/my-doc build",
+    "doc:start": "pnpm -C apps/my-doc start",
+    "doc:lint": "pnpm -C apps/my-doc lint"
   },
   "devDependencies": {
     "sass-embedded": "^1.97.2"

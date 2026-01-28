@@ -88,13 +88,14 @@ const statusMap = {
 };
 
 const pageVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 1, y: 16 },
   visible: { 
     opacity: 1, 
     y: 0,
     transition: {
-      duration: 0.5,
-      staggerChildren: 0.1
+      duration: 0.4,
+      ease: 'easeOut',
+      staggerChildren: 0.08
     }
   }
 };
@@ -252,8 +253,11 @@ const TodoPage: React.FC = () => {
             <h3 className="font-bold text-gray-700 dark:text-gray-200 m-0">待办 (Todo)</h3>
             <Tag color="default">{tasks.filter(t => t.status === 'todo').length}</Tag>
           </div>
-          <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-            <AnimatePresence mode="popLayout">
+          <div
+            className="flex-1 overflow-y-auto pr-2 custom-scrollbar"
+            style={{ scrollbarGutter: 'stable' }}
+          >
+            <AnimatePresence mode="popLayout" initial={false}>
               {tasks.filter(t => t.status === 'todo').map(task => (
                 <TaskCard key={task.id} task={task} />
               ))}
@@ -270,8 +274,11 @@ const TodoPage: React.FC = () => {
             <h3 className="font-bold text-blue-700 dark:text-blue-200 m-0">进行中 (In Progress)</h3>
             <Tag color="blue">{tasks.filter(t => t.status === 'in_progress').length}</Tag>
           </div>
-          <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-            <AnimatePresence mode="popLayout">
+          <div
+            className="flex-1 overflow-y-auto pr-2 custom-scrollbar"
+            style={{ scrollbarGutter: 'stable' }}
+          >
+            <AnimatePresence mode="popLayout" initial={false}>
               {tasks.filter(t => t.status === 'in_progress').map(task => (
                 <TaskCard key={task.id} task={task} />
               ))}
@@ -288,8 +295,11 @@ const TodoPage: React.FC = () => {
             <h3 className="font-bold text-green-700 dark:text-green-200 m-0">已完成 (Done)</h3>
             <Tag color="green">{tasks.filter(t => t.status === 'done').length}</Tag>
           </div>
-          <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-            <AnimatePresence mode="popLayout">
+          <div
+            className="flex-1 overflow-y-auto pr-2 custom-scrollbar"
+            style={{ scrollbarGutter: 'stable' }}
+          >
+            <AnimatePresence mode="popLayout" initial={false}>
               {tasks.filter(t => t.status === 'done').map(task => (
                 <TaskCard key={task.id} task={task} />
               ))}
