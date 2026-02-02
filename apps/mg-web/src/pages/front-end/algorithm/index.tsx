@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Input, Button, Tag, Badge, Empty } from "antd";
+import { Input, Button, Tag, Badge, Empty, Segmented } from "antd";
 import { Search, ThumbsUp, Play, FileText, Sparkles, Trophy, Target } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -123,9 +123,10 @@ const problems: Problem[] = [
 const Algorithm = () => {
   const [searchText, setSearchText] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("动态规划");
+  const [viewFilter, setViewFilter] = useState<"all" | "must">("all");
+  const [difficultyFilter, setDifficultyFilter] = useState<"全部" | "简单" | "中等" | "困难">("全部");
   const navigate = useNavigate();
 
-  // 根据选中的主题和搜索文本过滤题目
   const filteredProblems = useMemo(() => {
     return problems.filter((problem) => {
       const matchesTopic = problem.tag === selectedTopic;
@@ -133,11 +134,28 @@ const Algorithm = () => {
         !searchText ||
         problem.title.toLowerCase().includes(searchText.toLowerCase()) ||
         problem.tag.toLowerCase().includes(searchText.toLowerCase());
-      return matchesTopic && matchesSearch;
+      const matchesView = viewFilter === "all" ? true : problem.isMustSolve;
+      const matchesDifficulty =
+        difficultyFilter === "全部" ? true : problem.difficulty === difficultyFilter;
+      return matchesTopic && matchesSearch && matchesView && matchesDifficulty;
     });
-  }, [selectedTopic, searchText]);
+  }, [selectedTopic, searchText, viewFilter, difficultyFilter]);
 
-  // 获取难度标签颜色
+  const topicStats = useMemo(() => {
+    const list = problems.filter((problem) => problem.tag === selectedTopic);
+    const mustCount = list.filter((problem) => problem.isMustSolve).length;
+    const easyCount = list.filter((problem) => problem.difficulty === "简单").length;
+    const mediumCount = list.filter((problem) => problem.difficulty === "中等").length;
+    const hardCount = list.filter((problem) => problem.difficulty === "困难").length;
+    return {
+      total: list.length,
+      must: mustCount,
+      easy: easyCount,
+      medium: mediumCount,
+      hard: hardCount,
+    };
+  }, [selectedTopic]);
+
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "简单":
@@ -152,35 +170,85 @@ const Algorithm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-gray-900 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* 顶部 Header 区域 */}
-        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-              <Sparkles className="text-yellow-500 fill-yellow-500" />
-              算法训练营
-            </h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">
-              精选高频面试题，助你攻克算法难关
-            </p>
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
+      <div className="max-w-7xl mx-auto px-4 py-10">
+        <div className="mb-10 relative overflow-hidden rounded-3xl border border-gray-200 dark:border-slate-800/80 bg-white/95 dark:bg-gradient-to-br dark:from-slate-900/80 dark:via-slate-950 dark:to-slate-900/90 px-6 py-6 sm:px-8 sm:py-8 shadow-lg dark:shadow-[0_18px_60px_rgba(15,23,42,0.9)]">
+          <div className="pointer-events-none absolute inset-0 opacity-60">
+            <div className="absolute -top-32 -left-32 h-64 w-64 rounded-full bg-cyan-300/20 dark:bg-cyan-500/20 blur-3xl" />
+            <div className="absolute -bottom-40 right-0 h-72 w-72 rounded-full bg-violet-300/25 dark:bg-violet-500/25 blur-3xl" />
           </div>
-          <div className="relative w-full md:w-96 group">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-            <Input
-              size="large"
-              placeholder="搜索题目、标签..."
-              prefix={<Search className="w-5 h-5 text-gray-400" />}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              className="w-full relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 focus:border-blue-500 transition-all rounded-xl shadow-sm"
-              allowClear
-            />
+          <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 rounded-full bg-slate-900/80 text-cyan-300 ring-1 ring-cyan-500/30 px-3 py-1 text-xs font-medium dark:bg-slate-900/80 dark:text-cyan-300 dark:ring-cyan-500/30 bg-slate-100 text-cyan-700 ring-cyan-200">
+                <Sparkles className="h-3.5 w-3.5 text-yellow-500 dark:text-yellow-400" />
+                前端 · 算法训练营
+              </div>
+              <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl dark:text-slate-50">
+                刷题练功房
+              </h1>
+              <p className="max-w-xl text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                覆盖基础、进阶与高频面试题，配合必刷标签与难度维度，你可以按图索骥，
+                像经营项目一样经营自己的算法能力。
+              </p>
+              <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+                <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 dark:bg-slate-900/70">
+                  <ThumbsUp className="h-3.5 w-3.5 text-emerald-500 dark:text-emerald-400" />
+                  高频题目精炼整理
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 dark:bg-slate-900/70">
+                  <Trophy className="h-3.5 w-3.5 text-amber-500 dark:text-amber-400" />
+                  必刷清单驱动练习
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 dark:bg-slate-900/70">
+                  <Target className="h-3.5 w-3.5 text-sky-500 dark:text-sky-400" />
+                  按主题拆解知识图谱
+                </span>
+              </div>
+            </div>
+            <div className="relative w-full max-w-sm">
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-300/15 via-transparent to-violet-300/10 blur-xl dark:from-cyan-500/15 dark:to-violet-500/10" />
+              <div className="relative rounded-2xl border border-gray-200 bg-white/95 p-3 shadow-lg dark:border-slate-700/80 dark:bg-slate-950/80 dark:shadow-[0_18px_50px_rgba(15,23,42,0.9)]">
+                <div className="mb-2 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                  <span>题库搜索</span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-500 dark:bg-slate-900 dark:text-slate-400">
+                    Ctrl + K
+                  </span>
+                </div>
+                <Input
+                  size="large"
+                  placeholder="搜索题目、标签..."
+                  prefix={<Search className="w-4 h-4 text-slate-400" />}
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  className="w-full rounded-xl border border-gray-200 bg-white text-slate-900 placeholder:text-slate-400 shadow-sm hover:border-cyan-400 focus:border-cyan-500 focus:ring-0 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-500 dark:hover:border-cyan-500/70 dark:focus:border-cyan-500/90"
+                  allowClear
+                />
+                <div className="mt-3 grid grid-cols-3 gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+                  <div className="flex flex-col rounded-xl bg-slate-50 px-2 py-2 dark:bg-slate-900/80">
+                    <span className="text-[10px] text-slate-500 dark:text-slate-500">当前主题</span>
+                    <span className="mt-1 text-xs font-semibold text-slate-900 dark:text-slate-100">
+                      {topicStats.total} 道
+                    </span>
+                  </div>
+                  <div className="flex flex-col rounded-xl bg-slate-50 px-2 py-2 dark:bg-slate-900/80">
+                    <span className="text-[10px] text-slate-500 dark:text-slate-500">必刷题</span>
+                    <span className="mt-1 text-xs font-semibold text-amber-500 dark:text-amber-300">
+                      {topicStats.must}
+                    </span>
+                  </div>
+                  <div className="flex flex-col rounded-xl bg-slate-50 px-2 py-2 dark:bg-slate-900/80">
+                    <span className="text-[10px] text-slate-500 dark:text-slate-500">难度分布</span>
+                    <span className="mt-1 text-[11px] text-slate-700 dark:text-slate-300">
+                      E{topicStats.easy} · M{topicStats.medium} · H{topicStats.hard}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* 左侧主题列表 */}
           <div className="w-full lg:w-72 flex-shrink-0">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 sticky top-24 max-h-[calc(100vh-8rem)] flex flex-col">
               <div className="flex items-center gap-2 mb-4 px-2">
@@ -225,18 +293,52 @@ const Algorithm = () => {
             </div>
           </div>
 
-          {/* 右侧题目列表 */}
           <div className="flex-1 min-w-0">
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-8 w-1 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full" />
+                <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-cyan-500/80 via-sky-500 to-blue-500 text-slate-950 flex items-center justify-center shadow-[0_12px_30px_rgba(8,47,73,0.7)]">
+                  <span className="text-xs font-semibold">DP</span>
+                </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
                     {selectedTopic}
                   </h2>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    收录 {filteredProblems.length} 道精选题目
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    当前条件下共 {filteredProblems.length} 道题目
                   </p>
+                </div>
+              </div>
+              <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-end">
+                <Segmented
+                  size="small"
+                  value={viewFilter}
+                  onChange={(v) => setViewFilter(v as "all" | "must")}
+                  options={[
+                    { label: "全部题目", value: "all" },
+                    { label: "只看必刷", value: "must" },
+                  ]}
+                  className="bg-white text-[11px] text-slate-700 border border-gray-200 dark:bg-slate-900/80 dark:text-slate-200 dark:border-slate-700/80"
+                />
+                <div className="inline-flex items-center gap-1 rounded-2xl bg-white px-2 py-1 text-[11px] text-slate-600 border border-gray-200 dark:bg-slate-900/80 dark:text-slate-300 dark:border-slate-700/80">
+                  <span className="mr-1 text-slate-500 dark:text-slate-400">难度</span>
+                  {(["全部", "简单", "中等", "困难"] as const).map((level) => {
+                    const isActive = difficultyFilter === level;
+                    return (
+                      <button
+                        key={level}
+                        type="button"
+                        onClick={() => setDifficultyFilter(level)}
+                        className={[
+                          "rounded-xl px-2 py-0.5 transition-all",
+                          isActive
+                            ? "bg-slate-900 text-slate-50 shadow-sm dark:bg-slate-50 dark:text-slate-900"
+                            : "text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800",
+                        ].join(" ")}
+                      >
+                        {level}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -254,15 +356,15 @@ const Algorithm = () => {
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.2, delay: index * 0.05 }}
                     key={problem.id}
-                    className="group relative bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800 transition-all duration-300"
+                    className="group relative rounded-2xl p-5 border bg-white shadow-sm border-gray-200 hover:border-cyan-300 hover:shadow-md dark:bg-slate-900/80 dark:border-slate-800/80 dark:shadow-[0_18px_40px_rgba(15,23,42,0.9)] dark:hover:border-cyan-500/60 dark:hover:shadow-[0_22px_60px_rgba(8,47,73,0.95)] transition-all duration-300"
                   >
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-2">
-                          <span className="flex items-center justify-center w-6 h-6 rounded bg-gray-100 dark:bg-gray-700 text-xs font-mono text-gray-500 dark:text-gray-400">
+                          <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-slate-100 text-xs font-mono text-slate-500 dark:bg-slate-800 dark:text-slate-400">
                             {index + 1}
                           </span>
-                          <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                          <h3 className="font-semibold text-sm sm:text-base text-slate-900 group-hover:text-cyan-600 dark:text-slate-50 dark:group-hover:text-cyan-400 transition-colors">
                             {problem.title}
                           </h3>
                           {problem.isMustSolve && (
@@ -276,7 +378,7 @@ const Algorithm = () => {
                           )}
                         </div>
                         <div className="flex flex-wrap items-center gap-2 pl-9">
-                          <Tag className="rounded-md border-0 bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-300 px-2 py-0.5 m-0">
+                          <Tag className="rounded-md border-0 bg-cyan-50 text-cyan-700 px-2 py-0.5 m-0 dark:bg-cyan-500/10 dark:text-cyan-300">
                             #{problem.tag}
                           </Tag>
                           <Tag 
@@ -294,14 +396,14 @@ const Algorithm = () => {
                             <Button
                               type="text"
                               size="small"
-                              className="text-gray-500 hover:text-red-500"
+                              className="text-slate-500 hover:text-amber-500 dark:text-slate-400 dark:hover:text-amber-300"
                               onClick={() => console.log("取消必刷", problem.id)}
                             >
                               取消必刷
                             </Button>
                             <Button
                               size="middle"
-                              className="rounded-xl border-blue-200 text-blue-600 hover:border-blue-400 hover:text-blue-500"
+                              className="rounded-xl border border-slate-200 text-slate-700 hover:border-cyan-400 hover:text-cyan-600 bg-white dark:border-slate-600 dark:text-slate-100 dark:hover:border-cyan-400 dark:hover:text-cyan-300 dark:bg-slate-900/80"
                               icon={<Play className="w-4 h-4" />}
                               onClick={() =>
                                 console.log("动画演示", problem.id)
@@ -314,6 +416,7 @@ const Algorithm = () => {
                           <Button
                             type="text"
                             size="small"
+                            className="text-slate-500 hover:text-amber-500 dark:text-slate-400 dark:hover:text-amber-300"
                             onClick={() => console.log("设为必刷", problem.id)}
                           >
                             设为必刷
@@ -322,7 +425,7 @@ const Algorithm = () => {
                         <Button
                           type="primary"
                           size="middle"
-                          className="rounded-xl bg-blue-600 hover:bg-blue-500 shadow-blue-200 dark:shadow-none shadow-lg"
+                          className="rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-500 hover:from-cyan-400 hover:to-sky-400 shadow-[0_14px_40px_rgba(8,47,73,0.9)] border-0"
                           icon={<FileText className="w-4 h-4" />}
                           onClick={() => {
                             navigate(`/front/articleDetail/1998194863023136770`);
@@ -338,16 +441,16 @@ const Algorithm = () => {
             </motion.div>
 
             {filteredProblems.length === 0 && (
-              <motion.div 
-                initial={{ opacity: 0 }} 
+              <motion.div
+                initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="bg-white dark:bg-gray-800 rounded-2xl p-12 text-center border border-gray-100 dark:border-gray-700 shadow-sm"
+                className="rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-sm dark:border-slate-800/80 dark:bg-slate-900/80 dark:shadow-[0_18px_50px_rgba(15,23,42,0.9)]"
               >
-                <Empty 
-                  image={Empty.PRESENTED_IMAGE_SIMPLE} 
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
                   description={
-                    <span className="text-gray-500 dark:text-gray-400">
-                      暂无相关题目，换个关键词试试？
+                    <span className="text-slate-500 dark:text-slate-400">
+                      暂无相关题目，尝试切换难度或主题再试试看。
                     </span>
                   }
                 />

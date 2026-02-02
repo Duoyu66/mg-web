@@ -769,6 +769,30 @@ const Home = () => {
                     paragraph={{ rows: 3, width: ["100%", "80%", "60%"] }}
                     active
                   />
+                      <Skeleton
+                    avatar={{ size: 48, shape: "circle" }}
+                    title={{ width: "30%" }}
+                    paragraph={{ rows: 3, width: ["100%", "80%", "60%"] }}
+                    active
+                  />
+                      <Skeleton
+                    avatar={{ size: 48, shape: "circle" }}
+                    title={{ width: "30%" }}
+                    paragraph={{ rows: 3, width: ["100%", "80%", "60%"] }}
+                    active
+                  />
+                            <Skeleton
+                    avatar={{ size: 48, shape: "circle" }}
+                    title={{ width: "30%" }}
+                    paragraph={{ rows: 3, width: ["100%", "80%", "60%"] }}
+                    active
+                  />
+                            <Skeleton
+                    avatar={{ size: 48, shape: "circle" }}
+                    title={{ width: "30%" }}
+                    paragraph={{ rows: 3, width: ["100%", "80%", "60%"] }}
+                    active
+                  />
                 </div>
               )}
               {!hasNextPage && records.length > 0 && (

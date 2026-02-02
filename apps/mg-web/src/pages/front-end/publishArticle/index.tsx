@@ -115,7 +115,7 @@ const PublishArticle = () => {
           "ai",
           "printer",
           "attachment",
-          "source-code",
+          // "source-code",
           "image",
           "video",
           "line-height",
@@ -177,7 +177,7 @@ const PublishArticle = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col h-screen overflow-hidden">
       {/* 顶部导航栏 */}
       <header className="sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 h-16 flex-shrink-0">
-        <div className="max-w-[1920px] mx-auto px-4 h-full flex items-center justify-between">
+        <div className=" mx-0 px-4 h-full flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button 
               type="text" 
