@@ -349,7 +349,14 @@ const Header = () => {
                         className="hidden md:flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full px-3"
                     >
                         控制台
-                    </Button>       
+                    </Button>  
+                    <Button 
+                        type="text"
+                        onClick={() => navigate("/front/creator")}
+                        className="hidden md:flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full px-3"
+                    >
+                        创作中心
+                    </Button>     
                     {/* Action Buttons */}
                     <div className="flex items-center gap-2 ml-2">
                         {!isLoggedIn && (

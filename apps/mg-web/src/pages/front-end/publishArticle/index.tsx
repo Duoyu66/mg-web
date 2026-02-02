@@ -115,6 +115,11 @@ const PublishArticle = () => {
           "ai",
           "printer",
           "attachment",
+          "source-code",
+          "image",
+          "video",
+          "line-height",
+          "font-size"
         ],
         onMentionQuery: (query: string) => {
           const text = query.toLowerCase();

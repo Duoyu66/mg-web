@@ -48,6 +48,7 @@ import TutorialPage from "@/pages/front-end/tutorial";
 import LearningHub from "@/pages/front-end/learning";
 import CareerHub from "@/pages/front-end/career";
 import RoadmapDocPage from "@/pages/roadmapDoc";
+import CreatorCenter from "@/pages/front-end/creator";
 import ExercisePage from "@/pages/front-end/exercise";
 import AdminLayout from '@/pages/admin/layout';
 import AdminDashboard from '@/pages/admin/home';
@@ -351,6 +352,14 @@ const routes = [
                 meta: {
                     age: 1,
                     name: "张三"
+                }
+            },
+            {
+                title: '创作中心',
+                path: "creator",
+                component: CreatorCenter,
+                meta: {
+                    showFooter: false
                 }
             },
             {

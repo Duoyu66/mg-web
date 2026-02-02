@@ -35,11 +35,14 @@ type MentionOption = {
 import Aside from "./aside";
 import VipIcon from "@/components/vipIcon";
 
+type NavKey = "follow" | "recommend" | "frontend" | "backend" | "ops" | "test";
+
 const Home = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const [activeTab, setActiveTab] = useState<"recommend" | "follow">("recommend");
+  const [activeNavKey, setActiveNavKey] = useState<NavKey>("recommend");
 
   const queryParams = useMemo(
     () =>
@@ -78,6 +81,23 @@ const Home = () => {
     { value: "user2", label: "用户2" },
     { value: "user3", label: "用户3" },
   ];
+
+  const navTabs = [
+    { key: "follow", label: "关注" },
+    { key: "recommend", label: "推荐" },
+    { key: "frontend", label: "前端" },
+    { key: "backend", label: "后端" },
+    { key: "ops", label: "运维" },
+    { key: "test", label: "测试" },
+        { key: "algorithm", label: "算法" },
+        { key: "other", label: "其他" },
+  ] as const;
+
+  useEffect(() => {
+    if (activeNavKey === "recommend" || activeNavKey === "follow") {
+      setActiveTab(activeNavKey);
+    }
+  }, [activeNavKey]);
 
   const records = useMemo(() => {
     return data?.pages.flatMap((page) => page.list || []) || [];
@@ -257,27 +277,37 @@ const Home = () => {
                 className={`flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-800 rounded-tl-xl rounded-tr-xl transition-shadow duration-300 ${scrolled ? "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.05)]" : ""
                   }`}
               >
-                <div className="inline-flex items-center bg-gray-100 dark:bg-gray-700 rounded-full p-1">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("recommend")}
-                    className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${activeTab === "recommend"
-                        ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm"
-                        : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-                      }`}
-                  >
-                    推荐
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("follow")}
-                    className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${activeTab === "follow"
-                        ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm"
-                        : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-                      }`}
-                  >
-                    关注
-                  </button>
+                <div className="flex-1 overflow-x-auto scrollbar-hide">
+                  <div className="flex items-center gap-8 min-w-max">
+                    {navTabs.map((tab) => {
+                      const isActive = activeNavKey === tab.key;
+                      return (
+                        <button
+                          key={tab.key}
+                          type="button"
+                          onClick={() => setActiveNavKey(tab.key as NavKey)}
+                          className="flex cursor-pointer pb-1 relative flex-col border items-center flex-shrink-0"
+                        >
+                          <span
+                            className={`text-base ${
+                              isActive
+                                ? "text-emerald-500 font-bold"
+                                : "text-gray-500 dark:text-gray-400"
+                            }`}
+                          >
+                            {tab.label}
+                          </span>
+                          <span
+                            className={`mt-1 left-0 absolute bottom-[0px] h-[5px] ${
+                              isActive ? "w-[12px]" : "w-0"
+                            } rounded-full ${
+                              isActive ? "bg-emerald-500" : "bg-transparent"
+                            }`}
+                          />
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
                 <button
                   type="button"
