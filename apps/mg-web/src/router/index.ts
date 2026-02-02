@@ -58,6 +58,7 @@ import AdminArticle from '@/pages/admin/article';
 import AdminUser from '@/pages/admin/user';
 import AdminRolesPage from '@/pages/admin/system/roles';
 import AdminUserRolesPage from '@/pages/admin/system/userRoles';
+import AdminMember from '@/pages/admin/member';
 import SiteMap from '@/pages/SiteMap';
 
 import RoadmapExamPage from "@/pages/front-end/route/RoadmapExamPage";
@@ -143,6 +144,11 @@ const routes = [
                 title: "控制台"
             },
             {
+                path: "creator",
+                component: CreatorCenter,
+                title: "创作中心"
+            },
+            {
                 path: "company",
                 component: AdminCompanyList,
                 title: "面试公司管理"
@@ -156,6 +162,11 @@ const routes = [
                 path: "article",
                 component: AdminArticle,
                 title: "文章管理"
+            },
+            {
+                path: "member",
+                component: AdminMember,
+                title: "会员管理"
             },
             {
                 path: "user",

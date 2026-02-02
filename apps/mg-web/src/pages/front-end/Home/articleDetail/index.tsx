@@ -849,64 +849,33 @@ session.sendMessage(new TextMessage(json));
     </div>
   );
 
-  // 右侧目录组件 - 定位在内容区域右侧外，与侧边栏占位对齐
-  const RightToc = () => {
+  // 右侧目录：使用容器内粘性布局，避免覆盖内容
+  const TocAside = () => {
     if (toc.length === 0) return null;
-    
-    // 计算位置：主容器 max-w-7xl (80rem) 居中，目录应该在内容区域右侧外
-    // 主容器右边距 = (100vw - 80rem) / 2
-    // 目录应该在主容器右侧外，距离主容器右边约 1rem
-    const getRightPosition = () => {
-      if (typeof window === 'undefined') return '1rem';
-      const viewportWidth = window.innerWidth;
-      const maxContentWidth = 1280; // 80rem = 1280px
-      const rightPadding = 16; // 1rem = 16px (主容器的右边padding)
-      
-      if (viewportWidth <= maxContentWidth) {
-        // 小屏幕时，目录紧贴视口右边，减去右边padding
-        return `${rightPadding}px`;
-      }
-      
-      // 大屏幕时，计算内容区域右边界的位置
-      // 主容器居中后的左边距 = (100vw - 1280px) / 2
-      // 内容区域右边界 = 左边距 + 1280px - 16px (右边padding)
-      // 目录的 right = 视口宽度 - 内容区域右边界
-      const leftMargin = (viewportWidth - maxContentWidth) / 2;
-      const contentRightEdge = leftMargin + maxContentWidth - rightPadding;
-      const rightPosition = viewportWidth - contentRightEdge;
-      
-      return `${rightPosition}px`;
-    };
-
     return (
-      <div 
-        className="fixed top-16 z-[9998] w-80"
-        style={{ 
-          right: getRightPosition()
-        }}
-      >
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 max-h-[calc(100vh-3rem)] overflow-y-auto">
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">
-            目录
-          </h3>
-          <div className="space-y-1">
-            {toc.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => scrollToHeading(item.id)}
-                className={`w-full text-left px-3 py-2 rounded-lg transition-colors text-sm ${
-                  activeTocId === item.id
-                    ? "bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 border-l-2 border-primary-600 dark:border-primary-400"
-                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
-                }`}
-                style={{ paddingLeft: `${(item.level - 1) * 12 + 12}px` }}
-              >
-                {item.text}
-              </button>
-            ))}
+      <aside className="hidden xl:block w-80 flex-shrink-0">
+        <div className="sticky top-20">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 max-h-[calc(100vh-5rem)] overflow-y-auto border border-gray-200 dark:border-gray-700">
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">目录</h3>
+            <div className="space-y-1">
+              {toc.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => scrollToHeading(item.id)}
+                  className={`w-full text-left px-3 py-2 rounded-lg transition-colors text-sm ${
+                    activeTocId === item.id
+                      ? "bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 border-l-2 border-primary-600 dark:border-primary-400"
+                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  }`}
+                  style={{ paddingLeft: `${(item.level - 1) * 12 + 12}px` }}
+                >
+                  {item.text}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      </aside>
     );
   };
 
@@ -914,7 +883,6 @@ session.sendMessage(new TextMessage(json));
     <>
       {/* 使用 Portal 将 fixed 元素渲染到 body，避免受父容器 transform 影响 */}
       {typeof document !== 'undefined' && createPortal(<LeftActionBar />, document.body)}
-      {typeof document !== 'undefined' && createPortal(<RightToc />, document.body)}
 
       {/* 主容器 */}
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -1201,8 +1169,8 @@ session.sendMessage(new TextMessage(json));
             </div>
           </div>
 
-          {/* 侧边栏占位 - 保持布局 */}
-          <div className="w-80 flex-shrink-0"></div>
+          {/* 右侧目录（容器内粘性布局） */}
+          <TocAside />
         </div>
         </div>
       </div>

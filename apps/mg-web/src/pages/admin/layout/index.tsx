@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Layout, Menu, Breadcrumb, Avatar, theme, Select, Space, Tag, Result, Button } from 'antd';
-import { PieChartOutlined, UserOutlined, BankOutlined, BookOutlined, ReadOutlined, HomeOutlined, SettingOutlined } from '@ant-design/icons';
+import { PieChartOutlined, UserOutlined, BankOutlined, BookOutlined, ReadOutlined, HomeOutlined, SettingOutlined, CrownOutlined, EditOutlined } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '@/components/context/useTheme';
 import { canAccessAdminPath, getAdminRoleById, getAdminRoles, getAdminUsers, getCurrentAdminUser, setCurrentAdminUserId } from '@/utils/adminRbac';
@@ -29,6 +29,8 @@ const menuConfig: MenuConfigItem[] = [
   { key: '/front/admin/company', label: '面试公司管理', icon: <BankOutlined />, path: '/front/admin/company', permissionKey: '/front/admin/company' },
   { key: '/front/admin/question', label: '题库管理', icon: <BookOutlined />, path: '/front/admin/question', permissionKey: '/front/admin/question' },
   { key: '/front/admin/article', label: '文章管理', icon: <ReadOutlined />, path: '/front/admin/article', permissionKey: '/front/admin/article' },
+  { key: '/front/admin/member', label: '会员管理', icon: <CrownOutlined />, path: '/front/admin/member', permissionKey: '/front/admin/member' },
+  { key: '/front/admin/creator', label: '创作中心', icon: <EditOutlined />, path: '/front/admin/creator', permissionKey: '/front/admin/creator' },
   { key: '/front/admin/user', label: '用户管理', icon: <UserOutlined />, path: '/front/admin/user', permissionKey: '/front/admin/user' },
   {
     key: '/front/admin/system',

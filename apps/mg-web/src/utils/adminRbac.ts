@@ -39,6 +39,7 @@ const ADMIN_PERMISSION_TREE: PermissionTreeNode[] = [
       { key: '/front/admin/company', title: '面试公司管理' },
       { key: '/front/admin/question', title: '题库管理' },
       { key: '/front/admin/article', title: '文章管理' },
+      { key: '/front/admin/member', title: '会员管理' },
       { key: '/front/admin/user', title: '用户管理' },
       {
         key: 'group:system',
@@ -49,6 +50,7 @@ const ADMIN_PERMISSION_TREE: PermissionTreeNode[] = [
           { key: '/front/admin/system/user-roles', title: '用户角色分配' },
         ],
       },
+      { key: '/front/admin/creator', title: '创作中心' },
     ],
   },
 ];
@@ -160,7 +162,24 @@ function ensureInitialized() {
 export function getAdminRoles(): AdminRole[] {
   ensureInitialized();
   if (!isBrowser()) return getDefaultRoles();
-  return safeParseJson<AdminRole[]>(window.localStorage.getItem(STORAGE_KEYS.roles)) ?? getDefaultRoles();
+  const stored = safeParseJson<AdminRole[]>(window.localStorage.getItem(STORAGE_KEYS.roles)) ?? getDefaultRoles();
+  const allKeys = listAdminPermissionKeys();
+  let updated = false;
+  const next = stored.map(r => {
+    if (r.id === 'role_super_admin') {
+      // 超级管理员自动拥有最新的全部权限
+      const hasAll = allKeys.every(k => r.permissions.includes(k));
+      if (!hasAll || r.permissions.length !== allKeys.length) {
+        updated = true;
+        return { ...r, permissions: allKeys };
+      }
+    }
+    return r;
+  });
+  if (updated && isBrowser()) {
+    window.localStorage.setItem(STORAGE_KEYS.roles, JSON.stringify(next));
+  }
+  return next;
 }
 
 export function saveAdminRoles(roles: AdminRole[]) {
