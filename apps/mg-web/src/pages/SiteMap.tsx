@@ -80,6 +80,7 @@ const siteRoutes: RouteItem[] = [
       { title: '文章管理', path: '/front/admin/article' },
       { title: '会员管理', path: '/front/admin/member' },
       { title: '创作中心', path: '/front/admin/creator' },
+      { title: '收入分析', path: '/front/admin/revenue' },
       { title: '用户管理', path: '/front/admin/user' },
       { title: '角色管理', path: '/front/admin/system/roles' },
       { title: '用户角色分配', path: '/front/admin/system/user-roles' },

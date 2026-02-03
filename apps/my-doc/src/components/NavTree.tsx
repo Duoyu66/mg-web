@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import type { DirectoryNode, DocNode } from "@/lib/docs";
 import type { UserRole } from "@/lib/auth";
 
-const STORAGE_KEY = "nav-tree-expanded";
+const STORAGE_KEY_PREFIX = "nav-tree-expanded";
 
 type NavTreeProps = {
   tree: DirectoryNode[];
@@ -17,22 +17,18 @@ type NavTreeProps = {
 
 export function NavTree({ tree, currentSegments, userRole, moduleTitle }: NavTreeProps) {
   const pathname = usePathname();
-  // 判断是否在书籍页面，使用 useMemo 稳定值
   const isBookPage = useMemo(() => pathname.startsWith("/books/"), [pathname]);
+  const storageKey = moduleTitle ? `${STORAGE_KEY_PREFIX}-${moduleTitle}` : STORAGE_KEY_PREFIX;
   
-  // 在顶层管理展开状态，确保所有层级共享
-  // 服务器端和客户端都初始化为空 Set，避免 hydration 错误
   const [expandedItems, setExpandedItems] = useState<Set<string>>(() => {
-    // 使用 lazy initialization，在客户端立即读取 sessionStorage
     if (typeof window === "undefined") return new Set();
     try {
-      const saved = sessionStorage.getItem(STORAGE_KEY);
+      const saved = sessionStorage.getItem(storageKey);
       if (saved) {
         const items = JSON.parse(saved) as string[];
         return new Set(items);
       }
     } catch {
-      // 忽略解析错误
     }
     return new Set();
   });
@@ -45,20 +41,18 @@ export function NavTree({ tree, currentSegments, userRole, moduleTitle }: NavTre
     }
   }, []);
 
-  // 保存展开状态到 sessionStorage（使用防抖，避免频繁写入）
   useEffect(() => {
     if (!isHydratedRef.current || typeof window === "undefined") return;
     
     const timer = setTimeout(() => {
       try {
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(expandedItems)));
+        sessionStorage.setItem(storageKey, JSON.stringify(Array.from(expandedItems)));
       } catch {
-        // 忽略存储错误
       }
-    }, 100); // 100ms 防抖
+    }, 100);
     
     return () => clearTimeout(timer);
-  }, [expandedItems]);
+  }, [expandedItems, storageKey]);
 
   const toggleExpand = (key: string) => {
     setExpandedItems((prev) => {

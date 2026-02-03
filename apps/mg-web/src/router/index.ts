@@ -59,6 +59,9 @@ import AdminUser from '@/pages/admin/user';
 import AdminRolesPage from '@/pages/admin/system/roles';
 import AdminUserRolesPage from '@/pages/admin/system/userRoles';
 import AdminMember from '@/pages/admin/member';
+import AdminRevenuePage from '@/pages/admin/revenue';
+import AdminOrderPage from '@/pages/admin/order';
+import AdminBillPage from '@/pages/admin/bill';
 import SiteMap from '@/pages/SiteMap';
 
 import RoadmapExamPage from "@/pages/front-end/route/RoadmapExamPage";
@@ -167,6 +170,21 @@ const routes = [
                 path: "member",
                 component: AdminMember,
                 title: "会员管理"
+            },
+            {
+                path: "revenue",
+                component: AdminRevenuePage,
+                title: "收入分析"
+            },
+            {
+                path: "order",
+                component: AdminOrderPage,
+                title: "订单管理"
+            },
+            {
+                path: "bill",
+                component: AdminBillPage,
+                title: "账单管理"
             },
             {
                 path: "user",

@@ -40,6 +40,9 @@ const ADMIN_PERMISSION_TREE: PermissionTreeNode[] = [
       { key: '/front/admin/question', title: '题库管理' },
       { key: '/front/admin/article', title: '文章管理' },
       { key: '/front/admin/member', title: '会员管理' },
+      { key: '/front/admin/revenue', title: '收入分析' },
+      { key: '/front/admin/order', title: '订单管理' },
+      { key: '/front/admin/bill', title: '账单管理' },
       { key: '/front/admin/user', title: '用户管理' },
       {
         key: 'group:system',

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "木瓜文档系统",
+  title: "文档系统",
   description: "基于 Next.js 的木瓜编程内部文档系统",
 };
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Layout, Menu, Breadcrumb, Avatar, theme, Select, Space, Tag, Result, Button } from 'antd';
-import { PieChartOutlined, UserOutlined, BankOutlined, BookOutlined, ReadOutlined, HomeOutlined, SettingOutlined, CrownOutlined, EditOutlined } from '@ant-design/icons';
+import { PieChartOutlined, UserOutlined, BankOutlined, BookOutlined, ReadOutlined, HomeOutlined, SettingOutlined, CrownOutlined, EditOutlined, FundOutlined, ShoppingOutlined, ReconciliationOutlined } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '@/components/context/useTheme';
 import { canAccessAdminPath, getAdminRoleById, getAdminRoles, getAdminUsers, getCurrentAdminUser, setCurrentAdminUserId } from '@/utils/adminRbac';
@@ -31,6 +31,9 @@ const menuConfig: MenuConfigItem[] = [
   { key: '/front/admin/article', label: '文章管理', icon: <ReadOutlined />, path: '/front/admin/article', permissionKey: '/front/admin/article' },
   { key: '/front/admin/member', label: '会员管理', icon: <CrownOutlined />, path: '/front/admin/member', permissionKey: '/front/admin/member' },
   { key: '/front/admin/creator', label: '创作中心', icon: <EditOutlined />, path: '/front/admin/creator', permissionKey: '/front/admin/creator' },
+  { key: '/front/admin/revenue', label: '收入分析', icon: <FundOutlined />, path: '/front/admin/revenue', permissionKey: '/front/admin/revenue' },
+  { key: '/front/admin/order', label: '订单管理', icon: <ShoppingOutlined />, path: '/front/admin/order', permissionKey: '/front/admin/order' },
+  { key: '/front/admin/bill', label: '账单管理', icon: <ReconciliationOutlined />, path: '/front/admin/bill', permissionKey: '/front/admin/bill' },
   { key: '/front/admin/user', label: '用户管理', icon: <UserOutlined />, path: '/front/admin/user', permissionKey: '/front/admin/user' },
   {
     key: '/front/admin/system',
@@ -123,32 +126,78 @@ const AdminLayout: React.FC = () => {
   const items = generateMenuItems(filteredMenuConfig);
   const breadcrumbNameMap = generateBreadcrumbMap(menuConfig);
 
+  const findMenuConfigItemByKey = (nodes: MenuConfigItem[], key: string): MenuConfigItem | undefined => {
+    for (const node of nodes) {
+      if (node.key === key || node.path === key) {
+        return node;
+      }
+      if (node.children && node.children.length > 0) {
+        const found = findMenuConfigItemByKey(node.children, key);
+        if (found) return found;
+      }
+    }
+    return undefined;
+  };
+
+  const hasRouteForPath = (path: string): boolean => {
+    const traverse = (nodes: MenuConfigItem[]): boolean => {
+      for (const node of nodes) {
+        if (node.path === path) return true;
+        if (node.children && node.children.length > 0 && traverse(node.children)) return true;
+      }
+      return false;
+    };
+    return traverse(menuConfig);
+  };
+
   const handleMenuClick = (e: { key: string }) => {
-    navigate(e.key);
+    const target = findMenuConfigItemByKey(filteredMenuConfig, e.key);
+    if (target && target.path) {
+      navigate(target.path);
+    }
   };
 
   const pathSnippets = location.pathname.split('/').filter(i => i);
   const breadcrumbItems = [
-    { title: '后台管理' },
+    {
+      title: '后台管理',
+      key: '/front/admin',
+      onClick: () => navigate('/front/admin'),
+    },
     ...pathSnippets.map((_, index) => {
       const url = `/${pathSnippets.slice(0, index + 1).join('/')}`;
       if (breadcrumbNameMap[url]) {
-         return { title: breadcrumbNameMap[url] };
+        const clickable = hasRouteForPath(url);
+        if (clickable) {
+          return {
+            title: breadcrumbNameMap[url],
+            key: url,
+            onClick: () => navigate(url),
+          };
+        }
+        return {
+          title: breadcrumbNameMap[url],
+          key: url,
+        };
       }
       return null;
-    }).filter(item => item !== null) as { title: string }[]
+    }).filter(item => item !== null) as { title: string; key: string; onClick?: () => void }[]
   ];
   
   // Ensure we at least have the dashboard if we are at root admin
   if (location.pathname === '/front/admin' && breadcrumbItems.length === 1) {
-      breadcrumbItems.push({ title: '控制台' });
+      breadcrumbItems.push({
+        title: '控制台',
+        key: '/front/admin',
+        onClick: () => navigate('/front/admin'),
+      });
   }
 
   const canAccess = canAccessAdminPath(location.pathname, currentRole);
   const defaultEntry = currentRole?.permissions?.[0] || '/front/home';
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ height: '100vh', overflow: 'hidden' }}>
       <Sider 
         theme={currentTheme === 'dark' ? 'dark' : 'light'} 
         collapsible 
@@ -181,7 +230,7 @@ const AdminLayout: React.FC = () => {
             style={{ borderRight: 0 }}
         />
       </Sider>
-      <Layout>
+      <Layout style={{ display: 'flex', flexDirection: 'column' }}>
         <Header style={{ padding: 0, background: colorBgContainer, display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingRight: 24, boxShadow: currentTheme === 'dark' ? '0 1px 4px rgba(0,0,0,0.5)' : '0 1px 4px rgba(0,21,41,.08)', zIndex: 1 }}>
            <div className="px-4">
              <span className="text-lg font-bold" style={{ color: currentTheme === 'dark' ? '#fff' : '#1890ff' }}>MG 编程管理系统</span>
@@ -213,35 +262,60 @@ const AdminLayout: React.FC = () => {
              />
            </div>
         </Header>
-        <Content style={{ margin: '0 16px', overflow: 'hidden' }}>
-          <Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />
-          <div
-            style={{
-              padding: 24,
-              minHeight: 360,
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-            }}
-          >
-            {canAccess ? (
-              <Outlet />
-            ) : (
-              <Result
-                status="403"
-                title="没有权限"
-                subTitle="当前用户无权访问该页面，请联系管理员或切换角色。"
-                extra={
-                  <Button type="primary" onClick={() => navigate(defaultEntry)}>
-                    返回可访问页面
-                  </Button>
+        <Content style={{ margin: '16px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ margin: '8px 0 16px', flexShrink: 0 }}>
+            <Breadcrumb
+              items={breadcrumbItems}
+              itemRender={(route, _params, _routes, _paths) => {
+                const item = route as unknown as { title: React.ReactNode; key?: string; onClick?: () => void };
+                const isClickable = !!item.onClick;
+                if (!isClickable) {
+                  return (
+                    <span className="inline-flex items-center px-2 py-0.5 text-gray-500">
+                      {item.title}
+                    </span>
+                  );
                 }
-              />
-            )}
+                return (
+                  <span
+                    onClick={item.onClick}
+                    className="inline-flex items-center px-2 py-0.5 rounded-md cursor-pointer text-gray-600 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/40 transition-colors"
+                  >
+                    {item.title}
+                  </span>
+                );
+              }}
+            />
+          </div>
+          <div style={{ flex: 1, overflow: 'auto' }}>
+            <div
+              style={{
+                padding: 24,
+                minHeight: 360,
+                background: colorBgContainer,
+                borderRadius: borderRadiusLG,
+              }}
+            >
+              {canAccess ? (
+                <Outlet />
+              ) : (
+                <Result
+                  status="403"
+                  title="没有权限"
+                  subTitle="当前用户无权访问该页面，请联系管理员或切换角色。"
+                  extra={
+                    <Button type="primary" onClick={() => navigate(defaultEntry)}>
+                      返回可访问页面
+                    </Button>
+                  }
+                />
+              )}
+            </div>
           </div>
         </Content>
-        <Footer style={{ textAlign: 'center' }}>
+        {/* <Footer style={{ textAlign: 'center' }}>
           MG编程 ©{new Date().getFullYear()} 由 MG 制作
-        </Footer>
+        </Footer> */}
       </Layout>
     </Layout>
   );

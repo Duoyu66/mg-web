@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
 
-interface Order {
+export interface Order {
     id: string;
     productName: string;
     amount: number;
